@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -6,6 +6,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
     Form,
     FormControl,
@@ -22,7 +23,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Upload, User } from 'lucide-react';
 
 const signupSchema = z.object({
     firstName: z.string().min(2, 'First name is too short'),
@@ -32,6 +33,7 @@ const signupSchema = z.object({
     password: z.string().min(6, 'Password must be at least 6 characters'),
     confirmPassword: z.string(),
     role: z.enum(['Admin', 'Manager', 'Editor', 'Viewer']),
+    profilePic: z.string().optional(),
 }).refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
     path: ["confirmPassword"],
@@ -41,6 +43,8 @@ const SignupPage = () => {
     const { register } = useAuth();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = React.useState(false);
+    const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+    const [profilePicPreview, setProfilePicPreview] = useState<string>('');
 
     const form = useForm<z.infer<typeof signupSchema>>({
         resolver: zodResolver(signupSchema),
@@ -52,13 +56,79 @@ const SignupPage = () => {
             password: '',
             confirmPassword: '',
             role: 'Admin',
+            profilePic: '',
         },
     });
+
+    const handleProfilePicChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            // Check file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size must be less than 5MB');
+                return;
+            }
+
+            // Check file type
+            if (!file.type.startsWith('image/')) {
+                alert('Please select an image file');
+                return;
+            }
+
+            setProfilePicFile(file);
+            
+            // Create image and resize/compress if needed
+            const img = new Image();
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                img.onload = () => {
+                    // Resize image to max 300x300 pixels for better performance
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Calculate new dimensions maintaining aspect ratio
+                    let { width, height } = img;
+                    const maxSize = 300;
+                    
+                    if (width > height) {
+                        if (width > maxSize) {
+                            height = (height * maxSize) / width;
+                            width = maxSize;
+                        }
+                    } else {
+                        if (height > maxSize) {
+                            width = (width * maxSize) / height;
+                            height = maxSize;
+                        }
+                    }
+                    
+                    canvas.width = width;
+                    canvas.height = height;
+                    
+                    // Draw and compress image
+                    ctx?.drawImage(img, 0, 0, width, height);
+                    const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.8);
+                    
+                    setProfilePicPreview(compressedDataUrl);
+                };
+                img.src = e.target?.result as string;
+            };
+            reader.readAsDataURL(file);
+        }
+    };
 
     const onSubmit = async (values: z.infer<typeof signupSchema>) => {
         try {
             setIsLoading(true);
-            await register(values);
+            
+            // Prepare form data for submission
+            const submitData = {
+                ...values,
+                profilePic: profilePicPreview || values.profilePic
+            };
+            
+            await register(submitData);
             navigate('/admin/dashboard');
         } catch (error) {
             console.error(error);
@@ -135,6 +205,49 @@ const SignupPage = () => {
                                     </FormItem>
                                 )}
                             />
+
+                            <div className="space-y-4">
+                                <FormItem>
+                                    <FormLabel>Profile Picture (Optional)</FormLabel>
+                                    <div className="flex items-center gap-4">
+                                        <Avatar className="h-20 w-20">
+                                            <AvatarImage src={profilePicPreview} alt="Profile preview" />
+                                            <AvatarFallback>
+                                                {profilePicPreview ? (
+                                                    <User className="h-8 w-8" />
+                                                ) : (
+                                                    <User className="h-8 w-8" />
+                                                )}
+                                            </AvatarFallback>
+                                        </Avatar>
+                                        <div className="flex-1">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleProfilePicChange}
+                                                className="hidden"
+                                                id="profile-pic-upload"
+                                            />
+                                            <label htmlFor="profile-pic-upload">
+                                                <Button
+                                                    type="button"
+                                                    variant="outline"
+                                                    className="cursor-pointer"
+                                                    asChild
+                                                >
+                                                    <span>
+                                                        <Upload className="w-4 h-4 mr-2" />
+                                                        Upload Photo
+                                                    </span>
+                                                </Button>
+                                            </label>
+                                            <p className="text-xs text-slate-500 mt-1">
+                                                JPG, PNG or GIF. Max size 5MB.
+                                            </p>
+                                        </div>
+                                    </div>
+                                </FormItem>
+                            </div>
 
                             <div className="grid grid-cols-2 gap-4">
                                 <FormField
