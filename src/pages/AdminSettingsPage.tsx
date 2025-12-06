@@ -2,12 +2,14 @@ import React from 'react';
 import AdminLayout from '@/components/Admin/AdminLayout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { User, Shield, Settings, Bell, Users, Mail, MessageSquare, Database, Globe, Activity } from 'lucide-react';
+import { User, Shield, Settings, Bell, Users, Mail, MessageSquare, Database, Globe, Activity, Users2 } from 'lucide-react';
 
 import AdminProfilePage from './AdminProfilePage';
+import UsersTab from '@/components/Admin/UsersTab';
 
 // Placeholder components for tabs (will be implemented individually)
 const ProfileTab = () => <AdminProfilePage />;
+const UsersTabComponent = () => <UsersTab />;
 const SecurityTab = () => <div>Security Settings Content</div>;
 const GeneralTab = () => <div>General Settings Content</div>;
 const NotificationsTab = () => <div>Notification Settings Content</div>;
@@ -31,6 +33,10 @@ const AdminSettingsPage = () => {
                         <TabsTrigger value="profile" className="data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-slate-200">
                             <User className="h-4 w-4 md:mr-2" />
                             <span className="hidden md:inline">Profile</span>
+                        </TabsTrigger>
+                        <TabsTrigger value="users" className="data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-slate-200">
+                            <Users2 className="h-4 w-4 md:mr-2" />
+                            <span className="hidden md:inline">Users</span>
                         </TabsTrigger>
                         <TabsTrigger value="security" className="data-[state=active]:bg-white data-[state=active]:shadow-sm border border-transparent data-[state=active]:border-slate-200">
                             <Shield className="h-4 w-4 md:mr-2" />
@@ -68,6 +74,7 @@ const AdminSettingsPage = () => {
 
                     <div className="mt-6">
                         <TabsContent value="profile"><ProfileTab /></TabsContent>
+                        <TabsContent value="users"><UsersTabComponent /></TabsContent>
                         <TabsContent value="security"><SecurityTab /></TabsContent>
                         <TabsContent value="general"><GeneralTab /></TabsContent>
                         <TabsContent value="notifications"><NotificationsTab /></TabsContent>

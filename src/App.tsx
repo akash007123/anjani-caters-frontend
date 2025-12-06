@@ -17,6 +17,7 @@ import Quote from "./pages/Quote";
 import AdminContactsPage from "./pages/AdminContactsPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
+import AdminAddUsersPage from "./pages/AdminAddUsersPage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -59,6 +60,11 @@ const App = () => (
               <Route path="/admin/dashboard" element={
                 <ProtectedRoute>
                   <AdminDashboard />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/add-user" element={
+                <ProtectedRoute>
+                  <AdminAddUsersPage />
                 </ProtectedRoute>
               } />
 

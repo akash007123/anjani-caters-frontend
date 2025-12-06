@@ -76,4 +76,20 @@ export const authApiService = {
         const response = await authApi.put<{ success: boolean; message: string }>('/password', passwordData);
         return response.data;
     },
+
+    // User management methods for admin
+    getAllUsers: async () => {
+        const response = await authApi.get<{ success: boolean; count: number; data: User[] }>('/users');
+        return response.data;
+    },
+
+    updateUser: async (userId: string, userData: Partial<User>) => {
+        const response = await authApi.put<{ success: boolean; data: User; message: string }>(`/users/${userId}`, userData);
+        return response.data;
+    },
+
+    deleteUser: async (userId: string) => {
+        const response = await authApi.delete<{ success: boolean; message: string }>(`/users/${userId}`);
+        return response.data;
+    },
 };
