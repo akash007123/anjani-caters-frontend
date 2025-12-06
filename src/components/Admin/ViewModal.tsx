@@ -1,204 +1,112 @@
 import React from 'react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Mail, Phone, Calendar, MessageSquare, User, Edit } from 'lucide-react';
-import { Contact } from '@/services/contactApi';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { Mail, Phone, Calendar, User, MessageSquare, Tag, AlertCircle } from "lucide-react";
+import { Contact } from "@/services/contactApi";
 
 interface ViewModalProps {
-  contact: Contact;
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-  onEdit?: () => void;
+  contact: Contact | null;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-const ViewModal: React.FC<ViewModalProps> = ({ contact, open, onOpenChange, onEdit }) => {
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  };
+const ViewModal: React.FC<ViewModalProps> = ({ contact, isOpen, onClose }) => {
+  if (!contact) return null;
 
-  // Get status badge
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'New':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800 hover:bg-blue-200">New</Badge>;
-      case 'Pending':
-        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pending</Badge>;
-      case 'Resolved':
-        return <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">Resolved</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+      case 'New': return 'bg-blue-500 hover:bg-blue-600';
+      case 'Pending': return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'Resolved': return 'bg-green-500 hover:bg-green-600';
+      default: return 'bg-slate-500 hover:bg-slate-600';
     }
   };
 
-  // Get priority badge
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'High':
-        return <Badge variant="destructive">High</Badge>;
-      case 'Medium':
-        return <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200">Medium</Badge>;
-      case 'Low':
-        return <Badge variant="secondary">Low</Badge>;
-      default:
-        return <Badge variant="secondary">{priority}</Badge>;
+      case 'High': return 'text-red-600 bg-red-50 border-red-200';
+      case 'Medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'Low': return 'text-green-600 bg-green-50 border-green-200';
+      default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle className="flex items-center justify-between">
-            <span className="flex items-center gap-2">
-              <User className="h-5 w-5" />
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="sm:max-w-[600px] p-0 overflow-hidden bg-white border-slate-200 shadow-xl">
+        <DialogHeader className="p-6 bg-slate-50 border-b border-slate-100">
+          <div className="flex items-center justify-between">
+            <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
+              <User className="w-5 h-5 text-primary" />
               Contact Details
-            </span>
-            {onEdit && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={onEdit}
-                className="ml-auto"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit
-              </Button>
-            )}
-          </DialogTitle>
+            </DialogTitle>
+            <Badge className={`${getStatusColor(contact.status)} text-white border-0 px-3 py-1`}>
+              {contact.status}
+            </Badge>
+          </div>
+          <DialogDescription className="text-slate-500 mt-1">
+            Received on {format(new Date(contact.createdAt), "PPP 'at' p")}
+          </DialogDescription>
         </DialogHeader>
 
-        <div className="space-y-6">
-          {/* Contact Header */}
-          <div className="flex items-center justify-between p-4 bg-muted/50 rounded-lg">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-blue-600" />
-              </div>
+        <div className="p-6 space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <User className="w-3 h-3" /> Name
+              </label>
+              <p className="text-sm font-medium text-slate-900">{contact.name}</p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Mail className="w-3 h-3" /> Email
+              </label>
+              <p className="text-sm font-medium text-slate-900">{contact.email}</p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <Phone className="w-3 h-3" /> Phone
+              </label>
+              <p className="text-sm font-medium text-slate-900">{contact.phone || 'N/A'}</p>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" /> Priority
+              </label>
               <div>
-                <h3 className="text-xl font-semibold">{contact.name}</h3>
-                <p className="text-sm text-muted-foreground">
-                  Contact ID: {contact._id.substring(0, 8)}...
-                </p>
-              </div>
-            </div>
-            <div className="flex gap-2">
-              {getStatusBadge(contact.status)}
-              {getPriorityBadge(contact.priority)}
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Email */}
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <Mail className="h-5 w-5 text-blue-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Email</p>
-                <a
-                  href={`mailto:${contact.email}`}
-                  className="text-blue-600 hover:text-blue-800 underline break-all"
-                >
-                  {contact.email}
-                </a>
-              </div>
-            </div>
-
-            {/* Phone */}
-            <div className="flex items-center gap-3 p-3 border rounded-lg">
-              <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
-                <Phone className="h-5 w-5 text-green-600" />
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-medium">Phone</p>
-                {contact.phone ? (
-                  <a
-                    href={`tel:${contact.phone}`}
-                    className="text-blue-600 hover:text-blue-800 underline"
-                  >
-                    {contact.phone}
-                  </a>
-                ) : (
-                  <span className="text-muted-foreground">No phone number provided</span>
-                )}
+                <span className={`text-xs font-medium px-2 py-1 rounded-full border ${getPriorityColor(contact.priority)}`}>
+                  {contact.priority}
+                </span>
               </div>
             </div>
           </div>
 
-          {/* Message */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-2">
-              <MessageSquare className="h-5 w-5 text-muted-foreground" />
-              <h4 className="text-lg font-semibold">Message</h4>
-            </div>
-            <div className="p-4 bg-muted/30 rounded-lg border">
-              <p className="text-sm leading-relaxed whitespace-pre-wrap">
-                {contact.message}
-              </p>
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
+              <MessageSquare className="w-3 h-3" /> Message
+            </label>
+            <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 text-sm text-slate-700 leading-relaxed whitespace-pre-wrap">
+              {contact.message}
             </div>
           </div>
 
-          {/* Timestamps */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Created</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {formatDate(contact.createdAt)}
-              </p>
-            </div>
-            <div className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Last Updated</span>
-              </div>
-              <p className="text-sm text-muted-foreground">
-                {formatDate(contact.updatedAt)}
-              </p>
-            </div>
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t">
-            <Button
-              variant="outline"
-              onClick={() => window.open(`mailto:${contact.email}`, '_blank')}
-              className="flex-1"
-            >
-              <Mail className="h-4 w-4 mr-2" />
-              Send Email
-            </Button>
-            {contact.phone && (
-              <Button
-                variant="outline"
-                onClick={() => window.open(`tel:${contact.phone}`, '_blank')}
-                className="flex-1"
-              >
-                <Phone className="h-4 w-4 mr-2" />
-                Call Now
-              </Button>
-            )}
-            {onEdit && (
-              <Button
-                onClick={onEdit}
-                className="flex-1"
-              >
-                <Edit className="h-4 w-4 mr-2" />
-                Edit Contact
-              </Button>
-            )}
+          <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
+            <span className="flex items-center gap-1">
+              <Tag className="w-3 h-3" /> ID: {contact._id}
+            </span>
+            <span className="flex items-center gap-1">
+              <Calendar className="w-3 h-3" /> Last Updated: {format(new Date(contact.updatedAt), "PPP")}
+            </span>
           </div>
         </div>
       </DialogContent>

@@ -1,446 +1,305 @@
 import React, { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Badge } from '@/components/ui/badge';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from '@/components/ui/alert-dialog';
-import { Eye, Edit, Trash2, Search, Filter, Loader2, RefreshCw } from 'lucide-react';
-import { contactApiService, Contact, ContactsResponse, UpdateContactData } from '@/services/contactApi';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow
+} from "@/components/ui/table";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  MoreHorizontal,
+  ArrowUpDown,
+  Search,
+  Eye,
+  Edit,
+  Trash2,
+  Filter,
+  RefreshCw
+} from "lucide-react";
+import { contactApiService, Contact } from '@/services/contactApi';
+import { format } from 'date-fns';
+import { toast } from 'sonner';
 import ViewModal from './ViewModal';
 import EditModal from './EditModal';
 import DeleteConfirmModal from './DeleteConfirmModal';
+import { Skeleton } from '@/components/ui/skeleton';
 
 const AdminContactTable = () => {
-  // State management
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState<string>('All');
-  const [currentPage, setCurrentPage] = useState(1);
+  const [statusFilter, setStatusFilter] = useState('All');
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalContacts, setTotalContacts] = useState(0);
 
   // Modal states
-  const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [editModalOpen, setEditModalOpen] = useState(false);
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [viewContact, setViewContact] = useState<Contact | null>(null);
+  const [editContact, setEditContact] = useState<Contact | null>(null);
+  const [deleteContact, setDeleteContact] = useState<Contact | null>(null);
 
-  // Sample data fallback
-  const sampleContacts: Contact[] = [
-    {
-      _id: '1',
-      name: 'John Doe',
-      email: 'john.doe@example.com',
-      phone: '+91 12345 67890',
-      message: 'I would like to inquire about catering services for my wedding. We are expecting around 200 guests.',
-      status: 'New',
-      priority: 'High',
-      createdAt: '2024-12-01T10:00:00Z',
-      updatedAt: '2024-12-01T10:00:00Z'
-    },
-    {
-      _id: '2',
-      name: 'Jane Smith',
-      email: 'jane.smith@example.com',
-      phone: '+91 98765 43210',
-      message: 'Looking for corporate lunch catering for our office of 50 people. Need vegetarian options.',
-      status: 'Pending',
-      priority: 'Medium',
-      createdAt: '2024-12-02T14:30:00Z',
-      updatedAt: '2024-12-03T09:15:00Z'
-    },
-    {
-      _id: '3',
-      name: 'Mike Johnson',
-      email: 'mike.johnson@example.com',
-      phone: '+91 87654 32109',
-      message: 'Birthday party catering for 30 guests. Need non-vegetarian menu.',
-      status: 'Resolved',
-      priority: 'Low',
-      createdAt: '2024-11-28T16:45:00Z',
-      updatedAt: '2024-11-29T11:20:00Z'
-    }
-  ];
-
-  // Fetch contacts from API
-  const fetchContacts = async (page = 1, search = '', status = '') => {
-    setLoading(true);
-    setError(null);
-
+  const fetchContacts = async () => {
     try {
-      const response: ContactsResponse = await contactApiService.getAllContacts(
-        page,
-        10,
-        search,
-        status
-      );
-
+      setLoading(true);
+      const response = await contactApiService.getAllContacts(page, 10, searchTerm, statusFilter === 'All' ? '' : statusFilter);
       if (response.success) {
-        // Ensure all contacts have a status (assign "New" if missing)
-        const contactsWithStatus = response.data.contacts.map(contact => ({
-          ...contact,
-          status: contact.status || 'New'
-        }));
-
-        setContacts(contactsWithStatus);
-        setCurrentPage(response.data.page);
+        setContacts(response.data.contacts);
         setTotalPages(response.data.pages);
         setTotalContacts(response.data.total);
       }
-    } catch (err) {
-      console.error('Error fetching contacts:', err);
-      setError(err instanceof Error ? err.message : 'Failed to fetch contacts');
-      
-      // Use sample data as fallback
-      setContacts(sampleContacts);
-      setCurrentPage(1);
-      setTotalPages(1);
-      setTotalContacts(sampleContacts.length);
+    } catch (error) {
+      toast.error('Failed to fetch contacts');
+      console.error(error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Load contacts on component mount and when filters change
   useEffect(() => {
-    fetchContacts(currentPage, searchTerm, statusFilter !== 'All' ? statusFilter : '');
-  }, [currentPage, searchTerm, statusFilter]);
+    // Debounce search
+    const timer = setTimeout(() => {
+      fetchContacts();
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchTerm, statusFilter, page]);
 
-  // Handle search
-  const handleSearch = (value: string) => {
-    setSearchTerm(value);
-    setCurrentPage(1);
-  };
-
-  // Handle status filter
-  const handleStatusFilter = (value: string) => {
-    setStatusFilter(value);
-    setCurrentPage(1);
-  };
-
-  // Handle refresh
-  const handleRefresh = () => {
-    fetchContacts(currentPage, searchTerm, statusFilter !== 'All' ? statusFilter : '');
-  };
-
-  // Handle view contact
-  const handleViewContact = (contact: Contact) => {
-    setSelectedContact(contact);
-    setViewModalOpen(true);
-  };
-
-  // Handle edit contact
-  const handleEditContact = (contact: Contact) => {
-    setSelectedContact(contact);
-    setEditModalOpen(true);
-  };
-
-  // Handle delete contact
-  const handleDeleteContact = (contact: Contact) => {
-    setSelectedContact(contact);
-    setDeleteModalOpen(true);
-  };
-
-  // Handle contact update (from edit modal)
-  const handleContactUpdate = async (id: string, updateData: UpdateContactData) => {
+  const handleStatusUpdate = async (id: string, newStatus: 'New' | 'Pending' | 'Resolved') => {
     try {
-      const response = await contactApiService.updateContact(id, updateData);
-      if (response.success) {
-        // Update local state
-        setContacts(prev => prev.map(contact => 
-          contact._id === id ? response.data : contact
-        ));
-        setEditModalOpen(false);
-        setSelectedContact(null);
-      }
-    } catch (err) {
-      console.error('Error updating contact:', err);
-      throw err;
+      await contactApiService.updateContactStatus(id, newStatus);
+      toast.success(`Status updated to ${newStatus}`);
+      fetchContacts();
+    } catch (error) {
+      toast.error('Failed to update status');
     }
   };
 
-  // Handle contact deletion
-  const handleContactDelete = async (id: string) => {
+  const handleUpdateContact = async (id: string, data: any) => {
     try {
-      const response = await contactApiService.deleteContact(id);
-      if (response.success) {
-        // Remove from local state
-        setContacts(prev => prev.filter(contact => contact._id !== id));
-        setTotalContacts(prev => prev - 1);
-        setDeleteModalOpen(false);
-        setSelectedContact(null);
-      }
-    } catch (err) {
-      console.error('Error deleting contact:', err);
-      throw err;
+      await contactApiService.updateContact(id, data);
+      toast.success('Contact updated successfully');
+      fetchContacts();
+    } catch (error) {
+      toast.error('Failed to update contact');
+      throw error;
     }
   };
 
-  // Format date
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  const handleDeleteContact = async () => {
+    if (!deleteContact) return;
+    try {
+      await contactApiService.deleteContact(deleteContact._id);
+      toast.success('Contact deleted successfully');
+      fetchContacts();
+    } catch (error) {
+      toast.error('Failed to delete contact');
+      throw error;
+    }
   };
 
-  // Get status badge color
-  const getStatusBadge = (status: string) => {
+  const getStatusColor = (status: string) => {
     switch (status) {
-      case 'New':
-        return <Badge variant="default" className="bg-blue-100 text-blue-800 hover:bg-blue-200">New</Badge>;
-      case 'Pending':
-        return <Badge variant="default" className="bg-yellow-100 text-yellow-800 hover:bg-yellow-200">Pending</Badge>;
-      case 'Resolved':
-        return <Badge variant="default" className="bg-green-100 text-green-800 hover:bg-green-200">Resolved</Badge>;
-      default:
-        return <Badge variant="secondary">{status}</Badge>;
+      case 'New': return 'bg-blue-500 hover:bg-blue-600';
+      case 'Pending': return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'Resolved': return 'bg-green-500 hover:bg-green-600';
+      default: return 'bg-slate-500 hover:bg-slate-600';
     }
   };
 
-  // Get priority badge color
-  const getPriorityBadge = (priority: string) => {
+  const getPriorityColor = (priority: string) => {
     switch (priority) {
-      case 'High':
-        return <Badge variant="destructive">High</Badge>;
-      case 'Medium':
-        return <Badge variant="default" className="bg-orange-100 text-orange-800 hover:bg-orange-200">Medium</Badge>;
-      case 'Low':
-        return <Badge variant="secondary">Low</Badge>;
-      default:
-        return <Badge variant="secondary">{priority}</Badge>;
+      case 'High': return 'text-red-600 bg-red-50 border-red-200';
+      case 'Medium': return 'text-yellow-600 bg-yellow-50 border-yellow-200';
+      case 'Low': return 'text-green-600 bg-green-50 border-green-200';
+      default: return 'text-slate-600 bg-slate-50 border-slate-200';
     }
   };
 
   return (
-    <div className="space-y-6 w-full">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 w-full">
-        <div className="min-w-0 flex-1">
-          <h1 className="text-2xl md:text-3xl font-bold tracking-tight">Contact Management</h1>
-          <p className="text-muted-foreground mt-1 text-sm md:text-base">
-            Manage and track all contact inquiries ({totalContacts} total contacts)
-          </p>
+    <div className="space-y-4">
+      {/* Filters and Actions */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-center bg-white p-4 rounded-lg border border-slate-200 shadow-sm">
+        <div className="relative w-full sm:w-72">
+          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4" />
+          <Input
+            placeholder="Search contacts..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-9"
+          />
         </div>
-        <Button onClick={handleRefresh} disabled={loading} variant="outline" className="flex-shrink-0">
-          <RefreshCw className={`mr-2 h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          Refresh
-        </Button>
+
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="gap-2">
+                <Filter className="w-4 h-4" />
+                Status: {statusFilter}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem onClick={() => setStatusFilter('All')}>All</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('New')}>New</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('Pending')}>Pending</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setStatusFilter('Resolved')}>Resolved</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+
+          <Button variant="ghost" size="icon" onClick={fetchContacts} title="Refresh">
+            <RefreshCw className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
 
-      {/* Filters */}
-      <Card className="p-4 md:p-6">
-        <div className="flex flex-col sm:flex-row gap-4 w-full">
-          {/* Search */}
-          <div className="flex-1 min-w-0">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-              <Input
-                placeholder="Search by name, email, phone, or message..."
-                value={searchTerm}
-                onChange={(e) => handleSearch(e.target.value)}
-                className="pl-10 w-full"
-              />
-            </div>
-          </div>
-
-          {/* Status Filter */}
-          <div className="w-full sm:w-48 flex-shrink-0">
-            <Select value={statusFilter} onValueChange={handleStatusFilter}>
-              <SelectTrigger className="w-full">
-                <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Filter by status" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="All">All Status</SelectItem>
-                <SelectItem value="New">New</SelectItem>
-                <SelectItem value="Pending">Pending</SelectItem>
-                <SelectItem value="Resolved">Resolved</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </div>
-      </Card>
-
-      {/* Error State */}
-      {error && (
-        <Card className="p-4 border-destructive">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-destructive rounded-full"></div>
-            <p className="text-sm text-destructive font-medium">
-              {error} - Showing sample data
-            </p>
-          </div>
-        </Card>
-      )}
-
-      {/* Contacts Table */}
-      <Card className="w-full overflow-hidden">
-        <div className="overflow-x-auto w-full">
-          <Table>
-            <TableHeader>
+      {/* Table */}
+      <div className="rounded-md border border-slate-200 bg-white shadow-sm overflow-hidden">
+        <Table>
+          <TableHeader className="bg-slate-50">
+            <TableRow>
+              <TableHead className="w-[200px]">Name</TableHead>
+              <TableHead>Email</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Priority</TableHead>
+              <TableHead>Date</TableHead>
+              <TableHead className="text-right">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {loading ? (
+              Array.from({ length: 5 }).map((_, i) => (
+                <TableRow key={i}>
+                  <TableCell><Skeleton className="h-4 w-32" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-48" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-6 w-16 rounded-full" /></TableCell>
+                  <TableCell><Skeleton className="h-4 w-24" /></TableCell>
+                  <TableCell className="text-right"><Skeleton className="h-8 w-8 ml-auto rounded-md" /></TableCell>
+                </TableRow>
+              ))
+            ) : contacts.length === 0 ? (
               <TableRow>
-                <TableHead className="w-12 md:w-16">ID</TableHead>
-                <TableHead className="min-w-0">Name</TableHead>
-                <TableHead className="min-w-0 hidden sm:table-cell">Email</TableHead>
-                <TableHead className="min-w-0 hidden md:table-cell">Phone</TableHead>
-                <TableHead className="min-w-0 hidden lg:table-cell">Message</TableHead>
-                <TableHead className="min-w-0 hidden lg:table-cell">Created At</TableHead>
-                <TableHead className="min-w-0">Status</TableHead>
-                <TableHead className="text-right w-20 md:w-24">Actions</TableHead>
+                <TableCell colSpan={6} className="h-24 text-center text-slate-500">
+                  No contacts found.
+                </TableCell>
               </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8">
-                    <div className="flex items-center justify-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Loading contacts...</span>
-                    </div>
+            ) : (
+              contacts.map((contact) => (
+                <TableRow key={contact._id} className="hover:bg-slate-50/50 transition-colors">
+                  <TableCell className="font-medium text-slate-900">{contact.name}</TableCell>
+                  <TableCell className="text-slate-600">{contact.email}</TableCell>
+                  <TableCell>
+                    <Badge className={`${getStatusColor(contact.status)} text-white border-0`}>
+                      {contact.status}
+                    </Badge>
+                  </TableCell>
+                  <TableCell>
+                    <span className={`text-xs font-medium px-2 py-1 rounded-full border ${getPriorityColor(contact.priority)}`}>
+                      {contact.priority}
+                    </span>
+                  </TableCell>
+                  <TableCell className="text-slate-500 text-sm">
+                    {format(new Date(contact.createdAt), 'MMM d, yyyy')}
+                  </TableCell>
+                  <TableCell className="text-right">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" className="h-8 w-8 p-0">
+                          <span className="sr-only">Open menu</span>
+                          <MoreHorizontal className="h-4 w-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end">
+                        <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => setViewContact(contact)}>
+                          <Eye className="mr-2 h-4 w-4" /> View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => setEditContact(contact)}>
+                          <Edit className="mr-2 h-4 w-4" /> Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuLabel>Quick Status</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => handleStatusUpdate(contact._id, 'New')}>
+                          Mark as New
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusUpdate(contact._id, 'Pending')}>
+                          Mark as Pending
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleStatusUpdate(contact._id, 'Resolved')}>
+                          Mark as Resolved
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-600"
+                          onClick={() => setDeleteContact(contact)}
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </TableCell>
                 </TableRow>
-              ) : contacts.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={8} className="text-center py-8 text-muted-foreground">
-                    No contacts found
-                  </TableCell>
-                </TableRow>
-              ) : (
-                contacts.map((contact) => (
-                  <TableRow key={contact._id}>
-                    <TableCell className="font-mono text-xs md:text-sm">
-                      {contact._id.substring(0, 6)}...
-                    </TableCell>
-                    <TableCell className="font-medium truncate" title={contact.name}>
-                      {contact.name}
-                    </TableCell>
-                    <TableCell className="hidden sm:table-cell truncate" title={contact.email}>
-                      <a 
-                        href={`mailto:${contact.email}`}
-                        className="text-blue-600 hover:text-blue-800 underline"
-                      >
-                        {contact.email}
-                      </a>
-                    </TableCell>
-                    <TableCell className="hidden md:table-cell truncate" title={contact.phone || '-'}>
-                      {contact.phone ? (
-                        <a 
-                          href={`tel:${contact.phone}`}
-                          className="text-blue-600 hover:text-blue-800 underline"
-                        >
-                          {contact.phone}
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">-</span>
-                      )}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell max-w-xs truncate" title={contact.message}>
-                      {contact.message}
-                    </TableCell>
-                    <TableCell className="hidden lg:table-cell text-xs md:text-sm text-muted-foreground">
-                      {formatDate(contact.createdAt)}
-                    </TableCell>
-                    <TableCell>
-                      {getStatusBadge(contact.status)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-1 md:gap-2">
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleViewContact(contact)}
-                          title="View details"
-                          className="h-8 w-8 p-0"
-                        >
-                          <Eye className="h-3 w-3 md:h-4 md:w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleEditContact(contact)}
-                          title="Edit contact"
-                          className="h-8 w-8 p-0"
-                        >
-                          <Edit className="h-3 w-3 md:h-4 md:w-4" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => handleDeleteContact(contact)}
-                          title="Delete contact"
-                          className="h-8 w-8 p-0 text-destructive hover:text-destructive"
-                        >
-                          <Trash2 className="h-3 w-3 md:h-4 md:w-4" />
-                        </Button>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ))
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              ))
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 px-4 md:px-6 py-4 border-t">
-            <div className="text-sm text-muted-foreground order-2 sm:order-1">
-              Page {currentPage} of {totalPages}
-            </div>
-            <div className="flex gap-2 order-1 sm:order-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="text-xs md:text-sm"
-              >
-                Previous
-              </Button>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="text-xs md:text-sm"
-              >
-                Next
-              </Button>
-            </div>
-          </div>
-        )}
-      </Card>
+      {/* Pagination */}
+      <div className="flex items-center justify-between px-2">
+        <div className="text-sm text-slate-500">
+          Showing {contacts.length} of {totalContacts} results
+        </div>
+        <div className="flex items-center space-x-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.max(1, p - 1))}
+            disabled={page === 1 || loading}
+          >
+            Previous
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+            disabled={page === totalPages || loading}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
 
       {/* Modals */}
-      {selectedContact && (
-        <>
-          <ViewModal
-            contact={selectedContact}
-            open={viewModalOpen}
-            onOpenChange={setViewModalOpen}
-          />
-          <EditModal
-            contact={selectedContact}
-            open={editModalOpen}
-            onOpenChange={setEditModalOpen}
-            onSave={handleContactUpdate}
-          />
-          <DeleteConfirmModal
-            contact={selectedContact}
-            open={deleteModalOpen}
-            onOpenChange={setDeleteModalOpen}
-            onConfirm={handleContactDelete}
-          />
-        </>
-      )}
+      <ViewModal
+        contact={viewContact}
+        isOpen={!!viewContact}
+        onClose={() => setViewContact(null)}
+      />
+
+      <EditModal
+        contact={editContact}
+        isOpen={!!editContact}
+        onClose={() => setEditContact(null)}
+        onSave={handleUpdateContact}
+      />
+
+      <DeleteConfirmModal
+        isOpen={!!deleteContact}
+        onClose={() => setDeleteContact(null)}
+        onConfirm={handleDeleteContact}
+        itemName={deleteContact?.name}
+      />
     </div>
   );
 };

@@ -1,39 +1,19 @@
 import React from 'react';
-import AdminDashboard from '@/components/Admin/AdminDashboard';
+import AdminLayout from '@/components/Admin/AdminLayout';
 import AdminContactTable from '@/components/Admin/AdminContactTable';
-import { Button } from '@/components/ui/button';
-import { Download, RefreshCw, Plus } from 'lucide-react';
 
 const AdminContactsPage = () => {
-  const handleExport = () => {
-    // TODO: Implement export functionality
-    console.log('Export functionality to be implemented');
-  };
-
-  const handleAddNew = () => {
-    // TODO: Implement add new contact functionality
-    console.log('Add new contact functionality to be implemented');
-  };
-
   return (
-    <AdminDashboard
-      title="Contact Management"
-      subtitle="Manage and track all customer inquiries and messages"
-      actions={
-        <>
-          <Button variant="outline" onClick={handleExport}>
-            <Download className="h-4 w-4 mr-2" />
-            Export
-          </Button>
-          <Button onClick={handleAddNew}>
-            <Plus className="h-4 w-4 mr-2" />
-            Add Contact
-          </Button>
-        </>
-      }
-    >
-      <AdminContactTable />
-    </AdminDashboard>
+    <AdminLayout>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Contact Management</h1>
+          <p className="text-slate-500 mt-2">View and manage all customer inquiries and messages.</p>
+        </div>
+
+        <AdminContactTable />
+      </div>
+    </AdminLayout>
   );
 };
 

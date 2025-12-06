@@ -1,272 +1,152 @@
-import React from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { 
-  LayoutDashboard, 
-  Users, 
-  MessageSquare, 
-  Settings, 
-  BarChart3,
-  Shield,
-  Bell,
-  Search,
-  Menu,
-  X
-} from 'lucide-react';
+import React, { useEffect, useState } from 'react';
+import AdminLayout from './AdminLayout';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Users, FileText, Clock, CheckCircle, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { contactApiService } from '@/services/contactApi';
+import { quoteApiService } from '@/services/quoteApi';
+import { Skeleton } from '@/components/ui/skeleton';
 
-interface AdminDashboardProps {
-  children?: React.ReactNode;
-  title?: string;
-  subtitle?: string;
-  actions?: React.ReactNode;
-}
+const AdminDashboard = () => {
+  const [stats, setStats] = useState({
+    contacts: { total: 0, new: 0, pending: 0, resolved: 0 },
+    quotes: { total: 0, pending: 0, confirmed: 0 },
+    loading: true
+  });
 
-const AdminDashboard: React.FC<AdminDashboardProps> = ({
-  children,
-  title = "Dashboard",
-  subtitle,
-  actions
-}) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const [contactStats, quoteStats] = await Promise.all([
+          contactApiService.getContactStats(),
+          quoteApiService.getQuoteStats()
+        ]);
 
-  // Default dashboard content when no children are provided
-  const defaultContent = (
-    <div className="space-y-6">
-      {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Total Contacts</p>
-              <p className="text-2xl font-bold">1,234</p>
-            </div>
-            <Users className="h-8 w-8 text-blue-600" />
-          </div>
-        </Card>
-        
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">New This Week</p>
-              <p className="text-2xl font-bold">56</p>
-            </div>
-            <MessageSquare className="h-8 w-8 text-green-600" />
-          </div>
-        </Card>
-        
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Response Rate</p>
-              <p className="text-2xl font-bold">94%</p>
-            </div>
-            <BarChart3 className="h-8 w-8 text-purple-600" />
-          </div>
-        </Card>
-        
-        <Card className="p-6">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm font-medium text-muted-foreground">Pending</p>
-              <p className="text-2xl font-bold">12</p>
-            </div>
-            <Bell className="h-8 w-8 text-orange-600" />
-          </div>
-        </Card>
-      </div>
+        setStats({
+          contacts: contactStats.data as any,
+          quotes: {
+            total: quoteStats.data.totalQuotes,
+            pending: quoteStats.data.pendingQuotes,
+            confirmed: quoteStats.data.confirmedQuotes
+          },
+          loading: false
+        });
+      } catch (error) {
+        console.error('Failed to fetch stats:', error);
+        setStats(prev => ({ ...prev, loading: false }));
+      }
+    };
 
-      {/* Quick Actions */}
-      <Card className="p-6">
-        <h2 className="text-lg font-semibold mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <Button variant="outline" className="h-20 flex-col">
-            <MessageSquare className="h-6 w-6 mb-2" />
-            <span>View Contacts</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex-col">
-            <BarChart3 className="h-6 w-6 mb-2" />
-            <span>Analytics</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex-col">
-            <Users className="h-6 w-6 mb-2" />
-            <span>User Management</span>
-          </Button>
-          <Button variant="outline" className="h-20 flex-col">
-            <Settings className="h-6 w-6 mb-2" />
-            <span>Settings</span>
-          </Button>
+    fetchStats();
+  }, []);
+
+  const StatCard = ({ title, value, icon: Icon, description, trend, color }: any) => (
+    <Card className="hover:shadow-md transition-all duration-200 border-slate-200">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+        <CardTitle className="text-sm font-medium text-slate-600">
+          {title}
+        </CardTitle>
+        <div className={`p-2 rounded-lg ${color}`}>
+          <Icon className="h-4 w-4 text-white" />
         </div>
-      </Card>
-    </div>
+      </CardHeader>
+      <CardContent>
+        {stats.loading ? (
+          <Skeleton className="h-8 w-20 mb-2" />
+        ) : (
+          <>
+            <div className="text-2xl font-bold text-slate-900">{value}</div>
+            <p className="text-xs text-slate-500 mt-1 flex items-center gap-1">
+              {trend === 'up' ? (
+                <ArrowUpRight className="w-3 h-3 text-green-500" />
+              ) : (
+                <ArrowDownRight className="w-3 h-3 text-red-500" />
+              )}
+              {description}
+            </p>
+          </>
+        )}
+      </CardContent>
+    </Card>
   );
 
-  const navigationItems = [
-    {
-      name: 'Overview',
-      href: '#',
-      icon: LayoutDashboard,
-      current: true
-    },
-    {
-      name: 'Contacts',
-      href: '#',
-      icon: MessageSquare,
-      current: false,
-      badge: '12'
-    },
-    {
-      name: 'Users',
-      href: '#',
-      icon: Users,
-      current: false
-    },
-    {
-      name: 'Analytics',
-      href: '#',
-      icon: BarChart3,
-      current: false
-    },
-    {
-      name: 'Settings',
-      href: '#',
-      icon: Settings,
-      current: false
-    }
-  ];
-
   return (
-    <div className="min-h-screen bg-background flex">
-      {/* Mobile sidebar backdrop */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-
-      {/* Sidebar */}
-      <aside className={`
-        fixed inset-y-0 left-0 z-30 w-64 bg-card border-r border-border transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:relative lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
-        <div className="flex flex-col h-full">
-          {/* Logo/Header */}
-          <div className="flex items-center justify-between p-6 border-b border-border">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Shield className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h1 className="text-lg font-bold">Admin Panel</h1>
-                <p className="text-xs text-muted-foreground">Contact Management</p>
-              </div>
-            </div>
-            <Button
-              variant="ghost"
-              size="sm"
-              className="lg:hidden"
-              onClick={() => setSidebarOpen(false)}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
-
-          {/* Navigation */}
-          <nav className="flex-1 p-4 space-y-2">
-            {navigationItems.map((item) => (
-              <a
-                key={item.name}
-                href={item.href}
-                className={`
-                  flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors
-                  ${item.current 
-                    ? 'bg-primary text-primary-foreground' 
-                    : 'text-muted-foreground hover:text-foreground hover:bg-muted'
-                  }
-                `}
-              >
-                <item.icon className="h-4 w-4" />
-                <span className="flex-1">{item.name}</span>
-                {item.badge && (
-                  <span className="bg-primary/20 text-primary px-2 py-0.5 rounded-full text-xs">
-                    {item.badge}
-                  </span>
-                )}
-              </a>
-            ))}
-          </nav>
-
-          {/* User Profile */}
-          <div className="p-4 border-t border-border">
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-primary-foreground">A</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">Admin User</p>
-                <p className="text-xs text-muted-foreground truncate">admin@example.com</p>
-              </div>
-            </div>
-          </div>
+    <AdminLayout>
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900">Dashboard</h1>
+          <p className="text-slate-500 mt-2">Welcome back! Here's an overview of your catering business.</p>
         </div>
-      </aside>
 
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top navigation */}
-        <header className="sticky top-0 z-10 bg-background border-b border-border">
-          <div className="flex items-center justify-between px-4 py-3">
-            <div className="flex items-center gap-4">
-              {/* Mobile menu button */}
-              <Button
-                variant="ghost"
-                size="sm"
-                className="lg:hidden"
-                onClick={() => setSidebarOpen(true)}
-              >
-                <Menu className="h-4 w-4" />
-              </Button>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+          <StatCard
+            title="Total Contacts"
+            value={stats.contacts.total}
+            icon={Users}
+            description="All time inquiries"
+            trend="up"
+            color="bg-blue-500"
+          />
+          <StatCard
+            title="New Messages"
+            value={stats.contacts.new}
+            icon={Clock}
+            description="Requires attention"
+            trend="up"
+            color="bg-yellow-500"
+          />
+          <StatCard
+            title="Pending Quotes"
+            value={stats.quotes.pending}
+            icon={FileText}
+            description="Awaiting review"
+            trend="up"
+            color="bg-purple-500"
+          />
+          <StatCard
+            title="Confirmed Events"
+            value={stats.quotes.confirmed}
+            icon={CheckCircle}
+            description="Upcoming events"
+            trend="up"
+            color="bg-green-500"
+          />
+        </div>
 
-              {/* Page title */}
-              <div>
-                <h1 className="text-xl font-semibold">{title}</h1>
-                {subtitle && (
-                  <p className="text-sm text-muted-foreground">{subtitle}</p>
-                )}
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+          <Card className="col-span-4 border-slate-200">
+            <CardHeader>
+              <CardTitle>Recent Activity</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-center h-[200px] text-slate-400 text-sm">
+                Chart placeholder - Activity Timeline
               </div>
-            </div>
-
-            {/* Right side actions */}
-            <div className="flex items-center gap-3">
-              {/* Search */}
-              <div className="hidden sm:block relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                <input
-                  type="search"
-                  placeholder="Search..."
-                  className="pl-10 pr-4 py-2 w-64 text-sm bg-muted border border-transparent rounded-lg focus:border-border focus:bg-background transition-colors"
-                />
+            </CardContent>
+          </Card>
+          <Card className="col-span-3 border-slate-200">
+            <CardHeader>
+              <CardTitle>Quick Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-2">
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between hover:bg-slate-100 transition-colors cursor-pointer">
+                  <span className="text-sm font-medium text-slate-700">Review New Quotes</span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between hover:bg-slate-100 transition-colors cursor-pointer">
+                  <span className="text-sm font-medium text-slate-700">Update Menu Items</span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-400" />
+                </div>
+                <div className="p-3 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between hover:bg-slate-100 transition-colors cursor-pointer">
+                  <span className="text-sm font-medium text-slate-700">Check Schedule</span>
+                  <ArrowUpRight className="w-4 h-4 text-slate-400" />
+                </div>
               </div>
-
-              {/* Notifications */}
-              <Button variant="ghost" size="sm">
-                <Bell className="h-4 w-4" />
-              </Button>
-
-              {/* Custom actions */}
-              {actions}
-            </div>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 p-4 lg:p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto w-full">
-            {children || defaultContent}
-          </div>
-        </main>
+            </CardContent>
+          </Card>
+        </div>
       </div>
-    </div>
+    </AdminLayout>
   );
 };
 
