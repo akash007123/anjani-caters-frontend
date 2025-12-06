@@ -14,6 +14,8 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import Quote from "./pages/Quote";
+import AdminContactsPage from "./pages/AdminContactsPage";
+import AdminDashboard from "./components/Admin/AdminDashboard";
 import NotFound from "./pages/NotFound";
 import { ContactProvider } from "./contexts/ContactContext";
 
@@ -26,21 +28,30 @@ const App = () => (
         <Toaster />
         <Sonner />
         <BrowserRouter>
-          <Layout>
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/about" element={<About />} />
-              <Route path="/services" element={<Services />} />
-              <Route path="/menu" element={<Menu />} />
-              <Route path="/gallery" element={<Gallery />} />
-              <Route path="/testimonials" element={<Testimonials />} />
-              <Route path="/blog" element={<Blog />} />
-              <Route path="/blog/:slug" element={<BlogPost />} />
-              <Route path="/contact" element={<Contact />} />
-              <Route path="/quote" element={<Quote />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Layout>
+          <Routes>
+            {/* Admin Routes - No Layout wrapper */}
+            <Route path="/admin/contacts" element={<AdminContactsPage />} />
+            <Route path="/admin/dashboard" element={<AdminDashboard />} />
+            
+            {/* Public Routes - With Layout wrapper */}
+            <Route path="/*" element={
+              <Layout>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/services" element={<Services />} />
+                  <Route path="/menu" element={<Menu />} />
+                  <Route path="/gallery" element={<Gallery />} />
+                  <Route path="/testimonials" element={<Testimonials />} />
+                  <Route path="/blog" element={<Blog />} />
+                  <Route path="/blog/:slug" element={<BlogPost />} />
+                  <Route path="/contact" element={<Contact />} />
+                  <Route path="/quote" element={<Quote />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </Layout>
+            } />
+          </Routes>
         </BrowserRouter>
       </ContactProvider>
     </TooltipProvider>

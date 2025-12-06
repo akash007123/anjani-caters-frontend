@@ -34,6 +34,38 @@ interface ContactResponse {
   };
 }
 
+interface Contact {
+  _id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  status: 'New' | 'Pending' | 'Resolved';
+  priority: 'Low' | 'Medium' | 'High';
+  createdAt: string;
+  updatedAt: string;
+}
+
+interface ContactsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    contacts: Contact[];
+    total: number;
+    page: number;
+    pages: number;
+  };
+}
+
+interface UpdateContactData {
+  name?: string;
+  email?: string;
+  phone?: string;
+  message?: string;
+  status?: 'New' | 'Pending' | 'Resolved';
+  priority?: 'Low' | 'Medium' | 'High';
+}
+
 interface ApiError {
   success: false;
   message: string;
@@ -123,7 +155,7 @@ export const contactApiService = {
   // Test email configuration (for admin)
   testEmailConfig: async (): Promise<ContactResponse> => {
     try {
-      const response = await contactApi.get('/contacts/test/email');
+      const response = await contactApi.get('/contact/contacts/test/email');
       return response.data;
     } catch (error) {
       const apiError = error as AxiosError;
@@ -136,12 +168,84 @@ export const contactApiService = {
   // Get contact statistics (for admin)
   getContactStats: async (): Promise<StatsResponse> => {
     try {
-      const response = await contactApi.get('/contacts/stats/overview');
+      const response = await contactApi.get('/contact/contacts/stats/overview');
       return response.data;
     } catch (error) {
       const apiError = error as AxiosError;
       const responseData = apiError.response?.data as { message?: string } | undefined;
       const message = responseData?.message || 'Failed to fetch statistics';
+      throw new Error(message);
+    }
+  },
+
+  // Admin API functions
+  // Get all contacts with pagination and filters
+  getAllContacts: async (page = 1, limit = 10, search = '', status = ''): Promise<ContactsResponse> => {
+    try {
+      const params = new URLSearchParams({
+        page: page.toString(),
+        limit: limit.toString(),
+        ...(search && { search }),
+        ...(status && { status })
+      });
+      const response = await contactApi.get(`/contact/contacts?${params}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to fetch contacts';
+      throw new Error(message);
+    }
+  },
+
+  // Get single contact by ID
+  getContactById: async (id: string): Promise<{ success: boolean; data: Contact }> => {
+    try {
+      const response = await contactApi.get(`/contact/contacts/${id}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to fetch contact';
+      throw new Error(message);
+    }
+  },
+
+  // Update contact
+  updateContact: async (id: string, data: UpdateContactData): Promise<{ success: boolean; data: Contact; message: string }> => {
+    try {
+      const response = await contactApi.patch(`/contact/contacts/${id}`, data);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to update contact';
+      throw new Error(message);
+    }
+  },
+
+  // Update contact status
+  updateContactStatus: async (id: string, status: 'New' | 'Pending' | 'Resolved'): Promise<{ success: boolean; data: Contact; message: string }> => {
+    try {
+      const response = await contactApi.patch(`/contact/contacts/${id}/status`, { status });
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to update contact status';
+      throw new Error(message);
+    }
+  },
+
+  // Delete contact
+  deleteContact: async (id: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await contactApi.delete(`/contact/contacts/${id}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to delete contact';
       throw new Error(message);
     }
   }
@@ -151,4 +255,4 @@ export const contactApiService = {
 export { contactApi };
 
 // Export types for use in components
-export type { ContactFormData, ContactResponse, ApiError, HealthResponse, StatsResponse };
+export type { ContactFormData, ContactResponse, ApiError, HealthResponse, StatsResponse, Contact, ContactsResponse, UpdateContactData };
