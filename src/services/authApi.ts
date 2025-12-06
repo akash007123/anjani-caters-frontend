@@ -33,6 +33,26 @@ export interface User {
     lastLogin?: string;
 }
 
+export interface LoginCredentials {
+    email: string;
+    password: string;
+}
+
+export interface RegisterData {
+    firstName: string;
+    lastName: string;
+    email: string;
+    mobile: string;
+    password: string;
+    role?: string;
+    profilePic?: string;
+}
+
+export interface PasswordData {
+    currentPassword: string;
+    newPassword: string;
+}
+
 export interface AuthResponse {
     success: boolean;
     data: {
@@ -47,12 +67,12 @@ export interface AuthResponse {
 }
 
 export const authApiService = {
-    login: async (credentials: any) => {
+    login: async (credentials: LoginCredentials) => {
         const response = await authApi.post<AuthResponse>('/login', credentials);
         return response.data;
     },
 
-    register: async (userData: any) => {
+    register: async (userData: RegisterData) => {
         const response = await authApi.post<AuthResponse>('/register', userData);
         return response.data;
     },
@@ -72,7 +92,7 @@ export const authApiService = {
         return response.data;
     },
 
-    updatePassword: async (passwordData: { currentPassword: string; newPassword: string }) => {
+    updatePassword: async (passwordData: PasswordData) => {
         const response = await authApi.put<{ success: boolean; message: string }>('/password', passwordData);
         return response.data;
     },
@@ -90,6 +110,11 @@ export const authApiService = {
 
     deleteUser: async (userId: string) => {
         const response = await authApi.delete<{ success: boolean; message: string }>(`/users/${userId}`);
+        return response.data;
+    },
+
+    uploadProfilePic: async (profilePic: string) => {
+        const response = await authApi.put<{ success: boolean; data: User; message: string }>('/profile', { profilePic });
         return response.data;
     },
 };

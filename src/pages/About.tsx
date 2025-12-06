@@ -34,7 +34,7 @@ const About = () => {
         <div className="absolute inset-0 z-0">
           <img
             src={chefTeamImage}
-            alt="Elite Catering Team"
+            alt="Anjani Caters Team"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/90 via-primary/80 to-primary/60"></div>
@@ -83,7 +83,7 @@ const About = () => {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-20 pt-12 border-t border-primary-foreground/20 animate-fade-in delay-800">
               {[
                 {
-                  number: "2500+",
+                  number: "10,000+",
                   label: "Events Catered",
                   icon: "🎉",
                   description: "Successful celebrations"
@@ -169,7 +169,7 @@ const About = () => {
               <div className="space-y-8 text-muted-foreground leading-relaxed">
                 <div className="animate-slide-in-up delay-200">
                   <p className="text-lg">
-                    Elite Catering was founded in 2009 with a simple vision: to elevate the catering experience by combining exceptional cuisine with personalized service. What started as a passion project by Chef Rahul Sharma has grown into one of the most trusted names in premium catering.
+                    Anjani Caters was founded in 2010 with a simple vision: to elevate the catering experience by combining exceptional cuisine with personalized service. What started as a passion project by Chef Rahul Sharma has grown into one of the most trusted names in premium catering.
                   </p>
                 </div>
                 
@@ -364,7 +364,7 @@ const About = () => {
 
                   {/* Trust Indicators */}
                   <div className="mt-8 pt-6 border-t border-border/50 animate-fade-in delay-1000">
-                    <p className="text-sm text-muted-foreground mb-3">Trusted by 2500+ events • 98% client satisfaction</p>
+                    <p className="text-sm text-muted-foreground mb-3">Trusted by 10,000+ events • 98% client satisfaction</p>
                     <div className="flex justify-center items-center gap-1">
                       {[...Array(5)].map((_, i) => (
                         <Star key={i} className="h-4 w-4 text-accent fill-current" />
@@ -394,7 +394,7 @@ const About = () => {
               <div className="text-muted-foreground">Years Experience</div>
             </div>
             <div>
-              <div className="text-5xl font-bold text-accent mb-2">2500+</div>
+              <div className="text-5xl font-bold text-accent mb-2">10,000+</div>
               <div className="text-muted-foreground">Events Catered</div>
             </div>
             <div>
@@ -632,14 +632,12 @@ const About = () => {
 
       {/* Enhanced Awards & Recognition */}
       <section className="py-24 bg-background relative overflow-hidden">
-        {/* Background Elements */}
         <div className="absolute top-20 right-20 w-40 h-40 bg-accent/5 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 left-20 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/3 left-10 w-24 h-24 bg-yellow-500/5 rounded-full blur-xl"></div>
         
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          <div className="text-center mb-20">
-            {/* Badge */}
+          {/* <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-2 mb-6 animate-fade-in">
               <Award className="h-4 w-4 text-accent" />
               <span className="text-sm font-medium text-accent">Industry Excellence</span>
@@ -651,12 +649,11 @@ const About = () => {
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-in-up delay-200">
               Honored to be recognized by industry leaders for our commitment to culinary excellence
             </p>
-          </div>
+          </div> */}
 
           {/* Awards Timeline */}
-          <div className="max-w-6xl mx-auto">
+          {/* <div className="max-w-6xl mx-auto">
             <div className="relative">
-              {/* Timeline Line */}
               <div className="absolute left-1/2 transform -translate-x-1/2 w-1 h-full bg-gradient-to-b from-accent via-accent to-primary opacity-20 hidden lg:block"></div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 lg:gap-16">
@@ -697,13 +694,10 @@ const About = () => {
                   <div key={index} className={`animate-slide-in-up group ${index % 2 === 0 ? 'lg:pr-16' : 'lg:pl-16 lg:ml-auto'}`} style={{ animationDelay: `${index * 200}ms` }}>
                     <Card className="p-8 h-full bg-background/50 backdrop-blur-sm border-border/50 hover:bg-background hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl card-shadow group-hover:border-accent/30 relative overflow-hidden">
                       
-                      {/* Background Effect */}
                       <div className={`absolute inset-0 bg-gradient-to-br ${item.color} opacity-0 group-hover:opacity-5 transition-opacity duration-500`}></div>
                       
-                      {/* Timeline Dot (Desktop) */}
                       <div className="absolute top-8 left-1/2 transform -translate-x-1/2 w-4 h-4 bg-accent rounded-full border-4 border-background shadow-lg hidden lg:block group-hover:scale-125 transition-transform duration-300"></div>
                       
-                      {/* Award Icon */}
                       <div className="flex items-start gap-6 mb-6">
                         <div className={`w-16 h-16 bg-gradient-to-br ${item.color} rounded-2xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-lg`}>
                           {item.icon}
@@ -717,7 +711,6 @@ const About = () => {
                         </div>
                       </div>
 
-                      {/* Content */}
                       <div className="relative z-10">
                         <h3 className="text-xl font-bold mb-3 group-hover:text-accent transition-colors duration-300">
                           {item.award}
@@ -730,20 +723,18 @@ const About = () => {
                         </p>
                       </div>
 
-                      {/* Ribbon Effect */}
                       <div className="absolute top-0 right-0 w-20 h-20 overflow-hidden">
                         <div className="absolute top-0 right-0 w-16 h-16 bg-accent/10 transform rotate-45 translate-x-8 -translate-y-8"></div>
                         <Award className="absolute top-2 right-2 h-4 w-4 text-accent/60" />
                       </div>
 
-                      {/* Hover Effect Line */}
                       <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
                     </Card>
                   </div>
                 ))}
               </div>
             </div>
-          </div>
+          </div> */}
 
           {/* Recognition Summary */}
           <div className="text-center mt-20 animate-fade-in delay-1000">
@@ -776,9 +767,9 @@ const About = () => {
                 </div>
               </div>
 
-              <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-accent/25">
+              {/* <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-accent/25">
                 View All Achievements
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

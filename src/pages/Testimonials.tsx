@@ -7,7 +7,7 @@ const Testimonials = () => {
 
   const testimonials = [
     {
-      quote: "Elite Catering made our wedding day absolutely perfect. The food was exquisite, the presentation was stunning, and every guest raved about the experience. They handled everything with such professionalism and care.",
+      quote: "Anjani Caters made our wedding day absolutely perfect. The food was exquisite, the presentation was stunning, and every guest raved about the experience. They handled everything with such professionalism and care.",
       name: "Priya & Arjun",
       position: "Wedding Couple",
       company: "Mumbai",
@@ -16,7 +16,7 @@ const Testimonials = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "We've used Elite Catering for our company events for three years now. Their consistency, quality, and attention to detail is unmatched. They understand our needs and always deliver beyond expectations.",
+      quote: "We've used Anjani Caters for our company events for three years now. Their consistency, quality, and attention to detail is unmatched. They understand our needs and always deliver beyond expectations.",
       name: "Rajesh Kumar",
       position: "CEO",
       company: "TechVision Industries",
@@ -43,7 +43,7 @@ const Testimonials = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "Elite Catering transformed our home into a fine dining restaurant. The chef's personalized service and the quality of ingredients were outstanding. Our guests are still talking about it months later!",
+      quote: "Anjani Caters transformed our home into a fine dining restaurant. The chef's personalized service and the quality of ingredients were outstanding. Our guests are still talking about it months later!",
       name: "Meera Desai",
       position: "Home Host",
       company: "Bangalore",
@@ -64,7 +64,7 @@ const Testimonials = () => {
   const allTestimonials = [
     ...testimonials,
     {
-      quote: "Twenty-five years together deserved something special, and Elite Catering delivered. The romantic setup, exquisite cuisine, and impeccable service made it a night we'll never forget.",
+      quote: "Twenty-five years together deserved something special, and Anjani Caters delivered. The romantic setup, exquisite cuisine, and impeccable service made it a night we'll never forget.",
       name: "Sanjay Patel",
       position: "Anniversary Couple",
       company: "Pune",
@@ -73,7 +73,7 @@ const Testimonials = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "Organizing a gala for 200 guests is challenging, but Elite Catering made it seamless. Their team was professional, the food was exceptional, and they stayed within our budget. Remarkable service!",
+      quote: "Organizing a gala for 200 guests is challenging, but Anjani Caters made it seamless. Their team was professional, the food was exceptional, and they stayed within our budget. Remarkable service!",
       name: "Kavita Reddy",
       position: "Event Organizer",
       company: "Charity Foundation",
@@ -140,7 +140,7 @@ const Testimonials = () => {
 
             {/* Description */}
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-12 opacity-90 leading-relaxed animate-slide-in-up delay-400">
-              Discover why families, businesses, and organizations choose Elite Catering for their special occasions. Read authentic testimonials that reflect our commitment to excellence and customer satisfaction.
+              Discover why families, businesses, and organizations choose Anjani Caters for their special occasions. Read authentic testimonials that reflect our commitment to excellence and customer satisfaction.
             </p>
 
             {/* Call to Action */}
@@ -447,7 +447,7 @@ const Testimonials = () => {
                     Ready to Create Your Success Story?
                   </h3>
                   <p className="text-lg text-muted-foreground max-w-3xl mx-auto">
-                    Join our growing family of satisfied clients and experience the Elite Catering difference
+                    Join our growing family of satisfied clients and experience the Anjani Caters difference
                   </p>
                 </div>
 

@@ -108,12 +108,12 @@ const Contact = () => {
     {
       icon: Phone,
       title: "Call Us",
-      details: ["+91 12345 67890", "+91 98765 43210"],
+      details: ["+91 96855 33878", "+91 96855 33878"],
     },
     {
       icon: Mail,
       title: "Email Us",
-      details: ["info@elitecatering.com", "bookings@elitecatering.com"],
+      details: ["akashraikwar763@gmail.com", "akashraikwar763@gmail.com"],
     },
     {
       icon: Clock,
@@ -177,14 +177,14 @@ const Contact = () => {
                 { 
                   icon: Phone, 
                   title: "Call Now", 
-                  action: "+91 12345 67890", 
+                  action: "+91 96855 33878", 
                   color: "bg-green-100 text-green-700 border-green-200 hover:bg-green-200",
                   emoji: "📞"
                 },
                 { 
                   icon: Mail, 
                   title: "Email Us", 
-                  action: "info@elitecatering.com", 
+                  action: "akashraikwar763@gmail.com", 
                   color: "bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-200",
                   emoji: "✉️"
                 },

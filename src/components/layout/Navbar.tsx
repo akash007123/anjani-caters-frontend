@@ -20,7 +20,7 @@ const Navbar = () => {
     { to: "/", label: "Home" },
     { to: "/about", label: "About" },
     { to: "/services", label: "Services" },
-    { to: "/menu", label: "Menu" },
+    // { to: "/menu", label: "Menu" },
     { to: "/gallery", label: "Gallery" },
     { to: "/testimonials", label: "Reviews" },
     { to: "/blog", label: "Blog" },
@@ -36,11 +36,11 @@ const Navbar = () => {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2">
                 <Phone className="h-3 w-3 text-orange-400" />
-                <span className="text-slate-300">+91 12345 67890</span>
+                <span className="text-slate-300">+91 96855 33878</span>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="h-3 w-3 text-orange-400" />
-                <span className="text-slate-300">info@elitecatering.com</span>
+                <span className="text-slate-300">akashraikwar763@gmail.com</span>
               </div>
             </div>
             <div className="hidden md:flex items-center gap-2 text-slate-300">
@@ -69,7 +69,7 @@ const Navbar = () => {
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent leading-tight">
-                  Elite Catering
+                  Anjani Caters
                 </span>
                 <span className="text-xs text-slate-500 font-medium tracking-wider">
                   PREMIUM CULINARY EXPERIENCES
@@ -141,11 +141,11 @@ const Navbar = () => {
                 <div className="flex items-center gap-4 text-sm">
                   <div className="flex items-center gap-2">
                     <Phone className="h-4 w-4 text-orange-500" />
-                    <span className="font-medium text-slate-700">+91 12345 67890</span>
+                    <span className="font-medium text-slate-700">+91 96855 33878</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <Mail className="h-4 w-4 text-orange-500" />
-                    <span className="font-medium text-slate-700">info@elitecatering.com</span>
+                    <span className="font-medium text-slate-700">akashraikwar763@gmail.com</span>
                   </div>
                 </div>
               </div>

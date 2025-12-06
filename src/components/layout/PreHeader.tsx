@@ -10,9 +10,9 @@ const PreHeader = () => {
               <Phone className="h-4 w-4" />
               <span>+91 123 456 7890</span>
             </a>
-            <a href="mailto:info@elitecatering.com" className="flex items-center gap-2 hover:opacity-80 transition-smooth">
+            <a href="mailto:akashraikwar763@gmail.com" className="flex items-center gap-2 hover:opacity-80 transition-smooth">
               <Mail className="h-4 w-4" />
-              <span className="hidden sm:inline">info@elitecatering.com</span>
+              <span className="hidden sm:inline">akashraikwar763@gmail.com</span>
             </a>
           </div>
           <div className="flex items-center gap-2">

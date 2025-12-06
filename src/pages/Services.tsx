@@ -9,7 +9,7 @@ const Services = () => {
 
   const testimonials = [
     {
-      quote: "Elite Catering transformed our corporate gala into an unforgettable experience. The attention to detail, creative menu, and flawless execution exceeded all expectations.",
+      quote: "Anjani Caters transformed our corporate gala into an unforgettable experience. The attention to detail, creative menu, and flawless execution exceeded all expectations.",
       name: "Neha Kapoor",
       position: "CEO",
       company: "TechVision Industries",
@@ -18,7 +18,7 @@ const Services = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "Our wedding day was absolutely perfect thanks to Elite Catering. Every dish was crafted to perfection, and their team made sure everything ran smoothly. We couldn't have asked for better service.",
+      quote: "Our wedding day was absolutely perfect thanks to Anjani Caters. Every dish was crafted to perfection, and their team made sure everything ran smoothly. We couldn't have asked for better service.",
       name: "Rahul & Priya Sharma",
       position: "Wedding Couple",
       company: "Mumbai",
@@ -27,7 +27,7 @@ const Services = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "The anniversary party was a huge success! Elite Catering's innovative menu and professional service impressed all our guests. The custom cake was the highlight of the evening.",
+      quote: "The anniversary party was a huge success! Anjani Caters's innovative menu and professional service impressed all our guests. The custom cake was the highlight of the evening.",
       name: "Amit Patel",
       position: "Event Host",
       company: "Surat",
@@ -36,7 +36,7 @@ const Services = () => {
       image: "/placeholder.svg"
     },
     {
-      quote: "Outstanding service from start to finish. Elite Catering's team was professional, creative, and delivered beyond our expectations. The food quality and presentation were exceptional.",
+      quote: "Outstanding service from start to finish. Anjani Caters's team was professional, creative, and delivered beyond our expectations. The food quality and presentation were exceptional.",
       name: "Dr. Meera Joshi",
       position: "Hospital Administrator",
       company: "MediCare Hospital",

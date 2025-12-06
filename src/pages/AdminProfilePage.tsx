@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/components/Admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,8 @@ const AdminProfilePage = () => {
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isUploadingPic, setIsUploadingPic] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Form states
   const [profileData, setProfileData] = useState({
@@ -82,6 +84,57 @@ const AdminProfilePage = () => {
     }));
   };
 
+  const handleProfilePicClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please select an image file');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('File size must be less than 5MB');
+      return;
+    }
+
+    setIsUploadingPic(true);
+    try {
+      // Convert file to base64
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        try {
+          const response = await authApiService.uploadProfilePic(base64);
+          if (response.success) {
+            toast.success('Profile picture updated successfully');
+            // Refresh user data
+            window.location.reload();
+          }
+        } catch (error: unknown) {
+          let message = 'Failed to upload profile picture';
+          if (error instanceof Error && 'response' in error) {
+            const axiosError = error as { response?: { data?: { message?: string } } };
+            message = axiosError.response?.data?.message || message;
+          }
+          toast.error(message);
+        } finally {
+          setIsUploadingPic(false);
+        }
+      };
+      reader.readAsDataURL(file);
+    } catch (error: unknown) {
+      toast.error('Failed to read file');
+      setIsUploadingPic(false);
+    }
+  };
+
   const handleSaveProfile = async () => {
     if (!profileData.firstName || !profileData.lastName || !profileData.email || !profileData.mobile) {
       toast.error('Please fill in all required fields');
@@ -97,8 +150,12 @@ const AdminProfilePage = () => {
         // Refresh user data
         window.location.reload();
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to update profile';
+    } catch (error: unknown) {
+      let message = 'Failed to update profile';
+      if (error instanceof Error && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -148,8 +205,12 @@ const AdminProfilePage = () => {
           confirmPassword: '',
         });
       }
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Failed to change password';
+    } catch (error: unknown) {
+      let message = 'Failed to change password';
+      if (error instanceof Error && 'response' in error) {
+        const axiosError = error as { response?: { data?: { message?: string } } };
+        message = axiosError.response?.data?.message || message;
+      }
       toast.error(message);
     } finally {
       setIsLoading(false);
@@ -235,10 +296,22 @@ const AdminProfilePage = () => {
                         size="icon" 
                         variant="outline" 
                         className="absolute -bottom-2 -right-2 h-8 w-8 rounded-full"
-                        disabled={isEditing}
+                        disabled={isEditing || isUploadingPic}
+                        onClick={handleProfilePicClick}
                       >
-                        <Camera className="h-4 w-4" />
+                        {isUploadingPic ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-slate-600 border-t-transparent" />
+                        ) : (
+                          <Camera className="h-4 w-4" />
+                        )}
                       </Button>
+                      <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileChange}
+                        accept="image/*"
+                        className="hidden"
+                      />
                     </div>
                     <div>
                       <CardTitle className="text-2xl">

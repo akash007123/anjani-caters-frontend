@@ -24,7 +24,7 @@ const Footer = () => {
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
-                Elite Catering
+                Anjani Caters
               </span>
             </div>
             
@@ -136,8 +136,8 @@ const Footer = () => {
                 <div>
                   <h5 className="text-sm font-semibold text-white mb-1">Visit Our Kitchen</h5>
                   <p className="text-slate-300 text-sm leading-relaxed">
-                    123 Culinary Street, Food District<br />
-                    Mumbai 400001, Maharashtra
+                    43, Rani Ki Bagiya, Beniganj<br />
+                    Chhatarpur 456010, Madhya Pradesh
                   </p>
                 </div>
               </div>
@@ -149,7 +149,7 @@ const Footer = () => {
                 <div>
                   <h5 className="text-sm font-semibold text-white mb-1">Call Us</h5>
                   <a href="tel:+911234567890" className="text-slate-300 hover:text-orange-400 transition-colors text-sm">
-                    +91 12345 67890
+                    +91 96855 33878
                   </a>
                 </div>
               </div>
@@ -160,8 +160,8 @@ const Footer = () => {
                 </div>
                 <div>
                   <h5 className="text-sm font-semibold text-white mb-1">Email Us</h5>
-                  <a href="mailto:info@elitecatering.com" className="text-slate-300 hover:text-orange-400 transition-colors text-sm">
-                    info@elitecatering.com
+                  <a href="mailto:akashraikwar763@gmail.com" className="text-slate-300 hover:text-orange-400 transition-colors text-sm">
+                    akashraikwar763@gmail.com
                   </a>
                 </div>
               </div>
@@ -187,17 +187,17 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row justify-between items-center gap-6">
             <div className="text-center lg:text-left">
               <p className="text-slate-400 text-sm">
-                © {currentYear} Elite Catering. All rights reserved.
+                © {currentYear} Anjani Caters. All rights reserved.
               </p>
               <p className="text-slate-500 text-xs mt-1">
-                Crafted with ❤️ for unforgettable experiences
+                Develope & Design By ❤️ <a className="text-violet-200 text-md" href="https://sosapient.in/" target="_blank">Sosapient</a>
               </p>
             </div>
             
             <div className="flex gap-6 text-sm text-slate-400">
               <Link to="/privacy" className="hover:text-orange-400 transition-colors">Privacy Policy</Link>
               <Link to="/terms" className="hover:text-orange-400 transition-colors">Terms of Service</Link>
-              <Link to="/cookies" className="hover:text-orange-400 transition-colors">Cookie Policy</Link>
+              {/* <Link to="/cookies" className="hover:text-orange-400 transition-colors">Cookie Policy</Link> */}
             </div>
           </div>
         </div>

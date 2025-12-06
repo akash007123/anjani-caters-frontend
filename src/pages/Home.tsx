@@ -105,7 +105,7 @@ const Home = () => {
       name: "Priya & Arjun Sharma",
       event: "Wedding Reception",
       rating: 5,
-      text: "Elite Catering made our wedding absolutely magical. The food was exceptional, and their attention to detail was impeccable. Every guest raved about the experience!",
+      text: "Anjani Caters made our wedding absolutely magical. The food was exceptional, and their attention to detail was impeccable. Every guest raved about the experience!",
     },
     {
       name: "Rajesh Kumar",
@@ -129,22 +129,22 @@ const Home = () => {
 
   const teamMembers = [
     {
-      name: "Chef Anjali Reddy",
-      role: "Head Chef & Co-Founder",
+      name: "Umesh Raikwar",
+      role: "Head Chef & Founder",
       experience: "15+ years",
-      specialty: "Fusion Indian Cuisine",
+      // specialty: "Fusion Indian Cuisine",
     },
     {
-      name: "Chef Marcus Chen",
-      role: "Sous Chef",
+      name: "Akash Raikwar",
+      role: "Managing Director & Co-founder",
       experience: "10+ years",
-      specialty: "International Continental",
+      // specialty: "International Continental",
     },
     {
       name: "Chef Priya Sharma",
       role: "Pastry Chef",
       experience: "8+ years",
-      specialty: "Artisan Desserts & Baking",
+      // specialty: "Artisan Desserts & Baking",
     },
   ];
 
@@ -315,7 +315,7 @@ const Home = () => {
       </section>
 
       {/* Menu Highlights */}
-      <section className="py-24 bg-background">
+      {/* <section className="py-24 bg-background">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Signature Menu Highlights</h2>
@@ -341,7 +341,7 @@ const Home = () => {
             </Link>
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Testimonials */}
       <section className="py-24 bg-muted">
@@ -454,10 +454,10 @@ const Home = () => {
                     <Clock className="h-4 w-4" />
                     <span>{member.experience}</span>
                   </div>
-                  <div className="flex items-center justify-center gap-2">
+                  {/* <div className="flex items-center justify-center gap-2">
                     <Heart className="h-4 w-4" />
                     <span>{member.specialty}</span>
-                  </div>
+                  </div> */}
                 </div>
               </Card>
             ))}
@@ -471,7 +471,7 @@ const Home = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
             {[
               { number: "15+", label: "Years Experience" },
-              { number: "2500+", label: "Events Catered" },
+              { number: "10,000+", label: "Events Catered" },
               { number: "50+", label: "Expert Team" },
               { number: "98%", label: "Client Satisfaction" },
             ].map((stat, index) => (
@@ -485,7 +485,7 @@ const Home = () => {
       </section>
 
       {/* Awards Section */}
-      <section className="py-24 bg-muted">
+      {/* <section className="py-24 bg-muted">
         <div className="container mx-auto px-6 lg:px-12">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold mb-4">Awards & Recognition</h2>
@@ -503,7 +503,7 @@ const Home = () => {
             ))}
           </div>
         </div>
-      </section>
+      </section> */}
 
       {/* Blog Preview */}
       <section className="py-24 bg-background">
