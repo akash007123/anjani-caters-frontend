@@ -24,6 +24,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -32,6 +33,7 @@ interface AdminLayoutProps {
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const navItems = [
@@ -41,8 +43,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
   ];
 
-  const handleLogout = () => {
-    // Implement logout logic here
+  const handleLogout = async () => {
+    await logout();
     navigate('/');
   };
 
@@ -137,18 +139,27 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-9 w-9 rounded-full ring-2 ring-slate-100 hover:ring-slate-200 transition-all">
                   <Avatar className="h-9 w-9">
-                    <AvatarImage src="https://github.com/shadcn.png" alt="Admin" />
-                    <AvatarFallback>AD</AvatarFallback>
+                    <AvatarImage src={user?.profilePic || "https://github.com/shadcn.png"} alt={user?.firstName || "Admin"} />
+                    <AvatarFallback>
+                      {user?.firstName?.[0]?.toUpperCase()}{user?.lastName?.[0]?.toUpperCase() || 'A'}
+                    </AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="w-56" align="end" forceMount>
                 <DropdownMenuLabel className="font-normal">
                   <div className="flex flex-col space-y-1">
-                    <p className="text-sm font-medium leading-none">Admin User</p>
-                    <p className="text-xs leading-none text-muted-foreground">
-                      admin@anjanicaters.com
+                    <p className="text-sm font-medium leading-none">
+                      {user ? `${user.firstName} ${user.lastName}` : 'Admin User'}
                     </p>
+                    <p className="text-xs leading-none text-muted-foreground">
+                      {user?.email || 'admin@anjanicaters.com'}
+                    </p>
+                    {user?.role && (
+                      <p className="text-xs leading-none text-muted-foreground">
+                        Role: {user.role}
+                      </p>
+                    )}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
