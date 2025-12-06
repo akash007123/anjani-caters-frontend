@@ -16,6 +16,7 @@ import Contact from "./pages/Contact";
 import Quote from "./pages/Quote";
 import AdminContactsPage from "./pages/AdminContactsPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
+import AdminProfilePage from "./pages/AdminProfilePage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -48,6 +49,11 @@ const App = () => (
               <Route path="/admin/settings" element={
                 <ProtectedRoute>
                   <AdminSettingsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/profile" element={
+                <ProtectedRoute>
+                  <AdminProfilePage />
                 </ProtectedRoute>
               } />
               <Route path="/admin/dashboard" element={

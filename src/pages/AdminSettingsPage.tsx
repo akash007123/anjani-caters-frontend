@@ -4,8 +4,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { User, Shield, Settings, Bell, Users, Mail, MessageSquare, Database, Globe, Activity } from 'lucide-react';
 
+import AdminProfilePage from './AdminProfilePage';
+
 // Placeholder components for tabs (will be implemented individually)
-const ProfileTab = () => <div>Profile Settings Content</div>;
+const ProfileTab = () => <AdminProfilePage />;
 const SecurityTab = () => <div>Security Settings Content</div>;
 const GeneralTab = () => <div>General Settings Content</div>;
 const NotificationsTab = () => <div>Notification Settings Content</div>;

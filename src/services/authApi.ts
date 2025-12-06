@@ -26,8 +26,11 @@ export interface User {
     firstName: string;
     lastName: string;
     email: string;
+    mobile: string;
     role: 'Admin' | 'Manager' | 'Editor' | 'Viewer';
     profilePic?: string;
+    isActive: boolean;
+    lastLogin?: string;
 }
 
 export interface AuthResponse {
@@ -61,6 +64,16 @@ export const authApiService = {
 
     logout: async () => {
         const response = await authApi.post<{ success: boolean; message: string }>('/logout');
+        return response.data;
+    },
+
+    updateProfile: async (profileData: Partial<User>) => {
+        const response = await authApi.put<{ success: boolean; data: User; message: string }>('/profile', profileData);
+        return response.data;
+    },
+
+    updatePassword: async (passwordData: { currentPassword: string; newPassword: string }) => {
+        const response = await authApi.put<{ success: boolean; message: string }>('/password', passwordData);
         return response.data;
     },
 };
