@@ -15,6 +15,7 @@ import BlogPost from "./pages/BlogPost";
 import Contact from "./pages/Contact";
 import Quote from "./pages/Quote";
 import AdminContactsPage from "./pages/AdminContactsPage";
+import AdminQuotesPage from "./pages/AdminQuotesPage";
 import AdminSettingsPage from "./pages/AdminSettingsPage";
 import AdminProfilePage from "./pages/AdminProfilePage";
 import AdminAddUsersPage from "./pages/AdminAddUsersPage";
@@ -45,6 +46,11 @@ const App = () => (
               <Route path="/admin/contacts" element={
                 <ProtectedRoute>
                   <AdminContactsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/quotes" element={
+                <ProtectedRoute>
+                  <AdminQuotesPage />
                 </ProtectedRoute>
               } />
               <Route path="/admin/settings" element={

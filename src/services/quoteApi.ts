@@ -44,6 +44,31 @@ interface QuoteResponse {
   };
 }
 
+interface QuotesApiResponse {
+  success: boolean;
+  data: Array<{
+    _id: string;
+    name: string;
+    email: string;
+    phone?: string;
+    eventType: string;
+    eventDate: string;
+    guestCount: string;
+    venue?: string;
+    budget?: string;
+    requirements?: string;
+    status: 'New' | 'Pending' | 'Resolved';
+    priority: 'low' | 'medium' | 'high' | 'urgent';
+    createdAt: string;
+    updatedAt: string;
+  }>;
+  pagination: {
+    total: number;
+    page: number;
+    pages: number;
+  };
+}
+
 interface ApiError {
   success: false;
   message: string;
@@ -162,7 +187,7 @@ export const quoteApiService = {
     eventType?: string;
     page?: number;
     limit?: number;
-  }): Promise<QuoteResponse> => {
+  }): Promise<QuotesApiResponse> => {
     try {
       const queryParams = new URLSearchParams();
       if (params) {
@@ -206,6 +231,32 @@ export const quoteApiService = {
       const message = responseData?.message || 'Failed to fetch quote statistics';
       throw new Error(message);
     }
+  },
+
+  // Update quote (for admin)
+  updateQuote: async (id: string, data: Partial<QuoteFormData> & { status?: string; priority?: string }): Promise<QuoteResponse> => {
+    try {
+      const response = await quoteApi.put(`/quotes/${id}`, data);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to update quote';
+      throw new Error(message);
+    }
+  },
+
+  // Delete quote (for admin)
+  deleteQuote: async (id: string): Promise<{ success: boolean; message: string }> => {
+    try {
+      const response = await quoteApi.delete(`/quotes/${id}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to delete quote';
+      throw new Error(message);
+    }
   }
 };
 
@@ -213,4 +264,4 @@ export const quoteApiService = {
 export { quoteApi };
 
 // Export types for use in components
-export type { QuoteFormData, QuoteResponse, ApiError, HealthResponse, QuoteStatsResponse };
+export type { QuoteFormData, QuoteResponse, QuotesApiResponse, ApiError, HealthResponse, QuoteStatsResponse };
