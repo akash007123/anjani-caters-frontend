@@ -130,6 +130,46 @@ interface FeaturedBlogsResponse {
   data: Blog[];
 }
 
+interface Comment {
+  _id: string;
+  blog: string;
+  fullName: string;
+  email: string;
+  profilePic?: string;
+  comment: string;
+  isApproved: boolean;
+  createdAt: string;
+  updatedAt: string;
+  formattedDate?: string;
+}
+
+interface CommentFormData {
+  blogId: string;
+  fullName: string;
+  email: string;
+  profilePic?: string;
+  comment: string;
+}
+
+interface CommentsResponse {
+  success: boolean;
+  message: string;
+  data: {
+    comments: Comment[];
+    total: number;
+    page: number;
+    pages: number;
+    hasNextPage: boolean;
+    hasPrevPage: boolean;
+  };
+}
+
+interface CommentResponse {
+  success: boolean;
+  message: string;
+  data: Comment;
+}
+
 // Request interceptor for adding auth headers if needed
 blogApi.interceptors.request.use(
   (config) => {
@@ -400,6 +440,59 @@ export const blogApiService = {
       const message = responseData?.message || 'Failed to upload image';
       throw new Error(message);
     }
+  },
+
+  // Comments API
+  createComment: async (data: CommentFormData): Promise<CommentResponse> => {
+    try {
+      const response = await blogApi.post('/comments', data);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to create comment';
+      throw new Error(message);
+    }
+  },
+
+  getCommentsByBlog: async (blogId: string, params?: { page?: number; limit?: number }): Promise<CommentsResponse> => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+      const response = await blogApi.get(`/comments/blog/${blogId}?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to fetch comments';
+      throw new Error(message);
+    }
+  },
+
+  getCommentsByBlogSlug: async (slug: string, params?: { page?: number; limit?: number }): Promise<CommentsResponse> => {
+    try {
+      const queryParams = new URLSearchParams();
+      if (params) {
+        Object.entries(params).forEach(([key, value]) => {
+          if (value !== undefined) {
+            queryParams.append(key, value.toString());
+          }
+        });
+      }
+      const response = await blogApi.get(`/comments/blog/slug/${slug}?${queryParams.toString()}`);
+      return response.data;
+    } catch (error) {
+      const apiError = error as AxiosError;
+      const responseData = apiError.response?.data as { message?: string } | undefined;
+      const message = responseData?.message || 'Failed to fetch comments';
+      throw new Error(message);
+    }
   }
 };
 
@@ -417,5 +510,9 @@ export type {
   ApiError,
   HealthResponse,
   TagsResponse,
-  FeaturedBlogsResponse
+  FeaturedBlogsResponse,
+  Comment,
+  CommentFormData,
+  CommentsResponse,
+  CommentResponse
 };

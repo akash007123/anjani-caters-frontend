@@ -4,21 +4,25 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { 
-  Calendar, 
-  User, 
-  ArrowLeft, 
-  Clock, 
-  Share2, 
-  BookOpen, 
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import {
+  Calendar,
+  User,
+  ArrowLeft,
+  Clock,
+  Share2,
+  BookOpen,
   Tag,
   Eye,
   Heart,
   MessageCircle,
   Loader2,
-  AlertCircle
+  AlertCircle,
+  Send
 } from "lucide-react";
-import { Blog, blogApiService } from "@/services/blogApi";
+import { Blog, blogApiService, Comment, CommentFormData } from "@/services/blogApi";
 import { useToast } from "@/hooks/use-toast";
 
 const BlogPost = () => {
@@ -30,6 +34,18 @@ const BlogPost = () => {
   const [relatedBlogs, setRelatedBlogs] = useState<Blog[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Comments state
+  const [comments, setComments] = useState<Comment[]>([]);
+  const [commentsLoading, setCommentsLoading] = useState(false);
+  const [commentForm, setCommentForm] = useState<CommentFormData>({
+    blogId: '',
+    fullName: '',
+    email: '',
+    profilePic: '',
+    comment: ''
+  });
+  const [submittingComment, setSubmittingComment] = useState(false);
 
   // Load blog post data
   const loadBlogPost = async () => {
@@ -45,9 +61,12 @@ const BlogPost = () => {
       
       const response = await blogApiService.getBlogBySlug(slug);
       setBlog(response.data);
-      
+
       // Load related blogs (same category or tags)
       await loadRelatedBlogs(response.data);
+
+      // Load comments for this blog
+      await loadComments(response.data._id);
       
     } catch (error: unknown) {
       console.error('Error loading blog post:', error);
@@ -66,17 +85,91 @@ const BlogPost = () => {
         limit: 3,
         ...categoryParam
       });
-      
+
       // Filter out current blog and limit to 3
       const related = response.data.blogs
         .filter(b => b._id !== currentBlog._id)
         .slice(0, 3);
-        
+
       setRelatedBlogs(related);
     } catch (error) {
       console.error('Error loading related blogs:', error);
       // Don't show error for related blogs, just continue without them
     }
+  };
+
+  // Load comments for the blog
+  const loadComments = async (blogId: string) => {
+    try {
+      setCommentsLoading(true);
+      const response = await blogApiService.getCommentsByBlog(blogId);
+      setComments(response.data.comments);
+    } catch (error) {
+      console.error('Error loading comments:', error);
+      // Don't show error for comments, just continue without them
+    } finally {
+      setCommentsLoading(false);
+    }
+  };
+
+  // Handle comment form submission
+  const handleCommentSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!blog) return;
+
+    if (!commentForm.fullName.trim() || !commentForm.email.trim() || !commentForm.comment.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    try {
+      setSubmittingComment(true);
+      const commentData: CommentFormData = {
+        ...commentForm,
+        blogId: blog._id
+      };
+
+      await blogApiService.createComment(commentData);
+
+      // Reset form
+      setCommentForm({
+        blogId: '',
+        fullName: '',
+        email: '',
+        profilePic: '',
+        comment: ''
+      });
+
+      // Reload comments
+      await loadComments(blog._id);
+
+      toast({
+        title: "Comment Submitted",
+        description: "Your comment has been submitted successfully.",
+      });
+    } catch (error) {
+      console.error('Error submitting comment:', error);
+      toast({
+        title: "Error",
+        description: "Failed to submit comment. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmittingComment(false);
+    }
+  };
+
+  // Handle comment form input changes
+  const handleCommentInputChange = (field: keyof CommentFormData, value: string) => {
+    setCommentForm(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   // Update page metadata for SEO
@@ -361,6 +454,133 @@ const BlogPost = () => {
             <div className="text-sm text-muted-foreground">
               Last updated: {formatDate(blog.updatedAt)}
             </div>
+          </div>
+
+
+          {/* Comments Section */}
+          <div className="mt-12">
+            <div className="flex items-center gap-2 mb-6">
+              <MessageCircle className="h-5 w-5" />
+              <h3 className="text-2xl font-bold">Comments ({comments.length})</h3>
+            </div>
+
+            {/* Comment Form */}
+            <Card className="p-6 mb-8">
+              <h4 className="text-lg font-semibold mb-4">Leave a Comment</h4>
+              <form onSubmit={handleCommentSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      value={commentForm.fullName}
+                      onChange={(e) => handleCommentInputChange('fullName', e.target.value)}
+                      placeholder="Your full name"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email">Email *</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={commentForm.email}
+                      onChange={(e) => handleCommentInputChange('email', e.target.value)}
+                      placeholder="your.email@example.com"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="profilePic">Profile Picture URL (Optional)</Label>
+                  <Input
+                    id="profilePic"
+                    type="url"
+                    value={commentForm.profilePic}
+                    onChange={(e) => handleCommentInputChange('profilePic', e.target.value)}
+                    placeholder="https://example.com/your-photo.jpg"
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="comment">Comment *</Label>
+                  <Textarea
+                    id="comment"
+                    value={commentForm.comment}
+                    onChange={(e) => handleCommentInputChange('comment', e.target.value)}
+                    placeholder="Share your thoughts..."
+                    rows={4}
+                    required
+                  />
+                </div>
+                <Button
+                  type="submit"
+                  disabled={submittingComment}
+                  className="w-full md:w-auto"
+                >
+                  {submittingComment ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Send className="mr-2 h-4 w-4" />
+                      Submit Comment
+                    </>
+                  )}
+                </Button>
+              </form>
+            </Card>
+
+            {/* Comments List */}
+            {commentsLoading ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin" />
+                <span className="ml-2">Loading comments...</span>
+              </div>
+            ) : comments.length > 0 ? (
+              <div className="space-y-6">
+                {comments.map((comment) => (
+                  <Card key={comment._id} className="p-6">
+                    <div className="flex items-start gap-4">
+                      <div className="flex-shrink-0">
+                        {comment.profilePic ? (
+                          <img
+                            src={comment.profilePic}
+                            alt={comment.fullName}
+                            className="w-10 h-10 rounded-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
+                            <User className="h-5 w-5" />
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <h5 className="font-semibold">{comment.fullName}</h5>
+                          <span className="text-sm text-muted-foreground">
+                            {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                              year: 'numeric',
+                              month: 'long',
+                              day: 'numeric'
+                            })}
+                          </span>
+                        </div>
+                        <p className="text-muted-foreground whitespace-pre-wrap">{comment.comment}</p>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+            ) : (
+              <Card className="p-8 text-center">
+                <MessageCircle className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                <h4 className="text-lg font-semibold mb-2">No comments yet</h4>
+                <p className="text-muted-foreground">Be the first to share your thoughts on this article!</p>
+              </Card>
+            )}
           </div>
 
           {/* Call to Action */}
