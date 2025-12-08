@@ -593,10 +593,10 @@ const BlogAdmin: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {deletingBlog && (
         <DeleteConfirmModal
-          title="Delete Blog Post"
-          description={`Are you sure you want to delete "${deletingBlog.title}"? This action cannot be undone.`}
+          isOpen={true}
+          onClose={() => setDeletingBlog(null)}
           onConfirm={handleDeleteBlog}
-          onCancel={() => setDeletingBlog(null)}
+          itemName={deletingBlog.title}
         />
       )}
     </div>
