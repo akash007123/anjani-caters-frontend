@@ -46,6 +46,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
   const [authorName, setAuthorName] = useState('');
   const [authorEmail, setAuthorEmail] = useState('');
   const [category, setCategory] = useState('');
+  const [readingTime, setReadingTime] = useState<number | undefined>(undefined);
   
   // UI state
   const [newTag, setNewTag] = useState('');
@@ -70,6 +71,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
       setAuthorName(blog.author.name);
       setAuthorEmail(blog.author.email);
       setCategory(blog.category || '');
+      setReadingTime(blog.readingTime);
       setImagePreview(blog.coverImage);
     }
   }, [blog]);
@@ -218,7 +220,8 @@ const BlogForm: React.FC<BlogFormProps> = ({
         seoKeywords,
         authorName: authorName.trim(),
         authorEmail: authorEmail.trim(),
-        category: category.trim()
+        category: category.trim(),
+        readingTime
       };
 
       await onSubmit(formData);
@@ -461,6 +464,22 @@ const BlogForm: React.FC<BlogFormProps> = ({
               </SelectContent>
             </Select>
           </div>
+
+          {/* Reading Time */}
+          <div>
+            <Label htmlFor="readingTime">Reading Time (minutes)</Label>
+            <Input
+              id="readingTime"
+              type="number"
+              value={readingTime || ''}
+              onChange={(e) => setReadingTime(e.target.value ? parseInt(e.target.value) : undefined)}
+              placeholder="e.g. 5"
+              min="1"
+            />
+            <p className="text-xs text-muted-foreground mt-1">
+              Estimated reading time in minutes. Leave empty to auto-calculate.
+            </p>
+          </div>
         </CardContent>
       </Card>
 
@@ -529,7 +548,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
                     </div>
                     <div className="flex items-center gap-1">
                       <Clock className="h-4 w-4" />
-                      {Math.ceil((content.split(' ').length + sections.reduce((acc, curr) => acc + curr.sectionContent.split(' ').length, 0)) / 200)} min read
+                      {readingTime || Math.ceil((content.split(' ').length + sections.reduce((acc, curr) => acc + curr.sectionContent.split(' ').length, 0)) / 200)} min read
                     </div>
                   </div>
                   
@@ -634,7 +653,7 @@ const BlogForm: React.FC<BlogFormProps> = ({
                           </div>
                           <div className="flex items-center gap-1">
                             <Clock className="h-3 w-3" />
-                            <span>{Math.ceil((content.split(' ').length + sections.reduce((acc, curr) => acc + curr.sectionContent.split(' ').length, 0)) / 200)} min</span>
+                            <span>{readingTime || Math.ceil((content.split(' ').length + sections.reduce((acc, curr) => acc + curr.sectionContent.split(' ').length, 0)) / 200)} min</span>
                           </div>
                         </div>
                       </div>

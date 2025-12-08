@@ -27,6 +27,7 @@ interface BlogFormData {
   authorName: string;
   authorEmail: string;
   category?: string;
+  readingTime?: number;
 }
 
 interface BlogSection {
