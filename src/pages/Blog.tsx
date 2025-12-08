@@ -1,65 +1,146 @@
+import React, { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Calendar, User, ArrowRight, BookOpen, Clock, Star, Eye, Mail, CheckCircle, Gift, Zap } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { 
+  Calendar, 
+  User, 
+  ArrowRight, 
+  BookOpen, 
+  Clock, 
+  Star, 
+  Eye, 
+  Mail, 
+  CheckCircle, 
+  Gift, 
+  Zap,
+  Search,
+  Filter,
+  Loader2,
+  TrendingUp
+} from "lucide-react";
 import { Link } from "react-router-dom";
+import { Blog, blogApiService } from "@/services/blogApi";
+import { useToast } from "@/hooks/use-toast";
 
-const Blog = () => {
-  const blogPosts = [
-    {
-      slug: "wedding-menu-tips",
-      title: "10 Tips for Planning the Perfect Wedding Menu",
-      excerpt: "Creating a memorable wedding menu requires careful consideration of your guests' preferences, dietary restrictions, and the overall theme of your celebration.",
-      author: "Chef Rahul Sharma",
-      date: "March 15, 2024",
-      category: "Wedding Planning",
-      readTime: "5 min read",
-    },
-    {
-      slug: "fusion-cuisine",
-      title: "The Art of Fusion Cuisine: Blending Traditions",
-      excerpt: "Explore how modern catering is embracing fusion cuisine, combining traditional Indian flavors with international cooking techniques.",
-      author: "Priya Desai",
-      date: "March 10, 2024",
-      category: "Culinary Trends",
-      readTime: "7 min read",
-    },
-    {
-      slug: "corporate-catering",
-      title: "Corporate Event Catering: Making Lasting Impressions",
-      excerpt: "Your business events deserve catering that reflects your brand's professionalism and attention to detail. Here's how to choose the right service.",
-      author: "Vikram Patel",
-      date: "March 5, 2024",
-      category: "Corporate Events",
-      readTime: "6 min read",
-    },
-    {
-      slug: "seasonal-ingredients",
-      title: "Seasonal Ingredients: Why They Matter",
-      excerpt: "Discover how using seasonal, locally-sourced ingredients can elevate your event menu while supporting sustainable practices.",
-      author: "Chef Anita Kumar",
-      date: "February 28, 2024",
-      category: "Sustainability",
-      readTime: "4 min read",
-    },
-    {
-      slug: "dessert-experiences",
-      title: "Creating Memorable Dessert Experiences",
-      excerpt: "From elaborate dessert tables to individual plated masterpieces, learn how to end your event on a sweet note.",
-      author: "Pastry Chef Meera Singh",
-      date: "February 20, 2024",
-      category: "Desserts",
-      readTime: "5 min read",
-    },
-    {
-      slug: "dietary-accommodations",
-      title: "Dietary Accommodations Done Right",
-      excerpt: "A comprehensive guide to handling various dietary requirements at your event, ensuring every guest enjoys the culinary experience.",
-      author: "Nutritionist Sanjay Reddy",
-      date: "February 15, 2024",
-      category: "Nutrition",
-      readTime: "8 min read",
-    },
-  ];
+const BlogPage = () => {
+  const { toast } = useToast();
+  
+  // State management
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+  const [featuredBlogs, setFeaturedBlogs] = useState<Blog[]>([]);
+  const [allTags, setAllTags] = useState<string[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedTag, setSelectedTag] = useState('');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalBlogs, setTotalBlogs] = useState(0);
+
+  // Load blogs data
+  const loadBlogs = async () => {
+    try {
+      setLoading(true);
+      const params = {
+        page: currentPage,
+        limit: 6,
+        search: searchTerm || undefined,
+        tag: selectedTag || undefined,
+        featured: !selectedTag ? false : undefined
+      };
+      
+      const response = await blogApiService.getPublishedBlogs(params);
+      setBlogs(response.data.blogs);
+      setTotalPages(response.data.pages);
+      setTotalBlogs(response.data.total);
+    } catch (error) {
+      console.error('Error loading blogs:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load blogs. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Load featured blogs
+  const loadFeaturedBlogs = async () => {
+    try {
+      const response = await blogApiService.getFeaturedBlogs(3);
+      setFeaturedBlogs(response.data);
+    } catch (error) {
+      console.error('Error loading featured blogs:', error);
+    }
+  };
+
+  // Load all tags
+  const loadTags = async () => {
+    try {
+      const response = await blogApiService.getAllTags();
+      setAllTags(response.data);
+    } catch (error) {
+      console.error('Error loading tags:', error);
+    }
+  };
+
+  // Load data on mount and when filters change
+  useEffect(() => {
+    loadBlogs();
+  }, [currentPage, searchTerm, selectedTag]);
+
+  useEffect(() => {
+    loadFeaturedBlogs();
+    loadTags();
+  }, []);
+
+  // Format date
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  };
+
+  // Handle search
+  const handleSearch = (value: string) => {
+    setSearchTerm(value);
+    setCurrentPage(1);
+  };
+
+  // Handle tag filter
+  const handleTagFilter = (tag: string) => {
+    setSelectedTag(tag === 'all' ? '' : tag);
+    setCurrentPage(1);
+  };
+
+  // Clear filters
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedTag('');
+    setCurrentPage(1);
+  };
+
+  if (loading && blogs.length === 0) {
+    return (
+      <div className="min-h-screen pt-[120px] flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p className="text-muted-foreground">Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen pt-[120px]">
@@ -102,6 +183,67 @@ const Blog = () => {
               from our team of professional chefs and event specialists.
             </p>
 
+            {/* Search and Filter Section */}
+            <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm rounded-2xl p-6 mb-12 border border-white/20 shadow-lg">
+              <div className="flex flex-col md:flex-row gap-4 items-center">
+                <div className="relative flex-1 w-full">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                  <Input
+                    placeholder="Search blog posts..."
+                    value={searchTerm}
+                    onChange={(e) => handleSearch(e.target.value)}
+                    className="pl-10 bg-white/80 dark:bg-gray-900/80 border-gray-200 dark:border-gray-700"
+                  />
+                </div>
+                
+                <Select value={selectedTag} onValueChange={handleTagFilter}>
+                  <SelectTrigger className="w-full md:w-[200px] bg-white/80 dark:bg-gray-900/80 border-gray-200 dark:border-gray-700">
+                    <SelectValue placeholder="Filter by tag" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Topics</SelectItem>
+                    {allTags.map((tag) => (
+                      <SelectItem key={tag} value={tag}>
+                        {tag}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+
+                {(searchTerm || selectedTag) && (
+                  <Button
+                    variant="outline"
+                    onClick={clearFilters}
+                    className="w-full md:w-auto"
+                  >
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+              
+              {/* Active filters */}
+              {(searchTerm || selectedTag) && (
+                <div className="flex flex-wrap gap-2 mt-4">
+                  {searchTerm && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      Search: "{searchTerm}"
+                      <button onClick={() => setSearchTerm('')}>
+                        ×
+                      </button>
+                    </Badge>
+                  )}
+                  {selectedTag && (
+                    <Badge variant="secondary" className="flex items-center gap-1">
+                      Tag: {selectedTag}
+                      <button onClick={() => setSelectedTag('')}>
+                        ×
+                      </button>
+                    </Badge>
+                  )}
+                </div>
+              )}
+            </div>
+
             {/* Blog categories */}
             <div className="flex flex-wrap justify-center gap-3 mb-12">
               {[
@@ -115,6 +257,7 @@ const Blog = () => {
                 <span 
                   key={index}
                   className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium border ${category.color} hover:scale-105 transition-transform duration-200 cursor-pointer`}
+                  onClick={() => handleTagFilter(category.name)}
                 >
                   <span>{category.icon}</span>
                   {category.name}
@@ -125,8 +268,8 @@ const Blog = () => {
             {/* Quick stats */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-6 max-w-2xl mx-auto">
               {[
-                { number: "50+", label: "Articles" },
-                { number: "5", label: "Expert Chefs" },
+                { number: totalBlogs.toString(), label: "Articles" },
+                { number: allTags.length.toString(), label: "Topics" },
                 { number: "1000+", label: "Happy Readers" },
                 { number: "Weekly", label: "Updates" }
               ].map((stat, index) => (
@@ -152,178 +295,132 @@ const Blog = () => {
       </section>
 
       {/* Enhanced Featured Post */}
-      <section className="py-32 bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-20 right-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 right-10 w-24 h-24 bg-accent/15 rounded-full blur-xl animate-pulse delay-500"></div>
-        
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-3 mb-6">
-              <BookOpen className="h-5 w-5 text-accent" />
-              <span className="text-sm font-semibold text-accent">Must Read</span>
+      {featuredBlogs.length > 0 && !searchTerm && !selectedTag && (
+        <section className="py-32 bg-gradient-to-br from-background via-background to-muted/20 relative overflow-hidden">
+          {/* Background Elements */}
+          <div className="absolute top-20 right-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 left-20 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
+          <div className="absolute top-1/2 right-10 w-24 h-24 bg-accent/15 rounded-full blur-xl animate-pulse delay-500"></div>
+          
+          <div className="container mx-auto px-6 lg:px-12 relative z-10">
+            {/* Section Header */}
+            <div className="text-center mb-16">
+              <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-3 mb-6">
+                <BookOpen className="h-5 w-5 text-accent" />
+                <span className="text-sm font-semibold text-accent">Must Read</span>
+              </div>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                Featured Article
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                Discover our most popular and insightful content crafted by industry experts
+              </p>
             </div>
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-              Featured Article
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-              Discover our most popular and insightful content crafted by industry experts
-            </p>
-          </div>
 
-          <div className="max-w-5xl mx-auto">
-            <div className="group animate-slide-in-up">
-              <Card className="relative overflow-hidden bg-background/60 backdrop-blur-sm border-border/50 hover:border-accent/30 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-                
-                {/* Background Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
-                <div className="absolute -top-3 -right-3 w-8 h-8 border-r-2 border-t-2 border-accent/30 rounded-tr-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
-                <div className="absolute -bottom-3 -left-3 w-8 h-8 border-l-2 border-b-2 border-accent/30 rounded-bl-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
-                
-                {/* Content */}
-                <div className="relative z-10 p-12">
-                  {/* Category and Featured Badge */}
-                  <div className="flex items-center gap-4 mb-6">
-                    <div className="flex items-center gap-2">
-                      <span className="inline-flex items-center gap-1 bg-accent/10 border border-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">
-                        <Star className="h-3 w-3 fill-current" />
-                        Featured
-                      </span>
-                      <span className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium">
-                        <Eye className="h-3 w-3" />
-                        Popular
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Title */}
-                  <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-foreground group-hover:text-accent transition-colors duration-300">
-                    {blogPosts[0].title}
-                  </h2>
-
-                  {/* Meta Information */}
-                  <div className="flex flex-wrap items-center gap-8 text-sm text-muted-foreground mb-8">
-                    <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
-                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                        <User className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">{blogPosts[0].author}</div>
-                        <div className="text-xs">Author</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
-                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                        <Calendar className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">{blogPosts[0].date}</div>
-                        <div className="text-xs">Published</div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
-                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                        <Clock className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">{blogPosts[0].readTime}</div>
-                        <div className="text-xs">Reading Time</div>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
-                      <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                        <BookOpen className="h-5 w-5 text-accent" />
-                      </div>
-                      <div>
-                        <div className="font-semibold text-foreground">{blogPosts[0].category}</div>
-                        <div className="text-xs">Category</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Excerpt */}
-                  <div className="relative mb-10">
-                    <div className="absolute -left-6 top-0 w-1 h-full bg-gradient-to-b from-accent to-accent/30 rounded-full opacity-30"></div>
-                    <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed pl-8 group-hover:text-foreground/90 transition-colors duration-300">
-                      {blogPosts[0].excerpt}
-                    </p>
-                  </div>
-
-                  {/* Call to Action */}
-                  <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-                    <Link to={`/blog/${blogPosts[0].slug}`} className="group/btn">
-                      <Button 
-                        size="lg" 
-                        className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden"
-                      >
-                        <span className="relative z-10 flex items-center gap-3">
-                          <BookOpen className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-300" />
-                          Read Full Article
-                          <ArrowRight className="h-5 w-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+            <div className="max-w-5xl mx-auto">
+              <div className="group animate-slide-in-up">
+                <Card className="relative overflow-hidden bg-background/60 backdrop-blur-sm border-border/50 hover:border-accent/30 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
+                  
+                  {/* Background Effect */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                  
+                  {/* Content */}
+                  <div className="relative z-10 p-12">
+                    {/* Category and Featured Badge */}
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center gap-1 bg-accent/10 border border-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">
+                          <Star className="h-3 w-3 fill-current" />
+                          Featured
                         </span>
-                        <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-white/10 to-accent/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
-                      </Button>
-                    </Link>
-                    
-                    {/* Additional Actions */}
-                    <div className="flex gap-3">
-                      <button className="flex items-center gap-2 px-4 py-3 border border-border hover:border-accent/50 text-foreground hover:text-accent rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                        <Star className="h-4 w-4" />
-                        Save for Later
-                      </button>
-                      <button className="flex items-center gap-2 px-4 py-3 border border-border hover:border-accent/50 text-foreground hover:text-accent rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                        <ArrowRight className="h-4 w-4 rotate-45" />
-                        Share
-                      </button>
+                        <span className="inline-flex items-center gap-1 bg-primary/10 border border-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                          <Eye className="h-3 w-3" />
+                          Popular
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Title */}
+                    <h2 className="text-4xl md:text-5xl font-bold mb-6 leading-tight text-foreground group-hover:text-accent transition-colors duration-300">
+                      {featuredBlogs[0].title}
+                    </h2>
+
+                    {/* Meta Information */}
+                    <div className="flex flex-wrap items-center gap-8 text-sm text-muted-foreground mb-8">
+                      <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
+                        <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
+                          <User className="h-5 w-5 text-accent" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">{featuredBlogs[0].author.name}</div>
+                          <div className="text-xs">Author</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
+                        <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
+                          <Calendar className="h-5 w-5 text-accent" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">{formatDate(featuredBlogs[0].publishedAt || featuredBlogs[0].createdAt)}</div>
+                          <div className="text-xs">Published</div>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
+                        <div className="w-10 h-10 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
+                          <Clock className="h-5 w-5 text-accent" />
+                        </div>
+                        <div>
+                          <div className="font-semibold text-foreground">{featuredBlogs[0].readingTime || 5} min read</div>
+                          <div className="text-xs">Reading Time</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Excerpt */}
+                    <div className="relative mb-10">
+                      <div className="absolute -left-6 top-0 w-1 h-full bg-gradient-to-b from-accent to-accent/30 rounded-full opacity-30"></div>
+                      <p className="text-xl md:text-2xl text-muted-foreground leading-relaxed pl-8 group-hover:text-foreground/90 transition-colors duration-300">
+                        {featuredBlogs[0].excerpt}
+                      </p>
+                    </div>
+
+                    {/* Call to Action */}
+                    <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                      <Link to={`/blog/${featuredBlogs[0].slug}`} className="group/btn">
+                        <Button 
+                          size="lg" 
+                          className="bg-accent hover:bg-accent/90 text-accent-foreground px-8 py-4 text-lg font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 relative overflow-hidden"
+                        >
+                          <span className="relative z-10 flex items-center gap-3">
+                            <BookOpen className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-300" />
+                            Read Full Article
+                            <ArrowRight className="h-5 w-5 group-hover/btn:translate-x-1 transition-transform duration-300" />
+                          </span>
+                          <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-white/10 to-accent/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
+                        </Button>
+                      </Link>
+                      
+                      {/* Additional Actions */}
+                      <div className="flex gap-3">
+                        <button className="flex items-center gap-2 px-4 py-3 border border-border hover:border-accent/50 text-foreground hover:text-accent rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                          <Star className="h-4 w-4" />
+                          Save for Later
+                        </button>
+                        <button className="flex items-center gap-2 px-4 py-3 border border-border hover:border-accent/50 text-foreground hover:text-accent rounded-lg font-medium text-sm transition-all duration-300 hover:scale-105 backdrop-blur-sm">
+                          <ArrowRight className="h-4 w-4 rotate-45" />
+                          Share
+                        </button>
+                      </div>
                     </div>
                   </div>
-
-                  {/* Reading Progress Indicator */}
-                  <div className="mt-8 pt-6 border-t border-border/30">
-                    <div className="flex items-center justify-between text-xs text-muted-foreground">
-                      <span>Estimated completion: {blogPosts[0].readTime}</span>
-                      <span>Last updated: {blogPosts[0].date}</span>
-                    </div>
-                    <div className="mt-2 h-1 bg-border/30 rounded-full overflow-hidden">
-                      <div className="h-full bg-gradient-to-r from-accent to-accent/70 w-3/4 rounded-full animate-pulse"></div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Elements */}
-                <div className="absolute top-8 right-8 w-16 h-16 bg-accent/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
-                <div className="absolute bottom-8 left-8 w-12 h-12 bg-primary/10 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
-              </Card>
-            </div>
-          </div>
-
-          {/* Bottom Stats */}
-          <div className="text-center mt-16 animate-fade-in delay-800">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30">
-                <div className="text-3xl font-bold text-accent mb-2">2.5k+</div>
-                <div className="text-sm text-muted-foreground">Views</div>
-              </div>
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30">
-                <div className="text-3xl font-bold text-accent mb-2">98%</div>
-                <div className="text-sm text-muted-foreground">Found it Helpful</div>
-              </div>
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30">
-                <div className="text-3xl font-bold text-accent mb-2">4.9★</div>
-                <div className="text-sm text-muted-foreground">Reader Rating</div>
+                </Card>
               </div>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
+      )}
 
       {/* Enhanced Recent Posts Grid */}
       <section className="py-32 bg-gradient-to-br from-muted via-muted/50 to-background relative overflow-hidden">
@@ -338,121 +435,210 @@ const Blog = () => {
           <div className="text-center mb-20">
             <div className="inline-flex items-center gap-3 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-8 py-4 mb-8 animate-fade-in">
               <BookOpen className="h-5 w-5 text-accent" />
-              <span className="text-sm font-semibold text-accent">Latest Insights</span>
+              <span className="text-sm font-semibold text-accent">
+                {searchTerm || selectedTag ? 'Search Results' : 'Latest Insights'}
+              </span>
             </div>
 
             <h2 className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-foreground via-accent to-foreground bg-clip-text text-transparent animate-slide-in-up">
-              Recent Articles
+              {searchTerm || selectedTag ? 'Matching Articles' : 'Recent Articles'}
             </h2>
             <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-slide-in-up delay-200 mb-12">
-              Stay updated with our latest culinary insights, event planning tips, and industry trends
+              {searchTerm || selectedTag 
+                ? `Articles matching your search criteria` 
+                : 'Stay updated with our latest culinary insights, event planning tips, and industry trends'
+              }
             </p>
-
-            {/* Trust Indicators */}
-            <div className="flex justify-center items-center gap-8 flex-wrap mb-8 animate-fade-in delay-400">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Star className="h-4 w-4 text-accent fill-current" />
-                <span>Expert Content</span>
-              </div>
-              <div className="w-px h-6 bg-border"></div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4 text-accent" />
-                <span>Weekly Updates</span>
-              </div>
-              <div className="w-px h-6 bg-border"></div>
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <BookOpen className="h-4 w-4 text-accent" />
-                <span>5+ Expert Authors</span>
-              </div>
-            </div>
           </div>
           
-          {/* Enhanced Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {blogPosts.slice(1).map((post, index) => (
-              <div 
-                key={index} 
-                className="group animate-slide-in-up" 
-                style={{ animationDelay: `${index * 150}ms` }}
-              >
-                <Card className="relative h-full p-8 hover:scale-[1.03] transition-all duration-500 hover:shadow-2xl bg-background/60 backdrop-blur-sm border-border/50 hover:border-accent/30 overflow-hidden flex flex-col">
-                  
-                  {/* Background Effect */}
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
-                  {/* Decorative Corner */}
-                  <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-accent/20 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
-                  
-                  {/* Content */}
-                  <div className="relative z-10 flex flex-col h-full">
-                    {/* Category Badge */}
-                    <div className="mb-6">
-                      <span className="inline-flex items-center gap-1 bg-accent/10 border border-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">
-                        <BookOpen className="h-3 w-3" />
-                        {post.category}
-                      </span>
-                    </div>
+          {/* Loading State */}
+          {loading && (
+            <div className="flex items-center justify-center py-12">
+              <Loader2 className="h-8 w-8 animate-spin mr-4" />
+              <span>Loading articles...</span>
+            </div>
+          )}
+
+          {/* Empty State */}
+          {!loading && blogs.length === 0 && (
+            <div className="text-center py-12">
+              <div className="max-w-md mx-auto">
+                <BookOpen className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-xl font-semibold mb-2">No articles found</h3>
+                <p className="text-muted-foreground mb-6">
+                  {searchTerm || selectedTag 
+                    ? 'Try adjusting your search or filter criteria' 
+                    : 'No blog posts have been published yet.'
+                  }
+                </p>
+                {(searchTerm || selectedTag) && (
+                  <Button onClick={clearFilters} variant="outline">
+                    Clear Filters
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Blog Grid */}
+          {blogs.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {blogs.map((post, index) => (
+                <div 
+                  key={post._id} 
+                  className="group animate-slide-in-up" 
+                  style={{ animationDelay: `${index * 150}ms` }}
+                >
+                  <Card className="relative h-full p-8 hover:scale-[1.03] transition-all duration-500 hover:shadow-2xl bg-background/60 backdrop-blur-sm border-border/50 hover:border-accent/30 overflow-hidden flex flex-col">
                     
-                    {/* Title */}
-                    <h3 className="text-xl font-bold mb-4 leading-tight text-foreground group-hover:text-accent transition-colors duration-300 line-clamp-2">
-                      {post.title}
-                    </h3>
+                    {/* Background Effect */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
-                    {/* Excerpt */}
-                    <p className="text-muted-foreground mb-6 leading-relaxed flex-grow group-hover:text-foreground/90 transition-colors duration-300">
-                      {post.excerpt}
-                    </p>
+                    {/* Decorative Corner */}
+                    <div className="absolute top-4 right-4 w-8 h-8 border-t-2 border-r-2 border-accent/20 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
                     
-                    {/* Meta Information */}
-                    <div className="border-t border-border/50 pt-6 mb-6 space-y-4">
-                      {/* Author */}
-                      <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
-                        <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
-                          <User className="h-4 w-4 text-accent" />
-                        </div>
-                        <div>
-                          <div className="font-semibold text-sm text-foreground">{post.author}</div>
-                          <div className="text-xs text-muted-foreground">Author</div>
-                        </div>
+                    {/* Content */}
+                    <div className="relative z-10 flex flex-col h-full">
+                      {/* Category Badge */}
+                      <div className="mb-6">
+                        <span className="inline-flex items-center gap-1 bg-accent/10 border border-accent/20 text-accent px-3 py-1 rounded-full text-sm font-medium">
+                          <BookOpen className="h-3 w-3" />
+                          {post.category || 'General'}
+                        </span>
                       </div>
                       
-                      {/* Date and Read Time */}
-                      <div className="flex items-center justify-between text-sm">
-                        <div className="flex items-center gap-2 text-muted-foreground group-hover:text-accent transition-colors duration-300">
-                          <Calendar className="h-4 w-4" />
-                          <span>{post.date}</span>
+                      {/* Title */}
+                      <h3 className="text-xl font-bold mb-4 leading-tight text-foreground group-hover:text-accent transition-colors duration-300 line-clamp-2">
+                        {post.title}
+                      </h3>
+                      
+                      {/* Excerpt */}
+                      <p className="text-muted-foreground mb-6 leading-relaxed flex-grow group-hover:text-foreground/90 transition-colors duration-300 line-clamp-3">
+                        {post.excerpt}
+                      </p>
+                      
+                      {/* Meta Information */}
+                      <div className="border-t border-border/50 pt-6 mb-6 space-y-4">
+                        {/* Author */}
+                        <div className="flex items-center gap-3 group-hover:text-accent transition-colors duration-300">
+                          <div className="w-8 h-8 bg-accent/10 rounded-full flex items-center justify-center group-hover:bg-accent/20 transition-colors duration-300">
+                            <User className="h-4 w-4 text-accent" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-sm text-foreground">{post.author.name}</div>
+                            <div className="text-xs text-muted-foreground">Author</div>
+                          </div>
                         </div>
-                        <div className="flex items-center gap-2 text-muted-foreground group-hover:text-accent transition-colors duration-300">
-                          <Clock className="h-4 w-4" />
-                          <span>{post.readTime}</span>
+                        
+                        {/* Date and Read Time */}
+                        <div className="flex items-center justify-between text-sm">
+                          <div className="flex items-center gap-2 text-muted-foreground group-hover:text-accent transition-colors duration-300">
+                            <Calendar className="h-4 w-4" />
+                            <span>{formatDate(post.publishedAt || post.createdAt)}</span>
+                          </div>
+                          <div className="flex items-center gap-2 text-muted-foreground group-hover:text-accent transition-colors duration-300">
+                            <Clock className="h-4 w-4" />
+                            <span>{post.readingTime || 5} min</span>
+                          </div>
                         </div>
+
+                        {/* Tags */}
+                        {post.tags.length > 0 && (
+                          <div className="flex flex-wrap gap-1">
+                            {post.tags.slice(0, 3).map((tag, tagIndex) => (
+                              <Badge 
+                                key={tagIndex} 
+                                variant="outline" 
+                                className="text-xs cursor-pointer hover:bg-accent/10"
+                                onClick={() => handleTagFilter(tag)}
+                              >
+                                {tag}
+                              </Badge>
+                            ))}
+                            {post.tags.length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{post.tags.length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
+                      
+                      {/* Call to Action */}
+                      <Link to={`/blog/${post.slug}`} className="mt-auto">
+                        <Button 
+                          variant="ghost" 
+                          className="w-full p-0 h-auto justify-start gap-2 text-accent hover:text-accent-foreground hover:bg-accent group/btn font-medium"
+                        >
+                          <BookOpen className="h-4 w-4 group-hover/btn:scale-110 transition-transform duration-300" />
+                          Read Full Article
+                          <ArrowRight className="h-4 w-4 ml-auto group-hover/btn:translate-x-1 transition-transform duration-300" />
+                        </Button>
+                      </Link>
                     </div>
                     
-                    {/* Call to Action */}
-                    <Link to={`/blog/${post.slug}`} className="mt-auto">
-                      <Button 
-                        variant="ghost" 
-                        className="w-full p-0 h-auto justify-start gap-2 text-accent hover:text-accent-foreground hover:bg-accent group/btn font-medium"
-                      >
-                        <BookOpen className="h-4 w-4 group-hover/btn:scale-110 transition-transform duration-300" />
-                        Read Full Article
-                        <ArrowRight className="h-4 w-4 ml-auto group-hover/btn:translate-x-1 transition-transform duration-300" />
-                      </Button>
-                    </Link>
-                  </div>
+                    {/* Hover Effect Line */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
+                    
+                    {/* Floating Badge */}
+                    {post.featured && (
+                      <div className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs px-3 py-1 rounded-full font-medium shadow-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
+                        Featured
+                      </div>
+                    )}
+                  </Card>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-2 mt-12">
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                disabled={currentPage === 1 || loading}
+              >
+                Previous
+              </Button>
+              
+              <div className="flex gap-1">
+                {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                  let pageNum;
+                  if (totalPages <= 5) {
+                    pageNum = i + 1;
+                  } else if (currentPage <= 3) {
+                    pageNum = i + 1;
+                  } else if (currentPage >= totalPages - 2) {
+                    pageNum = totalPages - 4 + i;
+                  } else {
+                    pageNum = currentPage - 2 + i;
+                  }
                   
-                  {/* Hover Effect Line */}
-                  <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
-                  
-                  {/* Floating Badge */}
-                  <div className="absolute -top-2 -right-2 bg-accent text-accent-foreground text-xs px-3 py-1 rounded-full font-medium shadow-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-300">
-                    New
-                  </div>
-                </Card>
+                  return (
+                    <Button
+                      key={pageNum}
+                      variant={currentPage === pageNum ? "default" : "outline"}
+                      size="sm"
+                      onClick={() => setCurrentPage(pageNum)}
+                      disabled={loading}
+                    >
+                      {pageNum}
+                    </Button>
+                  );
+                })}
               </div>
-            ))}
-          </div>
+              
+              <Button
+                variant="outline"
+                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                disabled={currentPage === totalPages || loading}
+              >
+                Next
+              </Button>
+            </div>
+          )}
 
           {/* Enhanced Bottom Section */}
           <div className="text-center mt-20 animate-fade-in delay-1000">
@@ -461,10 +647,6 @@ const Blog = () => {
               {/* Background Effects */}
               <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
-              
-              {/* Floating Elements */}
-              <div className="absolute top-8 right-8 w-16 h-16 bg-accent/8 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
-              <div className="absolute bottom-8 left-8 w-12 h-12 bg-primary/8 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
 
               <div className="relative z-10">
                 {/* Header */}
@@ -516,164 +698,8 @@ const Blog = () => {
           </div>
         </div>
       </section>
-
-      {/* Enhanced Newsletter Section */}
-      <section className="py-32 bg-gradient-to-br from-background via-accent/5 to-primary/5 relative overflow-hidden">
-        {/* Animated Background Elements */}
-        <div className="absolute top-20 left-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 right-20 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div className="absolute top-1/2 left-10 w-24 h-24 bg-accent/15 rounded-full blur-xl animate-pulse delay-500"></div>
-        <div className="absolute top-1/3 right-10 w-20 h-20 bg-primary/10 rounded-full blur-lg animate-pulse delay-700"></div>
-        
-        {/* Floating Decorative Elements */}
-        <div className="absolute top-16 left-16 w-6 h-6 bg-orange-400 rounded-full animate-bounce opacity-60"></div>
-        <div className="absolute top-24 right-24 w-4 h-4 bg-amber-400 rounded-full animate-pulse opacity-40" style={{animationDelay: '1s'}}></div>
-        <div className="absolute bottom-16 left-24 w-5 h-5 bg-red-400 rounded-full animate-bounce opacity-50" style={{animationDelay: '2s'}}></div>
-        <div className="absolute bottom-32 right-16 w-3 h-3 bg-yellow-400 rounded-full animate-pulse opacity-30" style={{animationDelay: '0.5s'}}></div>
-
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-3 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-8 py-4 mb-8 animate-fade-in">
-              <Mail className="h-5 w-5 text-accent" />
-              <span className="text-sm font-semibold text-accent">Stay Connected</span>
-            </div>
-
-            <h2 className="text-4xl md:text-6xl font-bold mb-8 bg-gradient-to-r from-foreground via-accent to-foreground bg-clip-text text-transparent animate-slide-in-up">
-              Subscribe to Our Newsletter
-            </h2>
-            <p className="text-xl md:text-2xl text-muted-foreground max-w-4xl mx-auto leading-relaxed animate-slide-in-up delay-200">
-              Get the latest culinary tips, event planning advice, and exclusive offers delivered straight to your inbox
-            </p>
-          </div>
-
-          {/* Enhanced Newsletter Card */}
-          <div className="max-w-4xl mx-auto">
-            <div className="group animate-slide-in-up delay-400">
-              <Card className="relative overflow-hidden bg-background/70 backdrop-blur-xl border-border/50 hover:border-accent/30 hover:shadow-2xl transition-all duration-500 hover:scale-[1.02]">
-                
-                {/* Background Effect */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/10 via-transparent to-primary/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                
-                {/* Decorative Elements */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
-                <div className="absolute -top-3 -right-3 w-8 h-8 border-r-2 border-t-2 border-accent/30 rounded-tr-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
-                <div className="absolute -bottom-3 -left-3 w-8 h-8 border-l-2 border-b-2 border-accent/30 rounded-bl-lg opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
-                
-                {/* Content */}
-                <div className="relative z-10 p-16">
-                  {/* Icon and Benefits */}
-                  <div className="text-center mb-12">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-accent to-accent/70 rounded-full mb-6 group-hover:scale-110 transition-transform duration-300">
-                      <Mail className="h-10 w-10 text-accent-foreground" />
-                    </div>
-                    
-                    {/* Benefits Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-                      <div className="flex flex-col items-center p-6 rounded-xl bg-background/50 border border-border/30 hover:bg-background/70 transition-colors duration-300 group/benefit">
-                        <CheckCircle className="h-8 w-8 text-accent mb-3 group-hover/benefit:scale-110 transition-transform duration-300" />
-                        <div className="font-semibold mb-1">Expert Tips</div>
-                        <div className="text-sm text-muted-foreground text-center">Professional culinary insights from our chefs</div>
-                      </div>
-                      <div className="flex flex-col items-center p-6 rounded-xl bg-background/50 border border-border/30 hover:bg-background/70 transition-colors duration-300 group/benefit">
-                        <Gift className="h-8 w-8 text-accent mb-3 group-hover/benefit:scale-110 transition-transform duration-300" />
-                        <div className="font-semibold mb-1">Exclusive Offers</div>
-                        <div className="text-sm text-muted-foreground text-center">Special discounts and early access to events</div>
-                      </div>
-                      <div className="flex flex-col items-center p-6 rounded-xl bg-background/50 border border-border/30 hover:bg-background/70 transition-colors duration-300 group/benefit">
-                        <Zap className="h-8 w-8 text-accent mb-3 group-hover/benefit:scale-110 transition-transform duration-300" />
-                        <div className="font-semibold mb-1">Weekly Updates</div>
-                        <div className="text-sm text-muted-foreground text-center">Fresh content and trending topics</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Enhanced Form */}
-                  <div className="max-w-2xl mx-auto">
-                    <div className="relative mb-8">
-                      <div className="absolute -left-6 top-0 w-1 h-full bg-gradient-to-b from-accent to-accent/30 rounded-full opacity-30"></div>
-                      <div className="relative bg-gradient-to-r from-background via-accent/5 to-background rounded-2xl p-8 border border-border/30">
-                        <form className="space-y-6">
-                          <div className="relative">
-                            <input
-                              type="email"
-                              placeholder="Enter your email address"
-                              className="w-full px-6 py-4 text-lg rounded-xl border-2 border-border bg-background/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-accent focus:border-accent transition-all duration-300 placeholder:text-muted-foreground group-hover:border-accent/50"
-                            />
-                            <div className="absolute inset-0 rounded-xl bg-gradient-to-r from-accent/0 via-accent/5 to-accent/0 opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"></div>
-                          </div>
-                          
-                          <button 
-                            type="submit"
-                            className="w-full bg-gradient-to-r from-accent to-accent/80 hover:from-accent/90 hover:to-accent text-accent-foreground px-8 py-4 rounded-xl font-bold text-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl hover:shadow-accent/25 relative overflow-hidden group/btn"
-                          >
-                            <span className="relative z-10 flex items-center justify-center gap-3">
-                              <Mail className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-300" />
-                              Subscribe Now
-                              <CheckCircle className="h-5 w-5 group-hover/btn:scale-110 transition-transform duration-300" />
-                            </span>
-                            <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-white/10 to-accent/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
-                          </button>
-                        </form>
-                      </div>
-                    </div>
-
-                    {/* Trust Indicators */}
-                    <div className="text-center space-y-4">
-                      <div className="flex items-center justify-center gap-6 flex-wrap text-sm text-muted-foreground">
-                        <div className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-accent" />
-                          <span>No spam, unsubscribe anytime</span>
-                        </div>
-                        <div className="w-px h-4 bg-border"></div>
-                        <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4 text-accent" />
-                          <span>Join 5,000+ subscribers</span>
-                        </div>
-                        <div className="w-px h-4 bg-border"></div>
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4 text-accent" />
-                          <span>Weekly digest</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Floating Elements */}
-                <div className="absolute top-8 right-8 w-16 h-16 bg-accent/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
-                <div className="absolute bottom-8 left-8 w-12 h-12 bg-primary/10 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
-              </Card>
-            </div>
-          </div>
-
-          {/* Bottom Stats */}
-          <div className="text-center mt-16 animate-fade-in delay-800">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-3xl mx-auto">
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30 hover:bg-background/70 transition-colors duration-300">
-                <div className="text-3xl font-bold text-accent mb-2">5,000+</div>
-                <div className="text-sm text-muted-foreground">Happy Subscribers</div>
-              </div>
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30 hover:bg-background/70 transition-colors duration-300">
-                <div className="text-3xl font-bold text-accent mb-2">Weekly</div>
-                <div className="text-sm text-muted-foreground">Fresh Content</div>
-              </div>
-              <div className="text-center p-6 bg-background/50 backdrop-blur-sm rounded-xl border border-border/30 hover:bg-background/70 transition-colors duration-300">
-                <div className="text-3xl font-bold text-accent mb-2">98%</div>
-                <div className="text-sm text-muted-foreground">Satisfaction Rate</div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Corner Decorations */}
-        <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-accent/30 rounded-tl-lg opacity-60"></div>
-        <div className="absolute -top-3 -right-3 w-6 h-6 border-r-2 border-t-2 border-accent/30 rounded-tr-lg opacity-60"></div>
-        <div className="absolute -bottom-3 -left-3 w-6 h-6 border-l-2 border-b-2 border-accent/30 rounded-bl-lg opacity-60"></div>
-        <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-accent/30 rounded-br-lg opacity-60"></div>
-      </section>
     </div>
   );
 };
 
-export default Blog;
+export default BlogPage;
