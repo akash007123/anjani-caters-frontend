@@ -442,10 +442,10 @@ const BlogPost = () => {
           {/* Article Actions */}
           <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between mb-12 p-6 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-4">
-              <Button variant="outline" size="sm">
+              {/* <Button variant="outline" size="sm">
                 <Heart className="h-4 w-4 mr-2" />
                 Like ({blog.likeCount})
-              </Button>
+              </Button> */}
               <Button variant="outline" size="sm" onClick={handleShare}>
                 <Share2 className="h-4 w-4 mr-2" />
                 Share
@@ -458,10 +458,12 @@ const BlogPost = () => {
 
 
           {/* Comments Section */}
-          <div className="mt-12">
+          <div className="mt-12 mb-12">
             <div className="flex items-center gap-2 mb-6">
               <MessageCircle className="h-5 w-5" />
-              <h3 className="text-2xl font-bold">Comments ({comments.length})</h3>
+              <h3 className="text-2xl font-bold">Comments 
+                {/* ({comments.length}) */}
+                </h3>
             </div>
 
             {/* Comment Form */}
@@ -534,7 +536,7 @@ const BlogPost = () => {
             </Card>
 
             {/* Comments List */}
-            <div style={{maxHeight:'350px', overflow:'auto'}}>
+            {/* <div style={{maxHeight:'350px', overflow:'auto'}}>
               {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
@@ -554,7 +556,12 @@ const BlogPost = () => {
                           />
                         ) : (
                           <div className="w-10 h-10 rounded-full bg-muted flex items-center justify-center">
-                            <User className="h-5 w-5" />
+                            <span className="text-sm font-semibold">
+                              {comment.fullName
+                                .split(' ')
+                                .map(word => word.charAt(0).toUpperCase())
+                                .join('')}
+                            </span>
                           </div>
                         )}
                       </div>
@@ -582,7 +589,7 @@ const BlogPost = () => {
                 <p className="text-muted-foreground">Be the first to share your thoughts on this article!</p>
               </Card>
             )}
-            </div>
+            </div> */}
           </div>
 
           {/* Call to Action */}
