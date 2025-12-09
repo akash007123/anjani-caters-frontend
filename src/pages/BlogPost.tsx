@@ -534,7 +534,7 @@ const BlogPost = () => {
             </Card>
 
             {/* Comments List */}
-            <div style={{maxHeight:'35s0px', overflow:'auto'}}>
+            <div style={{maxHeight:'350px', overflow:'auto'}}>
               {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
