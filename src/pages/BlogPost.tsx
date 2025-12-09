@@ -46,6 +46,7 @@ const BlogPost = () => {
     comment: ''
   });
   const [submittingComment, setSubmittingComment] = useState(false);
+  const [commentSubmitted, setCommentSubmitted] = useState(false);
 
   // Load blog post data
   const loadBlogPost = async () => {
@@ -136,21 +137,15 @@ const BlogPost = () => {
 
       await blogApiService.createComment(commentData);
 
-      // Reset form
-      setCommentForm({
-        blogId: '',
-        fullName: '',
-        email: '',
-        profilePic: '',
-        comment: ''
-      });
+      // Set submitted state
+      setCommentSubmitted(true);
 
       // Reload comments
       await loadComments(blog._id);
 
       toast({
         title: "Comment Submitted",
-        description: "Your comment has been submitted successfully.",
+        description: "Your comment has been submitted successfully. Check your email for confirmation.",
       });
     } catch (error) {
       console.error('Error submitting comment:', error);
@@ -468,75 +463,96 @@ const BlogPost = () => {
 
             {/* Comment Form */}
             <Card className="p-6 mb-8">
-              <h4 className="text-lg font-semibold mb-4">Leave a Comment</h4>
-              <form onSubmit={handleCommentSubmit} className="space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="fullName">Full Name *</Label>
-                    <Input
-                      id="fullName"
-                      type="text"
-                      value={commentForm.fullName}
-                      onChange={(e) => handleCommentInputChange('fullName', e.target.value)}
-                      placeholder="Your full name"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="email">Email *</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      value={commentForm.email}
-                      onChange={(e) => handleCommentInputChange('email', e.target.value)}
-                      placeholder="your.email@example.com"
-                      required
-                    />
+              {commentSubmitted ? (
+                <div className="text-center py-8">
+                  <div className="mb-4">
+                    <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                      <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <h4 className="text-xl font-semibold text-green-800 mb-2">Thank You!</h4>
+                    <p className="text-muted-foreground mb-4">
+                      Your comment has been submitted successfully. We've sent a confirmation email to your inbox.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Your comment will appear after review by our team.
+                    </p>
                   </div>
                 </div>
-                <div>
-                  <Label htmlFor="profilePic">Profile Picture URL (Optional)</Label>
-                  <Input
-                    id="profilePic"
-                    type="url"
-                    value={commentForm.profilePic}
-                    onChange={(e) => handleCommentInputChange('profilePic', e.target.value)}
-                    placeholder="https://example.com/your-photo.jpg"
-                  />
-                </div>
-                <div>
-                  <Label htmlFor="comment">Comment *</Label>
-                  <Textarea
-                    id="comment"
-                    value={commentForm.comment}
-                    onChange={(e) => handleCommentInputChange('comment', e.target.value)}
-                    placeholder="Share your thoughts..."
-                    rows={4}
-                    required
-                  />
-                </div>
-                <Button
-                  type="submit"
-                  disabled={submittingComment}
-                  className="w-full md:w-auto"
-                >
-                  {submittingComment ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Send className="mr-2 h-4 w-4" />
-                      Submit Comment
-                    </>
-                  )}
-                </Button>
-              </form>
+              ) : (
+                <>
+                  <h4 className="text-lg font-semibold mb-4">Leave a Comment</h4>
+                  <form onSubmit={handleCommentSubmit} className="space-y-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="fullName">Full Name *</Label>
+                        <Input
+                          id="fullName"
+                          type="text"
+                          value={commentForm.fullName}
+                          onChange={(e) => handleCommentInputChange('fullName', e.target.value)}
+                          placeholder="Your full name"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="email">Email *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={commentForm.email}
+                          onChange={(e) => handleCommentInputChange('email', e.target.value)}
+                          placeholder="your.email@example.com"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="profilePic">Profile Picture URL (Optional)</Label>
+                      <Input
+                        id="profilePic"
+                        type="url"
+                        value={commentForm.profilePic}
+                        onChange={(e) => handleCommentInputChange('profilePic', e.target.value)}
+                        placeholder="https://example.com/your-photo.jpg"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="comment">Comment *</Label>
+                      <Textarea
+                        id="comment"
+                        value={commentForm.comment}
+                        onChange={(e) => handleCommentInputChange('comment', e.target.value)}
+                        placeholder="Share your thoughts..."
+                        rows={4}
+                        required
+                      />
+                    </div>
+                    <Button
+                      type="submit"
+                      disabled={submittingComment}
+                      className="w-full md:w-auto"
+                    >
+                      {submittingComment ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <Send className="mr-2 h-4 w-4" />
+                          Submit Comment
+                        </>
+                      )}
+                    </Button>
+                  </form>
+                </>
+              )}
             </Card>
 
             {/* Comments List */}
-            {/* <div style={{maxHeight:'350px', overflow:'auto'}}>
+            <div style={{maxHeight:'350px', overflow:'auto'}}>
               {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
@@ -589,7 +605,7 @@ const BlogPost = () => {
                 <p className="text-muted-foreground">Be the first to share your thoughts on this article!</p>
               </Card>
             )}
-            </div> */}
+            </div>
           </div>
 
           {/* Call to Action */}

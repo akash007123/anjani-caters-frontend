@@ -1,96 +1,98 @@
 import { Card } from "@/components/ui/card";
 import { Star, Quote, MessageCircle, Heart, Award, ChevronLeft, ChevronRight } from "lucide-react";
 import { useState, useEffect } from "react";
+import { testimonialApiService, type Testimonial } from "@/services/testimonialApi";
+
+interface DisplayTestimonial {
+  quote: string;
+  name: string;
+  position: string;
+  company: string;
+  rating: number;
+  eventType: string;
+  image: string;
+}
+import FeedbackFormModal from "@/components/FeedbackFormModal";
 
 const Testimonials = () => {
   const [activeIndex, setActiveIndex] = useState(0);
+  const [testimonials, setTestimonials] = useState<DisplayTestimonial[]>([]);
+  const [allTestimonials, setAllTestimonials] = useState<DisplayTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showFeedbackForm, setShowFeedbackForm] = useState(false);
 
-  const testimonials = [
-    {
-      quote: "Anjani Caters made our wedding day absolutely perfect. The food was exquisite, the presentation was stunning, and every guest raved about the experience. They handled everything with such professionalism and care.",
-      name: "Priya & Arjun",
-      position: "Wedding Couple",
-      company: "Mumbai",
-      rating: 5,
-      eventType: "Wedding Reception",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "We've used Anjani Caters for our company events for three years now. Their consistency, quality, and attention to detail is unmatched. They understand our needs and always deliver beyond expectations.",
-      name: "Rajesh Kumar",
-      position: "CEO",
-      company: "TechVision Industries",
-      rating: 5,
-      eventType: "Corporate Annual Dinner",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "From the initial consultation to the last dish served, everything was flawless. The team created a custom menu that perfectly reflected my taste, and the presentation was restaurant-quality. Highly recommend!",
-      name: "Anita Sharma",
-      position: "Event Host",
-      company: "Delhi",
-      rating: 5,
-      eventType: "50th Birthday Celebration",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Professional, creative, and absolutely delicious. They understood our brand vision and created an experience that impressed all our stakeholders. The attention to dietary requirements was exceptional.",
-      name: "Vikram Mehta",
-      position: "Marketing Director",
-      company: "InnovateCorp",
-      rating: 5,
-      eventType: "Product Launch Event",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Anjani Caters transformed our home into a fine dining restaurant. The chef's personalized service and the quality of ingredients were outstanding. Our guests are still talking about it months later!",
-      name: "Meera Desai",
-      position: "Home Host",
-      company: "Bangalore",
-      rating: 5,
-      eventType: "Intimate Dinner Party",
-      image: "/placeholder.svg"
-    },
-  ];
+  // Fetch testimonials from API
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      console.log('Starting to fetch testimonials...');
+      try {
+        console.log('Making API call to getApprovedTestimonials...');
+        const response = await testimonialApiService.getApprovedTestimonials();
+        console.log('API Response received:', response);
+
+        if (response.success) {
+          console.log('Response success, data length:', response.data.length);
+          if (response.data.length > 0) {
+            // Use API data - convert to DisplayTestimonial format
+            const carouselTestimonials = response.data.slice(0, 5).map(t => ({
+              quote: t.quote,
+              name: t.name,
+              position: t.position,
+              company: t.company,
+              rating: t.rating,
+              eventType: t.eventType,
+              image: t.image
+            }));
+            const gridTestimonials = response.data.map(t => ({
+              quote: t.quote,
+              name: t.name,
+              position: t.position,
+              company: t.company,
+              rating: t.rating,
+              eventType: t.eventType,
+              image: t.image
+            }));
+            console.log('Setting testimonials:', carouselTestimonials.length, 'carousel,', gridTestimonials.length, 'grid');
+            setTestimonials(carouselTestimonials);
+            setAllTestimonials(gridTestimonials);
+          } else {
+            console.log('Response success but no testimonials data');
+          }
+        } else {
+          console.log('Response not successful:', response);
+        }
+        // No fallback - testimonials will remain empty arrays if no data
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+        console.error('Error details:', error);
+        // No fallback - testimonials will remain empty arrays if error
+      } finally {
+        console.log('Setting loading to false');
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
+
+  // Auto-show feedback form on page load (with a small delay)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowFeedbackForm(true);
+    }, 2000); // Show after 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
 
   // Auto-advance carousel
   useEffect(() => {
-    const timer = setInterval(() => {
-      setActiveIndex((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
-    return () => clearInterval(timer);
+    if (testimonials.length > 0) {
+      const timer = setInterval(() => {
+        setActiveIndex((prev) => (prev + 1) % testimonials.length);
+      }, 6000);
+      return () => clearInterval(timer);
+    }
   }, [testimonials.length]);
-
-  const allTestimonials = [
-    ...testimonials,
-    {
-      quote: "Twenty-five years together deserved something special, and Anjani Caters delivered. The romantic setup, exquisite cuisine, and impeccable service made it a night we'll never forget.",
-      name: "Sanjay Patel",
-      position: "Anniversary Couple",
-      company: "Pune",
-      rating: 5,
-      eventType: "Anniversary Celebration",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Organizing a gala for 200 guests is challenging, but Anjani Caters made it seamless. Their team was professional, the food was exceptional, and they stayed within our budget. Remarkable service!",
-      name: "Kavita Reddy",
-      position: "Event Organizer",
-      company: "Charity Foundation",
-      rating: 5,
-      eventType: "Charity Gala",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Quick turnaround, professional service, and delicious food. They accommodated our last-minute dietary requests without any issues. Will definitely use them again for future corporate events.",
-      name: "Amit Singh",
-      position: "Business Manager",
-      company: "Corporate Solutions",
-      rating: 5,
-      eventType: "Business Luncheon",
-      image: "/placeholder.svg"
-    },
-  ];
 
   const StarRating = ({ rating }: { rating: number }) => (
     <div className="flex gap-1">
@@ -208,116 +210,137 @@ const Testimonials = () => {
 
           {/* Testimonial Carousel */}
           <div className="relative max-w-7xl mx-auto">
-            <div className="relative overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${activeIndex * 100}%)` }}
-              >
-                {testimonials.map((testimonial, index) => (
-                  <div key={index} className="w-full flex-shrink-0">
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                      {/* Content Side - Left */}
-                      <div className="order-2 md:order-1 animate-slide-in-up" style={{ animationDelay: `${index * 200}ms` }}>
-                        <Card className="p-10 bg-background/50 backdrop-blur-sm border-border/50 card-shadow hover:shadow-2xl transition-all duration-500">
-                          {/* Quote Icon */}
-                          <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-8">
-                            <Star className="h-8 w-8 text-accent fill-accent" />
+            {loading ? (
+              <div className="text-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+                <p className="text-muted-foreground">Loading testimonials...</p>
+              </div>
+            ) : testimonials.length === 0 ? (
+              <div className="text-center py-20">
+                <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold mb-2">No testimonials yet</h3>
+                <p className="text-muted-foreground mb-6">Be the first to share your experience!</p>
+                <button
+                  onClick={() => setShowFeedbackForm(true)}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Share Your Experience
+                </button>
+              </div>
+            ) : (
+              <>
+                <div className="relative overflow-hidden">
+                  <div
+                    className="flex transition-transform duration-500 ease-in-out"
+                    style={{ transform: `translateX(-${activeIndex * 100}%)` }}
+                  >
+                    {testimonials.map((testimonial, index) => (
+                      <div key={index} className="w-full flex-shrink-0">
+                        <div className="grid md:grid-cols-2 gap-12 items-center">
+                          {/* Content Side - Left */}
+                          <div className="order-2 md:order-1 animate-slide-in-up" style={{ animationDelay: `${index * 200}ms` }}>
+                            <Card className="p-10 bg-background/50 backdrop-blur-sm border-border/50 card-shadow hover:shadow-2xl transition-all duration-500">
+                              {/* Quote Icon */}
+                              <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-8">
+                                <Star className="h-8 w-8 text-accent fill-accent" />
+                              </div>
+
+                              {/* Testimonial Text */}
+                              <blockquote className="text-xl md:text-2xl font-medium mb-8 leading-relaxed text-foreground">
+                                "{testimonial.quote}"
+                              </blockquote>
+
+                              {/* Client Info */}
+                              <div className="border-t border-border/50 pt-6">
+                                <div className="font-bold text-lg text-foreground mb-1">
+                                  {testimonial.name}
+                                </div>
+                                <div className="text-accent font-semibold mb-2">
+                                  {testimonial.position}
+                                </div>
+                                <div className="text-sm text-muted-foreground">
+                                  {testimonial.company}
+                                </div>
+
+                                {/* Rating */}
+                                <div className="flex items-center gap-1 mt-4">
+                                  {[...Array(testimonial.rating)].map((_, i) => (
+                                    <Star key={i} className="h-5 w-5 text-accent fill-current" />
+                                  ))}
+                                  <span className="text-sm text-muted-foreground ml-2">
+                                    {testimonial.rating}/5 stars
+                                  </span>
+                                </div>
+                              </div>
+                            </Card>
                           </div>
-                          
-                          {/* Testimonial Text */}
-                          <blockquote className="text-xl md:text-2xl font-medium mb-8 leading-relaxed text-foreground">
-                            "{testimonial.quote}"
-                          </blockquote>
-                          
-                          {/* Client Info */}
-                          <div className="border-t border-border/50 pt-6">
-                            <div className="font-bold text-lg text-foreground mb-1">
-                              {testimonial.name}
-                            </div>
-                            <div className="text-accent font-semibold mb-2">
-                              {testimonial.position}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {testimonial.company}
-                            </div>
-                            
-                            {/* Rating */}
-                            <div className="flex items-center gap-1 mt-4">
-                              {[...Array(testimonial.rating)].map((_, i) => (
-                                <Star key={i} className="h-5 w-5 text-accent fill-current" />
-                              ))}
-                              <span className="text-sm text-muted-foreground ml-2">
-                                {testimonial.rating}/5 stars
-                              </span>
-                            </div>
-                          </div>
-                        </Card>
-                      </div>
-                      
-                      {/* Image Side - Right */}
-                      <div className="order-1 md:order-2 animate-slide-in-up delay-300" style={{ animationDelay: `${index * 200 + 100}ms` }}>
-                        <div className="relative group">
-                          {/* Main Image */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                            <img
-                              src={testimonial.image}
-                              alt={testimonial.name}
-                              className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-transparent"></div>
-                          </div>
-                          
-                          {/* Floating Stats */}
-                          <div className="absolute -bottom-6 -left-6 bg-background/90 backdrop-blur-sm rounded-xl p-4 border border-border/50 shadow-xl">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-accent">{testimonial.eventType}</div>
-                              <div className="text-sm text-muted-foreground">Event Type</div>
+
+                          {/* Image Side - Right */}
+                          <div className="order-1 md:order-2 animate-slide-in-up delay-300" style={{ animationDelay: `${index * 200 + 100}ms` }}>
+                            <div className="relative group">
+                              {/* Main Image */}
+                              <div className="relative overflow-hidden rounded-2xl shadow-2xl">
+                                <img
+                                  src={testimonial.image}
+                                  alt={testimonial.name}
+                                  className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-700"
+                                />
+                                <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-transparent"></div>
+                              </div>
+
+                              {/* Floating Stats */}
+                              <div className="absolute -bottom-6 -left-6 bg-background/90 backdrop-blur-sm rounded-xl p-4 border border-border/50 shadow-xl">
+                                <div className="text-center">
+                                  <div className="text-2xl font-bold text-accent">{testimonial.eventType}</div>
+                                  <div className="text-sm text-muted-foreground">Event Type</div>
+                                </div>
+                              </div>
+
+                              {/* Decorative Elements */}
+                              <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl opacity-60"></div>
+                              <div className="absolute top-1/2 -left-8 w-16 h-16 bg-primary/20 rounded-full blur-xl opacity-40"></div>
                             </div>
                           </div>
-                          
-                          {/* Decorative Elements */}
-                          <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl opacity-60"></div>
-                          <div className="absolute top-1/2 -left-8 w-16 h-16 bg-primary/20 rounded-full blur-xl opacity-40"></div>
                         </div>
                       </div>
-                    </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation Dots */}
-            <div className="flex justify-center gap-3 mt-12">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setActiveIndex(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === activeIndex 
-                      ? 'bg-accent scale-125' 
-                      : 'bg-border hover:bg-accent/50'
-                  }`}
-                />
-              ))}
-            </div>
-            
-            {/* Navigation Arrows */}
-            <div className="absolute top-1/2 -translate-y-1/2 -left-4 right-auto">
-              <button
-                onClick={() => setActiveIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-                className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-            </div>
-            <div className="absolute top-1/2 -translate-y-1/2 -right-4 left-auto">
-              <button
-                onClick={() => setActiveIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-                className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-            </div>
+                </div>
+
+                {/* Navigation Dots */}
+                <div className="flex justify-center gap-3 mt-12">
+                  {testimonials.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => setActiveIndex(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index === activeIndex
+                          ? 'bg-accent scale-125'
+                          : 'bg-border hover:bg-accent/50'
+                      }`}
+                    />
+                  ))}
+                </div>
+
+                {/* Navigation Arrows */}
+                <div className="absolute top-1/2 -translate-y-1/2 -left-4 right-auto">
+                  <button
+                    onClick={() => setActiveIndex((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+                    className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
+                  >
+                    <ChevronLeft className="h-6 w-6" />
+                  </button>
+                </div>
+                <div className="absolute top-1/2 -translate-y-1/2 -right-4 left-auto">
+                  <button
+                    onClick={() => setActiveIndex((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+                    className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
+                  >
+                    <ChevronRight className="h-6 w-6" />
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -366,7 +389,20 @@ const Testimonials = () => {
           
           {/* Enhanced Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {allTestimonials.map((testimonial, index) => (
+            {allTestimonials.length === 0 ? (
+              <div className="col-span-full text-center py-20">
+                <MessageCircle className="h-16 w-16 text-muted-foreground mx-auto mb-4" />
+                <h3 className="text-2xl font-semibold mb-2">No testimonials yet</h3>
+                <p className="text-muted-foreground mb-6">Be the first to share your experience!</p>
+                <button
+                  onClick={() => setShowFeedbackForm(true)}
+                  className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-lg font-semibold transition-colors"
+                >
+                  Share Your Experience
+                </button>
+              </div>
+            ) : (
+              allTestimonials.map((testimonial, index) => (
               <div 
                 key={index} 
                 className="group animate-slide-in-up" 
@@ -425,7 +461,8 @@ const Testimonials = () => {
                   </div>
                 </Card>
               </div>
-            ))}
+              ))
+            )}
           </div>
 
           {/* Enhanced Bottom Section */}
@@ -490,6 +527,12 @@ const Testimonials = () => {
           </div>
         </div>
       </section>
+
+      {/* Feedback Form Modal */}
+      <FeedbackFormModal
+        isOpen={showFeedbackForm}
+        onClose={() => setShowFeedbackForm(false)}
+      />
     </div>
   );
 };
