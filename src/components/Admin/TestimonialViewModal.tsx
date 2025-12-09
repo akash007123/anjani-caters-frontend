@@ -8,7 +8,16 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
-import { User, MessageSquare, Star, Calendar, Building, Tag, CheckCircle, Clock } from "lucide-react";
+import {
+  User,
+  MessageSquare,
+  Star,
+  Calendar,
+  Building,
+  Tag,
+  CheckCircle,
+  Clock
+} from "lucide-react";
 import { Testimonial } from "@/services/testimonialApi";
 
 interface TestimonialViewModalProps {
@@ -28,14 +37,23 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[700px] p-0 overflow-hidden bg-white border-slate-200 shadow-xl">
-        <DialogHeader className="p-6 bg-slate-50 border-b border-slate-100">
+      <DialogContent
+        className="sm:max-w-[700px] p-0 bg-white border-slate-200 shadow-xl 
+                   max-h-[85vh] overflow-y-auto rounded-xl"
+      >
+        {/* Sticky Header */}
+        <DialogHeader className="p-6 bg-slate-50 border-b border-slate-100 sticky top-0 z-20">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-bold text-slate-900 flex items-center gap-2">
               <User className="w-5 h-5 text-primary" />
               Testimonial Details
             </DialogTitle>
-            <Badge className={`${getStatusColor(testimonial.isApproved)} text-white border-0 px-3 py-1 flex items-center gap-1`}>
+
+            <Badge
+              className={`${getStatusColor(
+                testimonial.isApproved
+              )} text-white border-0 px-3 py-1 flex items-center gap-1`}
+            >
               {testimonial.isApproved ? (
                 <CheckCircle className="w-3 h-3" />
               ) : (
@@ -44,12 +62,15 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
               {testimonial.isApproved ? 'Approved' : 'Pending'}
             </Badge>
           </div>
+
           <DialogDescription className="text-slate-500 mt-1">
             Submitted on {format(new Date(testimonial.createdAt), "PPP 'at' p")}
           </DialogDescription>
         </DialogHeader>
 
+        {/* Scrollable Body */}
         <div className="p-6 space-y-6">
+          {/* Details Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-1">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
@@ -80,6 +101,7 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
             </div>
           </div>
 
+          {/* Rating */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <Star className="w-3 h-3" /> Rating
@@ -94,6 +116,7 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
             </div>
           </div>
 
+          {/* Testimonial Content */}
           <div className="space-y-2">
             <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-1">
               <MessageSquare className="w-3 h-3" /> Testimonial
@@ -103,6 +126,7 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
             </div>
           </div>
 
+          {/* Image */}
           {testimonial.image && testimonial.image !== '/placeholder.svg' && (
             <div className="space-y-2">
               <label className="text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -118,6 +142,7 @@ const TestimonialViewModal: React.FC<TestimonialViewModalProps> = ({ testimonial
             </div>
           )}
 
+          {/* Footer Info */}
           <div className="pt-4 border-t border-slate-100 flex justify-between items-center text-xs text-slate-400">
             <span className="flex items-center gap-1">
               <Tag className="w-3 h-3" /> ID: {testimonial._id}

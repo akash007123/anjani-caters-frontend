@@ -17,6 +17,7 @@ interface FeedbackFormModalProps {
 const FeedbackFormModal = ({ isOpen, onClose }: FeedbackFormModalProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showThankYou, setShowThankYou] = useState(false);
   const [formData, setFormData] = useState<TestimonialFormData>({
     quote: "",
     name: "",
@@ -42,6 +43,7 @@ const FeedbackFormModal = ({ isOpen, onClose }: FeedbackFormModalProps) => {
         image: undefined
       });
       setImagePreview(null);
+      setShowThankYou(false);
     }
   }, [isOpen]);
 
@@ -83,11 +85,7 @@ const FeedbackFormModal = ({ isOpen, onClose }: FeedbackFormModalProps) => {
 
     try {
       await testimonialApiService.submitTestimonial(formData);
-      toast({
-        title: "Thank you!",
-        description: "Your testimonial has been submitted successfully. It will be reviewed before being published.",
-      });
-      onClose();
+      setShowThankYou(true);
     } catch (error) {
       console.error("Error submitting testimonial:", error);
       toast({
@@ -126,15 +124,44 @@ const FeedbackFormModal = ({ isOpen, onClose }: FeedbackFormModalProps) => {
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-2xl">
-            <MessageCircle className="h-6 w-6 text-accent" />
-            Share Your Experience
+            {showThankYou ? (
+              <>
+                <Star className="h-6 w-6 text-accent" />
+                Thank You!
+              </>
+            ) : (
+              <>
+                <MessageCircle className="h-6 w-6 text-accent" />
+                Share Your Experience
+              </>
+            )}
           </DialogTitle>
-          <p className="text-muted-foreground">
-            We'd love to hear about your experience with Anjani Caters. Your feedback helps us improve and inspires others.
-          </p>
+          {showThankYou ? (
+            <p className="text-muted-foreground">
+              Your testimonial has been submitted successfully. It will be reviewed before being published.
+            </p>
+          ) : (
+            <p className="text-muted-foreground">
+              We'd love to hear about your experience with Anjani Caters. Your feedback helps us improve and inspires others.
+            </p>
+          )}
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        {showThankYou ? (
+          <div className="text-center py-8">
+            <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mx-auto mb-6">
+              <Star className="h-8 w-8 text-accent fill-accent" />
+            </div>
+            <h3 className="text-xl font-semibold mb-4">Your feedback means the world to us!</h3>
+            <p className="text-muted-foreground mb-6">
+              Thank you for taking the time to share your experience. We're excited to hear from you and will review your testimonial shortly.
+            </p>
+            <Button onClick={onClose} className="w-full">
+              Close
+            </Button>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-6">
           {/* Quote */}
           <div className="space-y-2">
             <Label htmlFor="quote" className="text-sm font-medium">
@@ -295,6 +322,7 @@ const FeedbackFormModal = ({ isOpen, onClose }: FeedbackFormModalProps) => {
             </Button>
           </div>
         </form>
+        )}
       </DialogContent>
     </Dialog>
   );
