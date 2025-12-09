@@ -534,7 +534,8 @@ const BlogPost = () => {
             </Card>
 
             {/* Comments List */}
-            {commentsLoading ? (
+            <div style={{maxHeight:'35s0px', overflow:'auto'}}>
+              {commentsLoading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="h-6 w-6 animate-spin" />
                 <span className="ml-2">Loading comments...</span>
@@ -581,6 +582,7 @@ const BlogPost = () => {
                 <p className="text-muted-foreground">Be the first to share your thoughts on this article!</p>
               </Card>
             )}
+            </div>
           </div>
 
           {/* Call to Action */}
