@@ -64,8 +64,8 @@ const Navbar = () => {
             {/* Enhanced Logo */}
             <Link to="/" className="flex items-center gap-3 group">
               <div className="relative">
-                <div className="absolute inset-0 bg-gradient-to-r from-orange-400 to-yellow-400 rounded-full opacity-20 group-hover:opacity-30 transition-opacity"></div>
-                <ChefHat className="h-10 w-10 text-orange-500 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
+                <div className="absolute inset-0 bg-gradient-to-r  rounded-full opacity-20 group-hover:opacity-30 transition-opacity"></div>
+                <img src="/logo.png" alt="Anjani Caters Logo" className="h-10 w-10 relative z-10 transition-all duration-300 group-hover:scale-110 group-hover:rotate-12" />
               </div>
               <div className="flex flex-col">
                 <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-yellow-500 bg-clip-text text-transparent leading-tight">

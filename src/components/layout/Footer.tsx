@@ -20,7 +20,7 @@ const Footer = () => {
           <div className="lg:col-span-4 space-y-6">
             <div className="flex items-center gap-3">
               <div className="relative">
-                <ChefHat className="h-10 w-10 text-orange-400" />
+                <img src="/logo.png" alt="Anjani Caters Logo" className="h-10 w-10" />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-400 rounded-full animate-pulse"></div>
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-orange-400 to-yellow-400 bg-clip-text text-transparent">
@@ -196,7 +196,7 @@ const Footer = () => {
             
             <div className="flex gap-6 text-sm text-slate-400">
               <Link to="/privacy" className="hover:text-orange-400 transition-colors">Privacy Policy</Link>
-              <Link to="/terms" className="hover:text-orange-400 transition-colors">Terms of Service</Link>
+              <Link to="/terms%conditions" className="hover:text-orange-400 transition-colors">Terms of Service</Link>
               {/* <Link to="/cookies" className="hover:text-orange-400 transition-colors">Cookie Policy</Link> */}
             </div>
           </div>

@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import { Camera, Image, Star, Eye, Filter, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Play, Users, Clock, Award } from "lucide-react";
 import eventSetup from "@/assets/event-setup.jpg";
+import chefTeam from "@/assets/chef-team.jpg";
+import heroImage from "@/assets/hero-image.jpg";
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -8,17 +10,21 @@ const Gallery = () => {
   const [activeFilter, setActiveFilter] = useState<string>("All");
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
   const [imageDetails, setImageDetails] = useState<{category: string, alt: string} | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const images = [
     { src: eventSetup, alt: "Elegant event setup with decorated tables", category: "Events", featured: true, size: "large" },
+    { src: chefTeam, alt: "Professional chef team preparing gourmet dishes", category: "Food", featured: true, size: "wide" },
+    { src: heroImage, alt: "Stunning catering presentation", category: "Food", featured: false, size: "normal" },
     { src: eventSetup, alt: "Wedding reception venue", category: "Weddings", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Corporate event catering", category: "Corporate", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Buffet presentation", category: "Food", featured: true, size: "wide" },
+    { src: chefTeam, alt: "Corporate event catering", category: "Corporate", featured: false, size: "normal" },
+    { src: heroImage, alt: "Buffet presentation", category: "Food", featured: true, size: "tall" },
     { src: eventSetup, alt: "Dessert table display", category: "Desserts", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Cocktail hour setup", category: "Events", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Birthday celebration", category: "Private", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Gourmet plating", category: "Food", featured: true, size: "tall" },
-    { src: eventSetup, alt: "Garden party setup", category: "Events", featured: false, size: "normal" },
+    { src: chefTeam, alt: "Cocktail hour setup", category: "Events", featured: false, size: "normal" },
+    { src: heroImage, alt: "Birthday celebration", category: "Private", featured: false, size: "normal" },
+    { src: eventSetup, alt: "Gourmet plating", category: "Food", featured: true, size: "normal" },
+    { src: chefTeam, alt: "Garden party setup", category: "Events", featured: false, size: "normal" },
+    { src: heroImage, alt: "Elegant dining experience", category: "Events", featured: false, size: "wide" },
   ];
 
   const categories = ["All", "Events", "Weddings", "Corporate", "Food", "Desserts", "Private"];
@@ -45,11 +51,14 @@ const Gallery = () => {
   };
 
   const handleImageClick = (imageSrc: string, index: number) => {
+    setIsLoading(true);
     setSelectedImage(imageSrc);
     setSelectedImageIndex(index);
     const image = filteredImages[index];
     setImageDetails({ category: image.category, alt: image.alt });
     setIsZoomed(false);
+    // Simulate loading time for better UX
+    setTimeout(() => setIsLoading(false), 300);
   };
 
   // Keyboard navigation
@@ -183,7 +192,7 @@ const Gallery = () => {
           </div>
 
           {/* Category Filter */}
-          <div className="mb-16">
+          <div className="mb-16" role="region" aria-label="Gallery Filters">
             <div className="flex flex-wrap justify-center gap-4">
               {categories.map((category) => (
                 <button
@@ -194,29 +203,31 @@ const Gallery = () => {
                       ? "bg-accent text-accent-foreground shadow-lg"
                       : "bg-muted/50 text-muted-foreground hover:bg-accent/10 hover:text-accent"
                   }`}
+                  aria-pressed={activeFilter === category}
+                  aria-label={`Filter by ${category} category`}
                 >
                   {category}
                 </button>
               ))}
             </div>
             <div className="text-center mt-6">
-              <p className="text-sm text-muted-foreground">
+              <p className="text-sm text-muted-foreground" aria-live="polite">
                 Showing {filteredImages.length} of {images.length} images
               </p>
             </div>
           </div>
 
           {/* Enhanced Gallery Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredImages.map((image, index) => (
               <div
                 key={`${image.src}-${index}`}
                 className={`group relative cursor-pointer overflow-hidden rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl ${
-                  image.featured ? "md:col-span-2 md:row-span-2" : ""
+                  image.featured ? "sm:col-span-2 lg:col-span-2 xl:col-span-2 lg:row-span-2" : ""
                 } ${
-                  image.size === "wide" ? "md:col-span-2" : ""
+                  image.size === "wide" ? "sm:col-span-2 lg:col-span-2 xl:col-span-2" : ""
                 } ${
-                  image.size === "tall" ? "md:row-span-2" : ""
+                  image.size === "tall" ? "sm:row-span-2 lg:row-span-2 xl:row-span-2" : ""
                 }`}
                 onClick={() => handleImageClick(image.src, index)}
               >
@@ -226,6 +237,7 @@ const Gallery = () => {
                   className={`w-full object-cover transition-all duration-500 group-hover:scale-110 ${
                     image.size === "tall" ? "h-96 md:h-[500px]" : "h-64 md:h-80"
                   }`}
+                  loading="lazy"
                 />
                 
                 {/* Enhanced Overlay */}
@@ -295,7 +307,12 @@ const Gallery = () => {
             setSelectedImageIndex(-1);
             setImageDetails(null);
             setIsZoomed(false);
+            setIsLoading(false);
           }}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="lightbox-title"
+          aria-describedby="lightbox-description"
         >
           <div className="relative w-full h-full flex items-center justify-center">
             {/* Close Button */}
@@ -307,6 +324,7 @@ const Gallery = () => {
                 setSelectedImageIndex(-1);
                 setImageDetails(null);
                 setIsZoomed(false);
+                setIsLoading(false);
               }}
             >
               <X className="h-6 w-6" />
@@ -357,15 +375,24 @@ const Gallery = () => {
               </div>
             </div>
 
+            {/* Loading Spinner */}
+            {isLoading && (
+              <div className="absolute inset-0 flex items-center justify-center bg-black/50 backdrop-blur-sm rounded-2xl">
+                <div className="w-12 h-12 border-4 border-white/30 border-t-white rounded-full animate-spin"></div>
+              </div>
+            )}
+
             {/* Main Image */}
             <img
               src={selectedImage}
               alt={imageDetails?.alt || "Gallery image"}
               className={`max-w-full max-h-full object-contain transition-all duration-500 cursor-zoom-${
                 isZoomed ? "out" : "in"
-              } ${isZoomed ? "scale-150 cursor-move" : "scale-100"}`}
+              } ${isZoomed ? "scale-150 cursor-move" : "scale-100"} ${isLoading ? 'opacity-0' : 'opacity-100'}`}
               onClick={(e) => e.stopPropagation()}
               draggable={false}
+              style={{ maxWidth: '90vw', maxHeight: '90vh' }}
+              onLoad={() => setIsLoading(false)}
             />
 
             {/* Image Details */}
