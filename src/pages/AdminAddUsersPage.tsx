@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Loader2, Upload, User, UserPlus } from 'lucide-react';
-import { authApiService } from '@/services/authApi';
+import { authApiService, RegisterData } from '@/services/authApi';
 import { useToast } from '@/hooks/use-toast';
 import { AxiosError } from 'axios';
 
@@ -134,13 +134,18 @@ const AdminAddUsersPage = () => {
     const onSubmit = async (values: AddUserFormData) => {
         try {
             setIsLoading(true);
-            
+
             // Prepare form data for submission
-            const submitData = {
-                ...values,
-                profilePic: profilePicPreview || values.profilePic
+            const submitData: RegisterData = {
+                firstName: values.firstName,
+                lastName: values.lastName,
+                email: values.email,
+                mobile: values.mobile,
+                password: values.password,
+                role: values.role,
+                profilePic: profilePicPreview || values.profilePic || undefined,
             };
-            
+
             await authApiService.register(submitData);
             
             toast({

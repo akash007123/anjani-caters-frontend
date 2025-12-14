@@ -188,7 +188,7 @@ const Home = () => {
           }}
           setApi={setApi}
         >
-          <CarouselContent>
+          <CarouselContent className="mt-16 sm:mt-20">
             {heroSlides.map((slide) => (
               <CarouselItem key={slide.id} className="relative h-screen">
                 <div className="relative w-full h-full flex items-center justify-center overflow-hidden">
@@ -201,9 +201,9 @@ const Home = () => {
                   />
                   
                   {/* Content */}
-                  <div className="relative z-20 container mx-auto px-6 lg:px-12 text-center text-primary-foreground">
+                  <div className="relative z-20 container mx-auto px-4 sm:px-6 lg:px-12 text-center text-primary-foreground">
                     <div className="max-w-4xl mx-auto">
-                      <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in">
+                      <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight animate-fade-in">
                         {slide.title.split(' ').map((word, index) => (
                           <span 
                             key={index} 
@@ -214,10 +214,10 @@ const Home = () => {
                           </span>
                         ))}
                       </h1>
-                      <h2 className="text-xl md:text-2xl mb-4 font-medium opacity-90 animate-fade-in" style={{ animationDelay: "0.4s" }}>
+                      <h2 className="text-lg sm:text-xl md:text-2xl mb-4 font-medium opacity-90 animate-fade-in" style={{ animationDelay: "0.4s" }}>
                         {slide.subtitle}
                       </h2>
-                      <p className="text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed opacity-95 animate-fade-in" style={{ animationDelay: "0.6s" }}>
+                      <p className="text-base sm:text-lg md:text-xl mb-10 max-w-3xl mx-auto leading-relaxed opacity-95 animate-fade-in" style={{ animationDelay: "0.6s" }}>
                         {slide.description}
                       </p>
                       <div className="flex flex-col sm:flex-row gap-4 justify-center animate-fade-in" style={{ animationDelay: "0.8s" }}>
@@ -241,12 +241,12 @@ const Home = () => {
                   </div>
                   
                   {/* Carousel Navigation */}
-                  <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-30">
+                  <div className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-30">
                     <div className="flex space-x-2">
                       {heroSlides.map((_, index) => (
                         <div
                           key={index}
-                          className="w-3 h-3 rounded-full bg-white/50 hover:bg-white/80 transition-all duration-300 cursor-pointer"
+                          className="w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-white/50 hover:bg-white/80 transition-all duration-300 cursor-pointer"
                         />
                       ))}
                     </div>
@@ -257,8 +257,8 @@ const Home = () => {
           </CarouselContent>
           
           {/* Navigation Arrows */}
-          <CarouselPrevious className="left-4 h-12 w-12 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm" />
-          <CarouselNext className="right-4 h-12 w-12 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm" />
+          <CarouselPrevious className="left-2 sm:left-4 h-8 w-8 sm:h-12 sm:w-12 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm" />
+          <CarouselNext className="right-2 sm:right-4 h-8 w-8 sm:h-12 sm:w-12 bg-white/20 hover:bg-white/30 border-white/30 text-white backdrop-blur-sm" />
         </Carousel>
       </section>
 
