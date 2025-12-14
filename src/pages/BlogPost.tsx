@@ -328,7 +328,7 @@ const BlogPost = () => {
   }
 
   return (
-    <div className="min-h-screen pt-[120px]">
+    <div className="min-h-screen">
       {/* Hero Section with Image */}
       <section className="relative h-[400px] bg-muted overflow-hidden">
         <img

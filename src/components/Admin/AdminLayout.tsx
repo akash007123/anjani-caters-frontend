@@ -10,7 +10,8 @@ import {
   X,
   Bell,
   Search,
-  User2
+  User2,
+  Images
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -42,6 +43,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { icon: Users, label: 'Contacts', path: '/admin/contacts' },
     { icon: FileText, label: 'Quotes', path: '/admin/quotes' },
     { icon: User2, label: 'Blogs', path: '/admin/blog' },
+    { icon: Images, label: 'Gallery', path: '/admin/gallery' },
     { icon: User2, label: 'Testimonial', path: '/admin/testimonial' },
     { icon: Settings, label: 'Settings', path: '/admin/settings' },
   ];

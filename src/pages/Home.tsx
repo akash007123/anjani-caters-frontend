@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -25,6 +25,7 @@ import {
   BookOpen,
 } from "lucide-react";
 import { useAutoplay } from "@/hooks/use-autoplay";
+import { blogApiService, type Blog } from "@/services/blogApi";
 import heroImage from "@/assets/hero-image.jpg";
 import chefTeamImage from "@/assets/chef-team.jpg";
 import eventSetupImage from "@/assets/event-setup.jpg";
@@ -99,6 +100,23 @@ const Home = () => {
 
   // Initialize autoplay
   useAutoplay({ api, interval: 5000, enabled: true });
+
+  // State for blogs
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+
+  // Fetch blogs on mount
+  useEffect(() => {
+    const fetchBlogs = async () => {
+      try {
+        const response = await blogApiService.getPublishedBlogs({ limit: 3 });
+        setBlogs(response.data.blogs);
+      } catch (error) {
+        console.error('Failed to fetch blogs:', error);
+      }
+    };
+    fetchBlogs();
+  }, []);
+
   const features = [
     {
       icon: ChefHat,
@@ -212,29 +230,6 @@ const Home = () => {
     },
   ];
 
-  const blogPosts = [
-    {
-      title: "5 Trends Shaping Modern Wedding Catering in 2024",
-      excerpt:
-        "Discover the latest trends in wedding catering, from interactive food stations to sustainable menu options...",
-      date: "Dec 15, 2024",
-      readTime: "5 min read",
-    },
-    {
-      title: "Corporate Event Catering: Creating Professional Impressions",
-      excerpt:
-        "Learn how to elevate your corporate events with sophisticated catering that impresses clients and colleagues...",
-      date: "Dec 10, 2024",
-      readTime: "4 min read",
-    },
-    {
-      title: "Seasonal Menu Planning: Winter Delights",
-      excerpt:
-        "Explore our seasonal winter menu featuring warming spices, comfort foods, and innovative seasonal ingredients...",
-      date: "Dec 5, 2024",
-      readTime: "6 min read",
-    },
-  ];
 
   const awards = [
     { title: "Best Catering Service 2024", organization: "Mumbai Food Awards" },
@@ -660,27 +655,32 @@ const Home = () => {
             </p>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {blogPosts.map((post, index) => (
+            {blogs.map((blog, index) => (
               <Card
-                key={index}
+                key={blog._id}
                 className="p-6 hover:scale-105 transition-smooth card-shadow"
               >
+                <img
+                  src={blog.coverImage}
+                  alt={blog.title}
+                  className="w-full h-48 object-cover mb-4 rounded-lg"
+                />
                 <div className="flex items-center gap-4 text-sm text-muted-foreground mb-4">
                   <div className="flex items-center gap-1">
                     <Clock className="h-4 w-4" />
-                    <span>{post.readTime}</span>
+                    <span>{blog.readingTime || 5} min read</span>
                   </div>
                   <span>•</span>
-                  <span>{post.date}</span>
+                  <span>{new Date(blog.publishedAt || blog.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' })}</span>
                 </div>
                 <h3 className="text-xl font-semibold mb-3 line-clamp-2">
-                  {post.title}
+                  {blog.title}
                 </h3>
                 <p className="text-muted-foreground mb-4 leading-relaxed line-clamp-3">
-                  {post.excerpt}
+                  {blog.excerpt}
                 </p>
                 <Link
-                  to="/blog"
+                  to={`/blog/${blog.slug}`}
                   className="text-accent font-medium inline-flex items-center gap-2 hover:gap-3 transition-smooth"
                 >
                   Read More
