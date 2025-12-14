@@ -122,7 +122,7 @@ const Testimonials = () => {
   );
 
   return (
-    <div className="min-h-screen pt-[120px]">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden">
         {/* Background Image with Overlay */}

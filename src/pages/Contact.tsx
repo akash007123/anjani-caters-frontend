@@ -123,7 +123,7 @@ const Contact = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-[120px]">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-gray-800 dark:to-blue-900/20">
         {/* Floating communication elements */}

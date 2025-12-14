@@ -3,55 +3,59 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Heart, Building2, PartyPopper, Utensils, Camera, Sparkles, Star, Award, Users } from "lucide-react";
 import { useState, useEffect } from "react";
+import { testimonialApiService, type Testimonial } from "@/services/testimonialApi";
+
+interface DisplayTestimonial {
+  quote: string;
+  name: string;
+  position: string;
+  company: string;
+  rating: number;
+  eventType: string;
+  image: string;
+}
 
 const Services = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [testimonials, setTestimonials] = useState<DisplayTestimonial[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const testimonials = [
-    {
-      quote: "Anjani Caters transformed our corporate gala into an unforgettable experience. The attention to detail, creative menu, and flawless execution exceeded all expectations.",
-      name: "Neha Kapoor",
-      position: "CEO",
-      company: "TechVision Industries",
-      rating: 5,
-      eventType: "Corporate Gala",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Our wedding day was absolutely perfect thanks to Anjani Caters. Every dish was crafted to perfection, and their team made sure everything ran smoothly. We couldn't have asked for better service.",
-      name: "Rahul & Priya Sharma",
-      position: "Wedding Couple",
-      company: "Mumbai",
-      rating: 5,
-      eventType: "Wedding Reception",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "The anniversary party was a huge success! Anjani Caters's innovative menu and professional service impressed all our guests. The custom cake was the highlight of the evening.",
-      name: "Amit Patel",
-      position: "Event Host",
-      company: "Surat",
-      rating: 5,
-      eventType: "Anniversary Party",
-      image: "/placeholder.svg"
-    },
-    {
-      quote: "Outstanding service from start to finish. Anjani Caters's team was professional, creative, and delivered beyond our expectations. The food quality and presentation were exceptional.",
-      name: "Dr. Meera Joshi",
-      position: "Hospital Administrator",
-      company: "MediCare Hospital",
-      rating: 5,
-      eventType: "Medical Conference",
-      image: "/placeholder.svg"
-    }
-  ];
+  // Fetch testimonials from API
+  useEffect(() => {
+    const fetchTestimonials = async () => {
+      try {
+        const response = await testimonialApiService.getApprovedTestimonials();
+        if (response.success && response.data.length > 0) {
+          // Use API data - convert to DisplayTestimonial format
+          const carouselTestimonials = response.data.slice(0, 5).map((t: Testimonial) => ({
+            quote: t.quote,
+            name: t.name,
+            position: t.position,
+            company: t.company,
+            rating: t.rating,
+            eventType: t.eventType,
+            image: t.image,
+          }));
+          setTestimonials(carouselTestimonials);
+        }
+      } catch (error) {
+        console.error("Error fetching testimonials:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, []);
 
   // Auto-advance carousel
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
-    }, 6000);
-    return () => clearInterval(timer);
+    if (testimonials.length > 0) {
+      const timer = setInterval(() => {
+        setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+      }, 6000);
+      return () => clearInterval(timer);
+    }
   }, [testimonials.length]);
 
   const services = [
@@ -130,7 +134,7 @@ const Services = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-[120px]">
+    <div className="min-h-screen">
       {/* Hero Section */}
       <section className="relative py-32 overflow-hidden">
         {/* Background Image with Overlay */}
@@ -522,270 +526,307 @@ const Services = () => {
       </section>
 
       {/* Enhanced Testimonial Carousel Section */}
-      <section className="py-24 bg-background relative overflow-hidden">
-        {/* Background Elements */}
-        <div className="absolute top-20 right-20 w-32 h-32 bg-accent/5 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-20 left-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        
-        <div className="container mx-auto px-6 lg:px-12 relative z-10">
-          {/* Section Header */}
-          <div className="text-center mb-20">
-            <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-2 mb-6 animate-fade-in">
-              <Star className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Client Stories</span>
-            </div>
+      <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-background relative overflow-hidden">
+  {/* Background Elements - Adjusted for mobile */}
+  <div className="absolute top-10 right-4 sm:top-20 sm:right-10 md:top-20 md:right-20 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-accent/5 rounded-full blur-3xl animate-pulse"></div>
+  <div className="absolute bottom-10 left-4 sm:bottom-20 sm:left-10 md:bottom-20 md:left-20 w-28 h-28 sm:w-32 sm:h-32 md:w-40 md:h-40 bg-primary/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
+  
+  <div className="container mx-auto px-4 sm:px-6 lg:px-8 xl:px-12 relative z-10">
+    {/* Section Header */}
+    <div className="text-center mb-12 sm:mb-16 md:mb-20">
+      <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-4 py-1.5 sm:px-5 sm:py-2 md:px-6 md:py-2 mb-4 sm:mb-6 animate-fade-in">
+        <Star className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+        <span className="text-xs sm:text-sm font-medium text-accent">Client Stories</span>
+      </div>
 
-            <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-slide-in-up">
-              What Our Clients Say
-            </h2>
-            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-in-up delay-200">
-              Real experiences from clients who trusted us with their most important moments
-            </p>
+      <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 sm:mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-slide-in-up px-2 sm:px-0">
+        What Our Clients Say
+      </h2>
+      <p className="text-sm sm:text-base md:text-lg lg:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-in-up delay-200 px-4 sm:px-0">
+        Real experiences from clients who trusted us with their most important moments
+      </p>
+    </div>
+
+    {/* Testimonial Carousel */}
+    <div className="relative max-w-7xl mx-auto">
+      {loading ? (
+        <div className="text-center py-20">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-accent mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading testimonials...</p>
+        </div>
+      ) : testimonials.length === 0 ? (
+        <div className="text-center py-20">
+          <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <Star className="h-8 w-8 text-accent fill-accent" />
           </div>
-
-          {/* Testimonial Carousel */}
-          <div className="relative max-w-7xl mx-auto">
-            <div className="relative overflow-hidden">
-              <div 
-                className="flex transition-transform duration-500 ease-in-out"
-                style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
-              >
-                {testimonials.map((testimonial, index) => (
-                  <div key={index} className="w-full flex-shrink-0">
-                    <div className="grid md:grid-cols-2 gap-12 items-center">
-                      {/* Content Side - Left */}
-                      <div className="order-2 md:order-1 animate-slide-in-up" style={{ animationDelay: `${index * 200}ms` }}>
-                        <Card className="p-10 bg-background/50 backdrop-blur-sm border-border/50 card-shadow hover:shadow-2xl transition-all duration-500">
-                          {/* Quote Icon */}
-                          <div className="w-16 h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-8">
-                            <Star className="h-8 w-8 text-accent fill-accent" />
-                          </div>
-                          
-                          {/* Testimonial Text */}
-                          <blockquote className="text-xl md:text-2xl font-medium mb-8 leading-relaxed text-foreground">
-                            "{testimonial.quote}"
-                          </blockquote>
-                          
-                          {/* Client Info */}
-                          <div className="border-t border-border/50 pt-6">
-                            <div className="font-bold text-lg text-foreground mb-1">
-                              {testimonial.name}
-                            </div>
-                            <div className="text-accent font-semibold mb-2">
-                              {testimonial.position}
-                            </div>
-                            <div className="text-sm text-muted-foreground">
-                              {testimonial.company}
-                            </div>
-                            
-                            {/* Rating */}
-                            <div className="flex items-center gap-1 mt-4">
-                              {[...Array(testimonial.rating)].map((_, i) => (
-                                <Star key={i} className="h-5 w-5 text-accent fill-current" />
-                              ))}
-                              <span className="text-sm text-muted-foreground ml-2">
-                                {testimonial.rating}/5 stars
-                              </span>
-                            </div>
-                          </div>
-                        </Card>
-                      </div>
-                      
-                      {/* Image Side - Right */}
-                      <div className="order-1 md:order-2 animate-slide-in-up delay-300" style={{ animationDelay: `${index * 200 + 100}ms` }}>
-                        <div className="relative group">
-                          {/* Main Image */}
-                          <div className="relative overflow-hidden rounded-2xl shadow-2xl">
-                            <img
-                              src={testimonial.image}
-                              alt={testimonial.name}
-                              className="w-full h-96 object-cover group-hover:scale-105 transition-transform duration-700"
-                            />
-                            <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-transparent"></div>
-                          </div>
-                          
-                          {/* Floating Stats */}
-                          <div className="absolute -bottom-6 -left-6 bg-background/90 backdrop-blur-sm rounded-xl p-4 border border-border/50 shadow-xl">
-                            <div className="text-center">
-                              <div className="text-2xl font-bold text-accent">{testimonial.eventType}</div>
-                              <div className="text-sm text-muted-foreground">Event Type</div>
-                            </div>
-                          </div>
-                          
-                          {/* Decorative Elements */}
-                          <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl opacity-60"></div>
-                          <div className="absolute top-1/2 -left-8 w-16 h-16 bg-primary/20 rounded-full blur-xl opacity-40"></div>
+          <h3 className="text-2xl font-semibold mb-2">
+            No testimonials yet
+          </h3>
+          <p className="text-muted-foreground mb-6">
+            Be the first to share your experience with us!
+          </p>
+        </div>
+      ) : (
+        <>
+          <div className="relative overflow-hidden">
+            <div
+              className="flex transition-transform duration-500 ease-in-out"
+              style={{ transform: `translateX(-${currentTestimonial * 100}%)` }}
+            >
+              {testimonials.map((testimonial, index) => (
+                <div key={index} className="w-full flex-shrink-0">
+                  <div className="flex flex-col lg:grid lg:grid-cols-2 gap-8 sm:gap-10 lg:gap-12 items-center">
+                    {/* Content Side */}
+                    <div className="order-2 lg:order-1 animate-slide-in-up" style={{ animationDelay: `${index * 200}ms` }}>
+                      <Card className="p-6 sm:p-8 md:p-10 bg-background/50 backdrop-blur-sm border-border/50 card-shadow hover:shadow-2xl transition-all duration-500">
+                        {/* Quote Icon */}
+                        <div className="w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-accent/10 rounded-2xl flex items-center justify-center mb-6 sm:mb-8">
+                          <Star className="h-6 w-6 sm:h-7 sm:w-7 md:h-8 md:w-8 text-accent fill-accent" />
                         </div>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            
-            {/* Navigation Dots */}
-            <div className="flex justify-center gap-3 mt-12">
-              {testimonials.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => setCurrentTestimonial(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === currentTestimonial 
-                      ? 'bg-accent scale-125' 
-                      : 'bg-border hover:bg-accent/50'
-                  }`}
-                />
-              ))}
-            </div>
-            
-            {/* Navigation Arrows */}
-            <div className="absolute top-1/2 -translate-y-1/2 -left-4 right-auto">
-              <button
-                onClick={() => setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
-                className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
-              >
-                ←
-              </button>
-            </div>
-            <div className="absolute top-1/2 -translate-y-1/2 -right-4 left-auto">
-              <button
-                onClick={() => setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
-                className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
-              >
-                →
-              </button>
-            </div>
-          </div>
 
-          {/* Enhanced Bottom Stats */}
-          <div className="text-center mt-20 animate-fade-in delay-1000">
-            <div className="relative group">
-              {/* Main Stats Card */}
-              <div className="bg-gradient-to-br from-accent/5 via-background to-primary/5 backdrop-blur-xl rounded-3xl p-10 md:p-12 max-w-5xl mx-auto border border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:scale-[1.02] relative overflow-hidden">
-                
-                {/* Background Effects */}
-                <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
-                
-                {/* Floating Elements */}
-                <div className="absolute top-8 right-8 w-16 h-16 bg-accent/8 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
-                <div className="absolute bottom-8 left-8 w-12 h-12 bg-primary/8 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
+                        {/* Testimonial Text */}
+                        <blockquote className="text-base sm:text-lg md:text-xl lg:text-2xl font-medium mb-6 sm:mb-8 leading-relaxed text-foreground">
+                          "{testimonial.quote}"
+                        </blockquote>
 
-                {/* Content */}
-                <div className="relative z-10">
-                  {/* Header */}
-                  <div className="mb-10 animate-slide-in-up">
-                    <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-4 py-2 mb-4">
-                      <Heart className="h-4 w-4 text-accent" />
-                      <span className="text-sm font-medium text-accent">Client Success</span>
-                    </div>
-                    <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-transparent">
-                      Join Our Happy Clients
-                    </h3>
-                    <p className="text-muted-foreground mt-3 max-w-2xl mx-auto">
-                      Experience the difference that thousands of satisfied clients already know
-                    </p>
-                  </div>
-
-                  {/* Stats Grid */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                    {[
-                      {
-                        number: "4.9/5",
-                        label: "Average Rating",
-                        description: "Based on client reviews",
-                        icon: "⭐",
-                        color: "from-yellow-500 to-orange-500",
-                        suffix: ""
-                      },
-                      {
-                        number: "500",
-                        label: "Happy Clients",
-                        description: "Satisfied customers",
-                        icon: "😊",
-                        color: "from-green-500 to-emerald-500",
-                        suffix: "+"
-                      },
-                      {
-                        number: "98",
-                        label: "Would Recommend",
-                        description: "Client satisfaction",
-                        icon: "👍",
-                        color: "from-blue-500 to-cyan-500",
-                        suffix: "%"
-                      },
-                      {
-                        number: "24",
-                        label: "Support Available",
-                        description: "Hours per day",
-                        icon: "🕐",
-                        color: "from-purple-500 to-pink-500",
-                        suffix: "/7"
-                      }
-                    ].map((stat, index) => (
-                      <div 
-                        key={index} 
-                        className="group/stat animate-slide-in-up hover:scale-105 transition-all duration-500"
-                        style={{ animationDelay: `${200 + (index * 150)}ms` }}
-                      >
-                        <div className="bg-background/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50 hover:border-accent/30 hover:bg-background/70 transition-all duration-300 group-hover/stat:shadow-xl relative overflow-hidden">
-                          
-                          {/* Background Gradient */}
-                          <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover/stat:opacity-5 transition-opacity duration-500`}></div>
-                          
-                          {/* Icon */}
-                          <div className="text-4xl mb-4 group-hover/stat:scale-110 transition-transform duration-300 relative z-10">
-                            {stat.icon}
+                        {/* Client Info */}
+                        <div className="border-t border-border/50 pt-4 sm:pt-6">
+                          <div className="font-bold text-base sm:text-lg text-foreground mb-1">
+                            {testimonial.name}
                           </div>
-                          
-                          {/* Number */}
-                          <div className="text-2xl md:text-3xl font-bold text-accent mb-3 group-hover/stat:text-accent/90 transition-colors duration-300 relative z-10">
-                            {stat.number}{stat.suffix}
+                          <div className="text-accent font-semibold text-sm sm:text-base mb-2">
+                            {testimonial.position}
                           </div>
-                          
-                          {/* Label */}
-                          <div className="text-sm font-semibold text-foreground mb-2 group-hover/stat:text-accent transition-colors duration-300 relative z-10">
-                            {stat.label}
-                          </div>
-                          
-                          {/* Description */}
-                          <div className="text-xs text-muted-foreground/80 relative z-10">
-                            {stat.description}
+                          <div className="text-xs sm:text-sm text-muted-foreground">
+                            {testimonial.company}
                           </div>
 
-                          {/* Progress Bar Animation */}
-                          <div className="absolute bottom-0 left-0 right-0 h-1 bg-border/30 rounded-b-2xl overflow-hidden">
-                            <div className={`h-full bg-gradient-to-r ${stat.color} transform scale-x-0 group-hover/stat:scale-x-100 transition-transform duration-700 origin-left`}></div>
+                          {/* Rating */}
+                          <div className="flex items-center gap-1 mt-3 sm:mt-4">
+                            {[...Array(testimonial.rating)].map((_, i) => (
+                              <Star key={i} className="h-4 w-4 sm:h-5 sm:w-5 text-accent fill-current" />
+                            ))}
+                            <span className="text-xs sm:text-sm text-muted-foreground ml-2">
+                              {testimonial.rating}/5 stars
+                            </span>
                           </div>
                         </div>
-                      </div>
-                    ))}
-                  </div>
+                      </Card>
+                    </div>
 
-                  {/* Call to Action */}
-                  <div className="mt-10 pt-6 border-t border-border/50 animate-fade-in delay-1000">
-                    <p className="text-muted-foreground mb-6">Ready to become our next success story?</p>
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                      <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
-                        Start Your Event
-                      </button>
-                      <button className="border-2 border-border hover:border-accent/50 text-foreground hover:text-accent bg-background/50 hover:bg-background/80 px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-sm">
-                        Read Reviews
-                      </button>
+                    {/* Image Side */}
+                    <div className="order-1 lg:order-2 animate-slide-in-up delay-300" style={{ animationDelay: `${index * 200 + 100}ms` }}>
+                      <div className="relative group">
+                        {/* Main Image */}
+                        <div className="relative overflow-hidden rounded-xl sm:rounded-2xl shadow-xl sm:shadow-2xl">
+                          <img
+                            src={testimonial.image}
+                            alt={testimonial.name}
+                            className="w-full h-64 sm:h-80 md:h-96 object-cover group-hover:scale-105 transition-transform duration-700"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-accent/20 via-transparent to-transparent"></div>
+                        </div>
+
+                        {/* Floating Stats */}
+                        <div className="absolute -bottom-4 -left-4 sm:-bottom-6 sm:-left-6 bg-background/90 backdrop-blur-sm rounded-lg sm:rounded-xl p-3 sm:p-4 border border-border/50 shadow-lg sm:shadow-xl">
+                          <div className="text-center">
+                            <div className="text-lg sm:text-xl md:text-2xl font-bold text-accent">{testimonial.eventType}</div>
+                            <div className="text-xs sm:text-sm text-muted-foreground">Event Type</div>
+                          </div>
+                        </div>
+
+                        {/* Decorative Elements - Hidden on mobile */}
+                        <div className="hidden sm:block absolute -top-4 -right-4 w-16 h-16 sm:w-20 sm:h-20 md:w-24 md:h-24 bg-accent/20 rounded-full blur-2xl opacity-60"></div>
+                        <div className="hidden sm:block absolute top-1/2 -left-6 sm:-left-8 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-primary/20 rounded-full blur-xl opacity-40"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              </div>
+              ))}
+            </div>
+          </div>
 
-              {/* Corner Decorations */}
-              <div className="absolute -top-3 -left-3 w-6 h-6 border-l-2 border-t-2 border-accent/30 rounded-tl-lg opacity-60"></div>
-              <div className="absolute -top-3 -right-3 w-6 h-6 border-r-2 border-t-2 border-accent/30 rounded-tr-lg opacity-60"></div>
-              <div className="absolute -bottom-3 -left-3 w-6 h-6 border-l-2 border-b-2 border-accent/30 rounded-bl-lg opacity-60"></div>
-              <div className="absolute -bottom-3 -right-3 w-6 h-6 border-r-2 border-b-2 border-accent/30 rounded-br-lg opacity-60"></div>
+          {/* Navigation Dots */}
+          <div className="flex justify-center gap-2 sm:gap-3 mt-8 sm:mt-12">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentTestimonial(index)}
+                className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full transition-all duration-300 ${
+                  index === currentTestimonial
+                    ? 'bg-accent scale-125 sm:scale-125'
+                    : 'bg-border hover:bg-accent/50'
+                }`}
+              />
+            ))}
+          </div>
+
+          {/* Navigation Arrows - Hidden on mobile, shown on sm+ */}
+          <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 -left-2 md:-left-4 right-auto">
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg text-sm sm:text-base"
+            >
+              ←
+            </button>
+          </div>
+          <div className="hidden sm:block absolute top-1/2 -translate-y-1/2 -right-2 md:-right-4 left-auto">
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+              className="w-10 h-10 sm:w-12 sm:h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg text-sm sm:text-base"
+            >
+              →
+            </button>
+          </div>
+
+          {/* Mobile Navigation Arrows - Positioned differently for mobile */}
+          <div className="sm:hidden flex justify-between mt-6">
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev === 0 ? testimonials.length - 1 : prev - 1))}
+              className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
+            >
+              ←
+            </button>
+            <button
+              onClick={() => setCurrentTestimonial((prev) => (prev === testimonials.length - 1 ? 0 : prev + 1))}
+              className="w-12 h-12 bg-background/80 backdrop-blur-sm border border-border/50 rounded-full flex items-center justify-center hover:bg-accent hover:text-accent-foreground transition-all duration-300 hover:scale-110 shadow-lg"
+            >
+              →
+            </button>
+          </div>
+        </>
+      )}
+    </div>
+
+    {/* Enhanced Bottom Stats */}
+    <div className="text-center mt-12 sm:mt-16 md:mt-20 animate-fade-in delay-1000">
+      <div className="relative group">
+        {/* Main Stats Card */}
+        <div className="bg-gradient-to-br from-accent/5 via-background to-primary/5 backdrop-blur-xl rounded-2xl sm:rounded-3xl p-6 sm:p-8 md:p-10 lg:p-12 max-w-5xl mx-auto border border-border/50 shadow-xl sm:shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:scale-[1.02] relative overflow-hidden">
+          
+          {/* Background Effects */}
+          <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
+          
+          {/* Floating Elements - Hidden on mobile */}
+          <div className="hidden sm:block absolute top-4 right-4 sm:top-8 sm:right-8 w-12 h-12 sm:w-14 sm:h-14 md:w-16 md:h-16 bg-accent/8 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
+          <div className="hidden sm:block absolute bottom-4 left-4 sm:bottom-8 sm:left-8 w-10 h-10 sm:w-12 sm:h-12 md:w-12 md:h-12 bg-primary/8 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
+
+          {/* Content */}
+          <div className="relative z-10">
+            {/* Header */}
+            <div className="mb-6 sm:mb-8 md:mb-10 animate-slide-in-up">
+              <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-3 py-1.5 sm:px-4 sm:py-2 mb-3 sm:mb-4">
+                <Heart className="h-3 w-3 sm:h-3.5 sm:w-3.5 md:h-4 md:w-4 text-accent" />
+                <span className="text-xs sm:text-sm font-medium text-accent">Client Success</span>
+              </div>
+              <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-transparent px-2 sm:px-0">
+                Join Our Happy Clients
+              </h3>
+              <p className="text-muted-foreground mt-2 sm:mt-3 max-w-2xl mx-auto text-sm sm:text-base px-4 sm:px-0">
+                Experience the difference that thousands of satisfied clients already know
+              </p>
+            </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+              {[
+                {
+                  number: "4.9",
+                  label: "Avg Rating",
+                  description: "Client reviews",
+                  icon: "⭐",
+                  color: "from-yellow-500 to-orange-500",
+                  suffix: "/5"
+                },
+                {
+                  number: "500",
+                  label: "Happy Clients",
+                  description: "Satisfied customers",
+                  icon: "😊",
+                  color: "from-green-500 to-emerald-500",
+                  suffix: "+"
+                },
+                {
+                  number: "98",
+                  label: "Recommend",
+                  description: "Satisfaction",
+                  icon: "👍",
+                  color: "from-blue-500 to-cyan-500",
+                  suffix: "%"
+                },
+                {
+                  number: "24",
+                  label: "Support",
+                  description: "Hours per day",
+                  icon: "🕐",
+                  color: "from-purple-500 to-pink-500",
+                  suffix: "/7"
+                }
+              ].map((stat, index) => (
+                <div 
+                  key={index} 
+                  className="group/stat animate-slide-in-up hover:scale-105 transition-all duration-500"
+                  style={{ animationDelay: `${200 + (index * 150)}ms` }}
+                >
+                  <div className="bg-background/50 backdrop-blur-sm rounded-xl sm:rounded-2xl p-4 sm:p-5 md:p-6 border border-border/50 hover:border-accent/30 hover:bg-background/70 transition-all duration-300 group-hover/stat:shadow-xl relative overflow-hidden">
+                    
+                    {/* Background Gradient */}
+                    <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover/stat:opacity-5 transition-opacity duration-500`}></div>
+                    
+                    {/* Icon */}
+                    <div className="text-2xl sm:text-3xl md:text-4xl mb-2 sm:mb-3 md:mb-4 group-hover/stat:scale-110 transition-transform duration-300 relative z-10">
+                      {stat.icon}
+                    </div>
+                    
+                    {/* Number */}
+                    <div className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-bold text-accent mb-1 sm:mb-2 md:mb-3 group-hover/stat:text-accent/90 transition-colors duration-300 relative z-10">
+                      {stat.number}{stat.suffix}
+                    </div>
+                    
+                    {/* Label */}
+                    <div className="text-xs sm:text-sm font-semibold text-foreground mb-1 group-hover/stat:text-accent transition-colors duration-300 relative z-10">
+                      {stat.label}
+                    </div>
+                    
+                    {/* Description */}
+                    <div className="text-xs text-muted-foreground/80 relative z-10">
+                      {stat.description}
+                    </div>
+
+                    {/* Progress Bar Animation */}
+                    <div className="absolute bottom-0 left-0 right-0 h-1 bg-border/30 rounded-b-xl sm:rounded-b-2xl overflow-hidden">
+                      <div className={`h-full bg-gradient-to-r ${stat.color} transform scale-x-0 group-hover/stat:scale-x-100 transition-transform duration-700 origin-left`}></div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Call to Action */}
+            <div className="mt-6 sm:mt-8 md:mt-10 pt-4 sm:pt-6 border-t border-border/50 animate-fade-in delay-1000">
+              <p className="text-muted-foreground mb-4 sm:mb-6 text-sm sm:text-base">Ready to become our next success story?</p>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center">
+                <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg text-sm sm:text-base">
+                  Start Your Event
+                </button>
+                <button className="border-2 border-border hover:border-accent/50 text-foreground hover:text-accent bg-background/50 hover:bg-background/80 px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 backdrop-blur-sm text-sm sm:text-base">
+                  Read Reviews
+                </button>
+              </div>
             </div>
           </div>
         </div>
-      </section>
+
+        {/* Corner Decorations - Hidden on mobile */}
+        <div className="hidden sm:block absolute -top-2 -left-2 sm:-top-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 border-l-2 border-t-2 border-accent/30 rounded-tl-lg opacity-60"></div>
+        <div className="hidden sm:block absolute -top-2 -right-2 sm:-top-3 sm:-right-3 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 border-r-2 border-t-2 border-accent/30 rounded-tr-lg opacity-60"></div>
+        <div className="hidden sm:block absolute -bottom-2 -left-2 sm:-bottom-3 sm:-left-3 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 border-l-2 border-b-2 border-accent/30 rounded-bl-lg opacity-60"></div>
+        <div className="hidden sm:block absolute -bottom-2 -right-2 sm:-bottom-3 sm:-right-3 w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 border-r-2 border-b-2 border-accent/30 rounded-br-lg opacity-60"></div>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* Enhanced CTA Section */}
       <section className="py-24 bg-muted relative overflow-hidden">

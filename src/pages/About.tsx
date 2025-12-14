@@ -7,7 +7,8 @@ const About = () => {
     {
       icon: Heart,
       title: "Passion",
-      description: "Every dish is crafted with genuine love for the culinary arts",
+      description:
+        "Every dish is crafted with genuine love for the culinary arts",
     },
     {
       icon: Award,
@@ -27,9 +28,9 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen pt-[120px]">
+    <div className="min-h-screen ">
       {/* Hero Section */}
-      <section className="relative py-32 overflow-hidden">
+      <section className="relative py-16 md:py-32 overflow-hidden">
         {/* Background Image with Overlay */}
         <div className="absolute inset-0 z-0">
           <img
@@ -44,14 +45,16 @@ const About = () => {
         {/* Decorative Elements */}
         <div className="absolute top-20 right-20 w-32 h-32 bg-accent/20 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 left-20 w-24 h-24 bg-accent/30 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        
+
         {/* Content */}
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="max-w-4xl mx-auto text-center text-primary-foreground">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-accent/20 backdrop-blur-sm border border-accent/30 rounded-full px-6 py-2 mb-8 animate-fade-in">
               <Award className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium">15+ Years of Excellence</span>
+              <span className="text-sm font-medium">
+                15+ Years of Excellence
+              </span>
             </div>
 
             {/* Main Heading */}
@@ -61,12 +64,15 @@ const About = () => {
 
             {/* Subtitle */}
             <p className="text-xl md:text-2xl lg:text-3xl font-light mb-8 max-w-3xl mx-auto leading-relaxed opacity-95 animate-slide-in-up delay-200">
-              Crafting extraordinary culinary experiences that bring people together and create lasting memories
+              Crafting extraordinary culinary experiences that bring people
+              together and create lasting memories
             </p>
 
             {/* Description */}
             <p className="text-lg md:text-xl max-w-2xl mx-auto mb-12 opacity-90 leading-relaxed animate-slide-in-up delay-400">
-              From intimate gatherings to grand celebrations, we've been transforming visions into unforgettable dining experiences with passion, creativity, and uncompromising quality.
+              From intimate gatherings to grand celebrations, we've been
+              transforming visions into unforgettable dining experiences with
+              passion, creativity, and uncompromising quality.
             </p>
 
             {/* Call to Action */}
@@ -86,48 +92,48 @@ const About = () => {
                   number: "10,000+",
                   label: "Events Catered",
                   icon: "🎉",
-                  description: "Successful celebrations"
+                  description: "Successful celebrations",
                 },
                 {
                   number: "50+",
                   label: "Team Members",
                   icon: "👥",
-                  description: "Expert professionals"
+                  description: "Expert professionals",
                 },
                 {
                   number: "15+",
                   label: "Years Experience",
                   icon: "⭐",
-                  description: "Industry expertise"
+                  description: "Industry expertise",
                 },
                 {
                   number: "98%",
                   label: "Client Satisfaction",
                   icon: "💯",
-                  description: "Happy clients"
-                }
+                  description: "Happy clients",
+                },
               ].map((stat, index) => (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className="text-center group cursor-pointer animate-slide-in-up hover:scale-105 transition-all duration-500"
-                  style={{ animationDelay: `${800 + (index * 200)}ms` }}
+                  style={{ animationDelay: `${800 + index * 200}ms` }}
                 >
                   <div className="bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-2xl p-6 hover:bg-accent/15 hover:border-accent/30 transition-all duration-300 group-hover:shadow-lg">
                     {/* Icon */}
                     <div className="text-3xl mb-3 group-hover:scale-110 transition-transform duration-300">
                       {stat.icon}
                     </div>
-                    
+
                     {/* Number */}
                     <div className="text-2xl md:text-3xl lg:text-4xl font-bold text-accent mb-2 group-hover:text-accent/90 transition-colors duration-300">
                       {stat.number}
                     </div>
-                    
+
                     {/* Label */}
                     <div className="text-sm md:text-base font-semibold text-foreground mb-1 group-hover:text-accent transition-colors duration-300">
                       {stat.label}
                     </div>
-                    
+
                     {/* Description */}
                     <div className="text-xs md:text-sm text-muted-foreground/80 opacity-80 group-hover:opacity-100 transition-opacity duration-300">
                       {stat.description}
@@ -152,36 +158,50 @@ const About = () => {
         {/* Decorative Elements */}
         <div className="absolute top-20 right-10 w-32 h-32 bg-accent/10 rounded-full blur-3xl"></div>
         <div className="absolute bottom-10 left-10 w-24 h-24 bg-primary/10 rounded-full blur-2xl"></div>
-        
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="grid md:grid-cols-2 gap-16 items-center">
             <div className="animate-fade-in">
               {/* Badge */}
               <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-4 py-2 mb-6">
                 <Heart className="h-4 w-4 text-accent" />
-                <span className="text-sm font-medium text-accent">Our Journey</span>
+                <span className="text-sm font-medium text-accent">
+                  Our Journey
+                </span>
               </div>
 
               <h2 className="text-4xl font-bold mb-8 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-slide-in-up">
                 Who We Are
               </h2>
-              
+
               <div className="space-y-8 text-muted-foreground leading-relaxed">
                 <div className="animate-slide-in-up delay-200">
                   <p className="text-lg">
-                    Anjani Caters was founded in 2010 with a simple vision: to elevate the catering experience by combining exceptional cuisine with personalized service. What started as a passion project by Chef Rahul Sharma has grown into one of the most trusted names in premium catering.
+                    Anjani Caters was founded in 2010 with a simple vision: to
+                    elevate the catering experience by combining exceptional
+                    cuisine with personalized service. What started as a passion
+                    project by Chef Rahul Sharma has grown into one of the most
+                    trusted names in premium catering.
                   </p>
                 </div>
-                
+
                 <div className="animate-slide-in-up delay-400">
                   <p className="text-lg">
-                    Our team of award-winning chefs brings together diverse culinary traditions, creating menus that honor both classic techniques and contemporary innovation. We believe that great food has the power to bring people together and create lasting memories.
+                    Our team of award-winning chefs brings together diverse
+                    culinary traditions, creating menus that honor both classic
+                    techniques and contemporary innovation. We believe that
+                    great food has the power to bring people together and create
+                    lasting memories.
                   </p>
                 </div>
-                
+
                 <div className="animate-slide-in-up delay-600">
                   <p className="text-lg">
-                    Today, we serve weddings, corporate events, and private celebrations across the region, always maintaining our commitment to quality, creativity, and exceptional service. Every event is an opportunity for us to showcase our passion for culinary excellence.
+                    Today, we serve weddings, corporate events, and private
+                    celebrations across the region, always maintaining our
+                    commitment to quality, creativity, and exceptional service.
+                    Every event is an opportunity for us to showcase our passion
+                    for culinary excellence.
                   </p>
                 </div>
               </div>
@@ -203,13 +223,13 @@ const About = () => {
                   alt="Professional chef team preparing gourmet dishes"
                   className="rounded-2xl card-shadow w-full h-auto transform group-hover:scale-[1.02] transition-all duration-500"
                 />
-                
+
                 {/* Image Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-primary/20 via-transparent to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-                
+
                 {/* Decorative Corner */}
                 <div className="absolute -top-4 -right-4 w-24 h-24 bg-accent/20 rounded-full blur-2xl group-hover:scale-110 transition-transform duration-500"></div>
-                
+
                 {/* Stats Overlay */}
                 <div className="absolute bottom-6 left-6 right-6 bg-background/90 backdrop-blur-sm rounded-lg p-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-4 group-hover:translate-y-0">
                   <div className="grid grid-cols-2 gap-4 text-center">
@@ -219,19 +239,23 @@ const About = () => {
                     </div>
                     <div>
                       <div className="text-xl font-bold text-accent">2500+</div>
-                      <div className="text-xs text-muted-foreground">Events</div>
+                      <div className="text-xs text-muted-foreground">
+                        Events
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               {/* Floating Elements */}
               <div className="absolute -bottom-6 -left-6 bg-accent/10 backdrop-blur-sm rounded-xl p-4 animate-float">
                 <div className="flex items-center gap-3">
                   <Award className="h-8 w-8 text-accent" />
                   <div>
                     <div className="font-semibold text-sm">Award Winning</div>
-                    <div className="text-xs text-muted-foreground">Since 2009</div>
+                    <div className="text-xs text-muted-foreground">
+                      Since 2009
+                    </div>
                   </div>
                 </div>
               </div>
@@ -246,36 +270,43 @@ const About = () => {
         <div className="absolute top-20 left-20 w-40 h-40 bg-accent/10 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-20 w-32 h-32 bg-primary/10 rounded-full blur-2xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/2 left-10 w-20 h-20 bg-accent/5 rounded-full blur-xl"></div>
-        
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-20">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-2 mb-6 animate-fade-in">
               <Star className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Our Foundation</span>
+              <span className="text-sm font-medium text-accent">
+                Our Foundation
+              </span>
             </div>
 
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-slide-in-up">
               Our Values
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-in-up delay-200">
-              The principles that guide everything we do and shape every experience we create
+              The principles that guide everything we do and shape every
+              experience we create
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             {values.map((value, index) => (
-              <div key={index} className="animate-slide-in-up group" style={{ animationDelay: `${index * 150}ms` }}>
+              <div
+                key={index}
+                className="animate-slide-in-up group"
+                style={{ animationDelay: `${index * 150}ms` }}
+              >
                 <Card className="p-8 text-center h-full bg-background/50 backdrop-blur-sm border-border/50 hover:bg-background hover:scale-105 transition-all duration-500 hover:shadow-2xl card-shadow group-hover:border-accent/30 relative overflow-hidden">
                   {/* Card Background Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
                   {/* Icon Container */}
                   <div className="relative">
                     <div className="w-20 h-20 mx-auto mb-6 bg-accent/10 rounded-2xl flex items-center justify-center group-hover:bg-accent/20 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
                       <value.icon className="h-10 w-10 text-accent transition-all duration-300 group-hover:scale-110" />
                     </div>
-                    
+
                     {/* Decorative Ring */}
                     <div className="absolute -inset-2 rounded-full border border-accent/20 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
                   </div>
@@ -292,7 +323,7 @@ const About = () => {
 
                   {/* Hover Effect Lines */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
-                  
+
                   {/* Floating Particles Effect */}
                   <div className="absolute top-4 right-4 w-2 h-2 bg-accent/20 rounded-full opacity-0 group-hover:opacity-100 group-hover:animate-ping transition-opacity duration-300"></div>
                 </Card>
@@ -305,11 +336,10 @@ const About = () => {
             <div className="relative group">
               {/* Background Card */}
               <div className="bg-gradient-to-br from-background via-background/95 to-background/90 backdrop-blur-xl rounded-3xl p-10 md:p-12 max-w-4xl mx-auto border border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:scale-[1.02] relative overflow-hidden">
-                
                 {/* Background Effects */}
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
-                
+
                 {/* Floating Elements */}
                 <div className="absolute top-8 right-8 w-16 h-16 bg-accent/10 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
                 <div className="absolute bottom-8 left-8 w-12 h-12 bg-primary/10 rounded-full blur-lg opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
@@ -319,7 +349,9 @@ const About = () => {
                   {/* Badge */}
                   <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-4 py-2 mb-6 animate-slide-in-up">
                     <Star className="h-4 w-4 text-accent" />
-                    <span className="text-sm font-medium text-accent">Ready to Begin?</span>
+                    <span className="text-sm font-medium text-accent">
+                      Ready to Begin?
+                    </span>
                   </div>
 
                   {/* Main Heading */}
@@ -329,7 +361,9 @@ const About = () => {
 
                   {/* Description */}
                   <p className="text-lg md:text-xl text-muted-foreground mb-8 max-w-3xl mx-auto leading-relaxed animate-slide-in-up delay-400">
-                    Let us bring our passion, excellence, partnership, and innovation to your next event. Every celebration deserves the perfect culinary experience.
+                    Let us bring our passion, excellence, partnership, and
+                    innovation to your next event. Every celebration deserves
+                    the perfect culinary experience.
                   </p>
 
                   {/* Value Highlights */}
@@ -338,11 +372,16 @@ const About = () => {
                       { icon: Heart, label: "Passion" },
                       { icon: Award, label: "Excellence" },
                       { icon: Users, label: "Partnership" },
-                      { icon: Star, label: "Innovation" }
+                      { icon: Star, label: "Innovation" },
                     ].map((item, index) => (
-                      <div key={index} className="flex flex-col items-center p-3 rounded-xl bg-muted/50 hover:bg-accent/10 transition-all duration-300 group-hover:scale-105">
+                      <div
+                        key={index}
+                        className="flex flex-col items-center p-3 rounded-xl bg-muted/50 hover:bg-accent/10 transition-all duration-300 group-hover:scale-105"
+                      >
                         <item.icon className="h-6 w-6 text-accent mb-2" />
-                        <span className="text-sm font-medium text-foreground">{item.label}</span>
+                        <span className="text-sm font-medium text-foreground">
+                          {item.label}
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -356,7 +395,7 @@ const About = () => {
                       </span>
                       <div className="absolute inset-0 bg-gradient-to-r from-accent/0 via-white/10 to-accent/0 transform -skew-x-12 -translate-x-full group-hover/btn:translate-x-full transition-transform duration-700"></div>
                     </button>
-                    
+
                     <button className="border-2 border-border hover:border-accent/50 text-foreground hover:text-accent bg-background/50 hover:bg-background/80 px-8 py-4 rounded-xl font-semibold text-lg transition-all duration-300 hover:scale-105 backdrop-blur-sm">
                       View Portfolio
                     </button>
@@ -364,12 +403,19 @@ const About = () => {
 
                   {/* Trust Indicators */}
                   <div className="mt-8 pt-6 border-t border-border/50 animate-fade-in delay-1000">
-                    <p className="text-sm text-muted-foreground mb-3">Trusted by 10,000+ events • 98% client satisfaction</p>
+                    <p className="text-sm text-muted-foreground mb-3">
+                      Trusted by 10,000+ events • 98% client satisfaction
+                    </p>
                     <div className="flex justify-center items-center gap-1">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} className="h-4 w-4 text-accent fill-current" />
+                        <Star
+                          key={i}
+                          className="h-4 w-4 text-accent fill-current"
+                        />
                       ))}
-                      <span className="text-sm text-muted-foreground ml-2">5.0 rating</span>
+                      <span className="text-sm text-muted-foreground ml-2">
+                        5.0 rating
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -386,24 +432,40 @@ const About = () => {
       </section>
 
       {/* Stats Section */}
-      <section className="py-24 bg-background">
-        <div className="container mx-auto px-6 lg:px-12">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-            <div>
-              <div className="text-5xl font-bold text-accent mb-2">15+</div>
-              <div className="text-muted-foreground">Years Experience</div>
+      <section className="py-12 md:py-16 lg:py-24 bg-background">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-12">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 sm:gap-8 text-center">
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent mb-1 sm:mb-2">
+                15+
+              </div>
+              <div className="text-xs sm:text-sm text-muted-foreground px-1">
+                Years Experience
+              </div>
             </div>
-            <div>
-              <div className="text-5xl font-bold text-accent mb-2">10,000+</div>
-              <div className="text-muted-foreground">Events Catered</div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent mb-1 sm:mb-2">
+                10,000+
+              </div>
+              <div className="text-xs sm:text-sm text-muted-foreground px-1">
+                Events Catered
+              </div>
             </div>
-            <div>
-              <div className="text-5xl font-bold text-accent mb-2">50+</div>
-              <div className="text-muted-foreground">Team Members</div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent mb-1 sm:mb-2">
+                50+
+              </div>
+              <div className="text-xs sm:text-sm text-muted-foreground px-1">
+                Team Members
+              </div>
             </div>
-            <div>
-              <div className="text-5xl font-bold text-accent mb-2">98%</div>
-              <div className="text-muted-foreground">Client Satisfaction</div>
+            <div className="flex flex-col items-center justify-center">
+              <div className="text-3xl sm:text-4xl md:text-5xl font-bold text-accent mb-1 sm:mb-2">
+                98%
+              </div>
+              <div className="text-xs sm:text-sm text-muted-foreground px-1">
+                Client Satisfaction
+              </div>
             </div>
           </div>
         </div>
@@ -414,62 +476,72 @@ const About = () => {
         {/* Background Elements */}
         <div className="absolute top-20 left-20 w-32 h-32 bg-accent/5 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 right-20 w-40 h-40 bg-primary/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           <div className="text-center mb-20">
             {/* Badge */}
             <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-2 mb-6 animate-fade-in">
               <Users className="h-4 w-4 text-accent" />
-              <span className="text-sm font-medium text-accent">Our Leadership</span>
+              <span className="text-sm font-medium text-accent">
+                Our Leadership
+              </span>
             </div>
 
             <h2 className="text-4xl md:text-5xl font-bold mb-6 bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent animate-slide-in-up">
               Meet Our Leadership
             </h2>
             <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed animate-slide-in-up delay-200">
-              Passionate professionals dedicated to culinary excellence and unforgettable experiences
+              Passionate professionals dedicated to culinary excellence and
+              unforgettable experiences
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {[
-              { 
-                name: "Chef Rahul Sharma", 
-                role: "Founder & Executive Chef", 
+              {
+                name: "Chef Rahul Sharma",
+                role: "Founder & Executive Chef",
                 desc: "15 years of culinary expertise with training from Le Cordon Bleu. Master of both traditional and contemporary cuisine.",
                 image: "👨‍🍳",
                 expertise: ["Culinary Arts", "Menu Design", "Team Leadership"],
-                achievement: "Michelin-trained Chef"
+                achievement: "Michelin-trained Chef",
               },
-              { 
-                name: "Priya Desai", 
-                role: "Operations Director", 
+              {
+                name: "Priya Desai",
+                role: "Operations Director",
                 desc: "MBA graduate specializing in event management and logistics. Expert in turning visions into flawless executions.",
                 image: "👩‍💼",
                 expertise: ["Event Planning", "Operations", "Client Relations"],
-                achievement: "Certified Event Manager"
+                achievement: "Certified Event Manager",
               },
-              { 
-                name: "Vikram Patel", 
-                role: "Creative Director", 
+              {
+                name: "Vikram Patel",
+                role: "Creative Director",
                 desc: "Award-winning designer crafting memorable event experiences. Specializes in thematic presentations and visual storytelling.",
                 image: "🎨",
-                expertise: ["Visual Design", "Event Theming", "Brand Experience"],
-                achievement: "Design Excellence Award"
+                expertise: [
+                  "Visual Design",
+                  "Event Theming",
+                  "Brand Experience",
+                ],
+                achievement: "Design Excellence Award",
               },
             ].map((member, index) => (
-              <div key={index} className="animate-slide-in-up group" style={{ animationDelay: `${index * 200}ms` }}>
+              <div
+                key={index}
+                className="animate-slide-in-up group"
+                style={{ animationDelay: `${index * 200}ms` }}
+              >
                 <Card className="p-8 text-center h-full bg-background/50 backdrop-blur-sm border-border/50 hover:bg-background hover:scale-105 transition-all duration-500 hover:shadow-2xl card-shadow group-hover:border-accent/30 relative overflow-hidden">
-                  
                   {/* Background Effect */}
                   <div className="absolute inset-0 bg-gradient-to-br from-accent/5 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                  
+
                   {/* Professional Image Placeholder */}
                   <div className="relative mb-6">
                     <div className="w-28 h-28 mx-auto bg-gradient-to-br from-accent/20 to-accent/10 rounded-2xl flex items-center justify-center text-4xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border-2 border-accent/20 group-hover:border-accent/40">
                       {member.image}
                     </div>
-                    
+
                     {/* Achievement Badge */}
                     <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2 bg-accent text-accent-foreground text-xs px-3 py-1 rounded-full font-medium">
                       {member.achievement}
@@ -491,7 +563,7 @@ const About = () => {
                     {/* Expertise Tags */}
                     <div className="flex flex-wrap justify-center gap-2 mb-4">
                       {member.expertise.map((skill, skillIndex) => (
-                        <span 
+                        <span
                           key={skillIndex}
                           className="text-xs bg-muted/50 text-foreground px-3 py-1 rounded-full border border-border/50 group-hover:bg-accent/10 group-hover:border-accent/30 transition-all duration-300"
                         >
@@ -503,7 +575,7 @@ const About = () => {
 
                   {/* Hover Effect Line */}
                   <div className="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-center"></div>
-                  
+
                   {/* Decorative Corner */}
                   <div className="absolute top-4 right-4 w-6 h-6 border-t-2 border-r-2 border-accent/20 opacity-0 group-hover:opacity-100 group-hover:scale-110 transition-all duration-500"></div>
                 </Card>
@@ -516,11 +588,10 @@ const About = () => {
             <div className="relative group">
               {/* Background Card */}
               <div className="bg-gradient-to-br from-background via-background/95 to-background/90 backdrop-blur-xl rounded-3xl p-10 md:p-12 max-w-5xl mx-auto border border-border/50 shadow-2xl hover:shadow-3xl transition-all duration-500 group-hover:scale-[1.02] relative overflow-hidden">
-                
                 {/* Background Effects */}
                 <div className="absolute inset-0 bg-gradient-to-br from-accent/3 via-transparent to-primary/3 opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
                 <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-accent/0 via-accent to-accent/0 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-700 origin-center"></div>
-                
+
                 {/* Floating Elements */}
                 <div className="absolute top-8 right-8 w-20 h-20 bg-accent/8 rounded-full blur-2xl opacity-0 group-hover:opacity-100 group-hover:scale-150 transition-all duration-700 delay-200"></div>
                 <div className="absolute bottom-8 left-8 w-16 h-16 bg-primary/8 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-hover:scale-125 transition-all duration-700 delay-400"></div>
@@ -531,7 +602,9 @@ const About = () => {
                   <div className="mb-10 animate-slide-in-up">
                     <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-4 py-2 mb-4">
                       <Star className="h-4 w-4 text-accent" />
-                      <span className="text-sm font-medium text-accent">Team Excellence</span>
+                      <span className="text-sm font-medium text-accent">
+                        Team Excellence
+                      </span>
                     </div>
                     <h3 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-foreground via-foreground to-accent bg-clip-text text-transparent">
                       Our Team by the Numbers
@@ -549,55 +622,56 @@ const About = () => {
                         label: "Total Team Members",
                         description: "Expert professionals",
                         icon: "👥",
-                        color: "from-blue-500 to-blue-600"
+                        color: "from-blue-500 to-blue-600",
                       },
                       {
                         number: "15+",
                         label: "Years Combined Experience",
                         description: "Industry veterans",
                         icon: "⭐",
-                        color: "from-yellow-500 to-yellow-600"
+                        color: "from-yellow-500 to-yellow-600",
                       },
                       {
                         number: "25+",
                         label: "Cuisine Specialties",
                         description: "Global flavors",
                         icon: "🍽️",
-                        color: "from-green-500 to-green-600"
+                        color: "from-green-500 to-green-600",
                       },
                       {
                         number: "100%",
                         label: "Passion for Excellence",
                         description: "Dedicated to quality",
                         icon: "💯",
-                        color: "from-red-500 to-red-600"
-                      }
+                        color: "from-red-500 to-red-600",
+                      },
                     ].map((stat, index) => (
-                      <div 
-                        key={index} 
+                      <div
+                        key={index}
                         className="group/stat animate-slide-in-up hover:scale-105 transition-all duration-500"
-                        style={{ animationDelay: `${400 + (index * 150)}ms` }}
+                        style={{ animationDelay: `${400 + index * 150}ms` }}
                       >
                         <div className="bg-background/50 backdrop-blur-sm rounded-2xl p-6 border border-border/50 hover:border-accent/30 hover:bg-background/70 transition-all duration-300 group-hover/stat:shadow-xl relative overflow-hidden">
-                          
                           {/* Background Gradient */}
-                          <div className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover/stat:opacity-5 transition-opacity duration-500`}></div>
-                          
+                          <div
+                            className={`absolute inset-0 bg-gradient-to-br ${stat.color} opacity-0 group-hover/stat:opacity-5 transition-opacity duration-500`}
+                          ></div>
+
                           {/* Icon */}
                           <div className="text-4xl mb-4 group-hover/stat:scale-110 transition-transform duration-300 relative z-10">
                             {stat.icon}
                           </div>
-                          
+
                           {/* Number */}
                           <div className="text-2xl md:text-3xl font-bold text-accent mb-3 group-hover/stat:text-accent/90 transition-colors duration-300 relative z-10">
                             {stat.number}
                           </div>
-                          
+
                           {/* Label */}
                           <div className="text-sm font-semibold text-foreground mb-2 group-hover/stat:text-accent transition-colors duration-300 relative z-10">
                             {stat.label}
                           </div>
-                          
+
                           {/* Description */}
                           <div className="text-xs text-muted-foreground/80 relative z-10">
                             {stat.description}
@@ -612,7 +686,9 @@ const About = () => {
 
                   {/* Bottom CTA */}
                   <div className="mt-10 pt-6 border-t border-border/50 animate-fade-in delay-1000">
-                    <p className="text-muted-foreground mb-4">Ready to work with our exceptional team?</p>
+                    <p className="text-muted-foreground mb-4">
+                      Ready to work with our exceptional team?
+                    </p>
                     <button className="bg-accent hover:bg-accent/90 text-accent-foreground px-6 py-3 rounded-lg font-semibold transition-all duration-300 hover:scale-105 hover:shadow-lg">
                       Join Our Team
                     </button>
@@ -635,7 +711,7 @@ const About = () => {
         <div className="absolute top-20 right-20 w-40 h-40 bg-accent/5 rounded-full blur-3xl animate-pulse"></div>
         <div className="absolute bottom-20 left-20 w-32 h-32 bg-primary/5 rounded-full blur-2xl animate-pulse delay-1000"></div>
         <div className="absolute top-1/3 left-10 w-24 h-24 bg-yellow-500/5 rounded-full blur-xl"></div>
-        
+
         <div className="container mx-auto px-6 lg:px-12 relative z-10">
           {/* <div className="text-center mb-20">
             <div className="inline-flex items-center gap-2 bg-accent/10 backdrop-blur-sm border border-accent/20 rounded-full px-6 py-2 mb-6 animate-fade-in">
@@ -743,23 +819,33 @@ const About = () => {
                 A Legacy of Excellence
               </h3>
               <p className="text-lg text-muted-foreground mb-8 leading-relaxed max-w-3xl mx-auto">
-                Our awards represent more than recognition—they embody our unwavering commitment to culinary excellence, 
-                innovation, and exceptional service. Each achievement drives us to reach new heights in the catering industry.
+                Our awards represent more than recognition—they embody our
+                unwavering commitment to culinary excellence, innovation, and
+                exceptional service. Each achievement drives us to reach new
+                heights in the catering industry.
               </p>
-              
+
               {/* Achievement Stats */}
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
                 <div className="text-center">
                   <div className="text-3xl font-bold text-accent mb-2">4+</div>
-                  <div className="text-sm text-muted-foreground">Industry Awards</div>
+                  <div className="text-sm text-muted-foreground">
+                    Industry Awards
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-accent mb-2">4</div>
-                  <div className="text-sm text-muted-foreground">Years Running</div>
+                  <div className="text-sm text-muted-foreground">
+                    Years Running
+                  </div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-accent mb-2">100%</div>
-                  <div className="text-sm text-muted-foreground">Client Satisfaction</div>
+                  <div className="text-3xl font-bold text-accent mb-2">
+                    100%
+                  </div>
+                  <div className="text-sm text-muted-foreground">
+                    Client Satisfaction
+                  </div>
                 </div>
                 <div className="text-center">
                   <div className="text-3xl font-bold text-accent mb-2">∞</div>
