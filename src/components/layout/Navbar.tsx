@@ -168,15 +168,15 @@ const Navbar = () => {
         </div>
 
         {/* Enhanced Mobile Menu - Fixed height issues */}
-        <div 
-          className={`lg:hidden fixed left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200/50 shadow-2xl transition-all duration-500 ease-in-out overflow-y-auto ${
-            isMobileMenuOpen 
-              ? 'top-[calc(48px+64px)] sm:top-[calc(32px+80px)] opacity-100 max-h-[calc(100vh-112px)] sm:max-h-[calc(100vh-112px)]' 
-              : 'top-[calc(48px+64px)] sm:top-[calc(32px+80px)] opacity-0 max-h-0 pointer-events-none'
+        <div
+          className={`lg:hidden fixed left-0 right-0 bg-white/95 backdrop-blur-xl border-t border-slate-200/50 shadow-2xl transition-all duration-500 ease-in-out ${
+            isMobileMenuOpen
+              ? 'top-[calc(48px+64px)] sm:top-[calc(32px+80px)] opacity-100 h-[calc(100vh-112px)] sm:h-[calc(100vh-112px)]'
+              : 'top-[calc(48px+64px)] sm:top-[calc(32px+80px)] opacity-0 h-0 pointer-events-none'
           }`}
-          style={{ maxHeight: isMobileMenuOpen ? 'calc(100vh - 112px)' : '0' }}
+          style={{ height: isMobileMenuOpen ? 'calc(100vh - 112px)' : '0' }}
         >
-          <div className="container mx-auto px-4 sm:px-6 py-6">
+          <div className="container mx-auto px-4 sm:px-6 py-6 h-full flex flex-col">
             {/* Mobile Quick Contact */}
             <div className="mb-6 p-4 bg-gradient-to-r from-orange-50 to-yellow-50 rounded-xl border border-orange-100">
               <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 text-sm">
@@ -191,38 +191,42 @@ const Navbar = () => {
               </div>
             </div>
 
-            {/* Mobile Navigation Links */}
-            <div className="flex flex-col gap-1 mb-6">
-              {navLinks.map((link) => (
-                <NavLink
-                  key={link.to}
-                  to={link.to}
-                  end
-                  className="group relative px-4 py-3 text-base font-semibold text-slate-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all duration-300 flex items-center justify-between"
-                  activeClassName="text-orange-500 bg-orange-50 font-bold"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                >
-                  <span>{link.label}</span>
-                  <div className="w-2 h-2 bg-orange-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                </NavLink>
-              ))}
+            {/* Scrollable Navigation Links */}
+            <div className="flex-1 overflow-y-auto">
+              <div className="flex flex-col gap-1 mb-6">
+                {navLinks.map((link) => (
+                  <NavLink
+                    key={link.to}
+                    to={link.to}
+                    end
+                    className="group relative px-4 py-3 text-base font-semibold text-slate-600 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition-all duration-300 flex items-center justify-between"
+                    activeClassName="text-orange-500 bg-orange-50 font-bold"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <span>{link.label}</span>
+                    <div className="w-2 h-2 bg-orange-400 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </NavLink>
+                ))}
+              </div>
+
+              {/* Mobile Rating - Visible on mobile */}
+              <div className="mb-6 flex items-center justify-center gap-2 text-slate-600 bg-slate-50 p-3 rounded-lg">
+                <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                <span className="text-sm font-medium">4.9/5 Rating • 15+ Years Experience</span>
+              </div>
             </div>
 
-            {/* Mobile Rating - Visible on mobile */}
-            <div className="mb-6 flex items-center justify-center gap-2 text-slate-600 bg-slate-50 p-3 rounded-lg">
-              <Star className="h-4 w-4 text-yellow-400 fill-current" />
-              <span className="text-sm font-medium">4.9/5 Rating • 15+ Years Experience</span>
+            {/* Mobile CTA - Fixed at bottom */}
+            <div className="mt-6 flex-shrink-0">
+              <Link to="/quote" onClick={() => setIsMobileMenuOpen(false)} className="block">
+                <Button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white border-0 shadow-lg shadow-orange-500/25 transition-all duration-300 transform hover:scale-[1.02]">
+                  <span className="flex items-center justify-center gap-2">
+                    <ChefHat className="h-5 w-5" />
+                    Get Instant Quote
+                  </span>
+                </Button>
+              </Link>
             </div>
-
-            {/* Mobile CTA */}
-            <Link to="/quote" onClick={() => setIsMobileMenuOpen(false)} className="block">
-              <Button className="w-full bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-white border-0 shadow-lg shadow-orange-500/25 transition-all duration-300 transform hover:scale-[1.02]">
-                <span className="flex items-center justify-center gap-2">
-                  <ChefHat className="h-5 w-5" />
-                  Get Instant Quote
-                </span>
-              </Button>
-            </Link>
           </div>
         </div>
       </nav>
