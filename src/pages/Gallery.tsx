@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Camera, Image, Star, Eye, Filter, X, ChevronLeft, ChevronRight, ZoomIn, ZoomOut, Play, Users, Clock, Award } from "lucide-react";
+import { galleryApiService, type GalleryImage } from "@/services/galleryApi";
+import { toast } from "@/hooks/use-toast";
 import eventSetup from "@/assets/event-setup.jpg";
-import chefTeam from "@/assets/chef-team.jpg";
-import heroImage from "@/assets/hero-image.jpg";
 
 const Gallery = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -11,23 +11,47 @@ const Gallery = () => {
   const [isZoomed, setIsZoomed] = useState<boolean>(false);
   const [imageDetails, setImageDetails] = useState<{category: string, alt: string} | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [images, setImages] = useState<GalleryImage[]>([]);
+  const [categories, setCategories] = useState<string[]>(["All"]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [stats, setStats] = useState({
+    totalImages: 0,
+    totalCategories: 0,
+    featuredImages: 0
+  });
 
-  const images = [
-    { src: eventSetup, alt: "Elegant event setup with decorated tables", category: "Events", featured: true, size: "large" },
-    { src: chefTeam, alt: "Professional chef team preparing gourmet dishes", category: "Food", featured: true, size: "wide" },
-    { src: heroImage, alt: "Stunning catering presentation", category: "Food", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Wedding reception venue", category: "Weddings", featured: false, size: "normal" },
-    { src: chefTeam, alt: "Corporate event catering", category: "Corporate", featured: false, size: "normal" },
-    { src: heroImage, alt: "Buffet presentation", category: "Food", featured: true, size: "tall" },
-    { src: eventSetup, alt: "Dessert table display", category: "Desserts", featured: false, size: "normal" },
-    { src: chefTeam, alt: "Cocktail hour setup", category: "Events", featured: false, size: "normal" },
-    { src: heroImage, alt: "Birthday celebration", category: "Private", featured: false, size: "normal" },
-    { src: eventSetup, alt: "Gourmet plating", category: "Food", featured: true, size: "normal" },
-    { src: chefTeam, alt: "Garden party setup", category: "Events", featured: false, size: "normal" },
-    { src: heroImage, alt: "Elegant dining experience", category: "Events", featured: false, size: "wide" },
-  ];
+  // Fetch gallery images and categories on component mount
+  useEffect(() => {
+    const fetchGalleryData = async () => {
+      try {
+        setLoading(true);
+        const [imagesResponse, categoriesResponse, statsResponse] = await Promise.all([
+          galleryApiService.getGalleryImages(),
+          galleryApiService.getCategories(),
+          galleryApiService.getGalleryStats()
+        ]);
 
-  const categories = ["All", "Events", "Weddings", "Corporate", "Food", "Desserts", "Private"];
+        setImages(imagesResponse.data);
+        setCategories(["All", ...categoriesResponse.data]);
+        setStats({
+          totalImages: statsResponse.data.totalImages,
+          totalCategories: statsResponse.data.totalCategories,
+          featuredImages: statsResponse.data.featuredImages
+        });
+      } catch (error) {
+        console.error("Error fetching gallery data:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load gallery images. Please try again later.",
+          variant: "destructive",
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGalleryData();
+  }, []);
 
   const filteredImages = activeFilter === "All" ? images : images.filter(img => img.category === activeFilter);
 
@@ -36,7 +60,7 @@ const Gallery = () => {
     if (selectedImageIndex > 0) {
       const newIndex = selectedImageIndex - 1;
       setSelectedImageIndex(newIndex);
-      setSelectedImage(filteredImages[newIndex].src);
+      setSelectedImage(filteredImages[newIndex].image);
       setImageDetails({ category: filteredImages[newIndex].category, alt: filteredImages[newIndex].alt });
     }
   };
@@ -45,7 +69,7 @@ const Gallery = () => {
     if (selectedImageIndex < filteredImages.length - 1) {
       const newIndex = selectedImageIndex + 1;
       setSelectedImageIndex(newIndex);
-      setSelectedImage(filteredImages[newIndex].src);
+      setSelectedImage(filteredImages[newIndex].image);
       setImageDetails({ category: filteredImages[newIndex].category, alt: filteredImages[newIndex].alt });
     }
   };
@@ -147,16 +171,16 @@ const Gallery = () => {
             {/* Gallery Stats Row */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-8 mt-20 pt-12 border-t border-primary-foreground/20 animate-fade-in delay-800">
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">500+</div>
-                <div className="text-sm md:text-base opacity-80">Event Photos</div>
+                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">{stats.totalImages}+</div>
+                <div className="text-sm md:text-base opacity-80">Gallery Images</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">8</div>
-                <div className="text-sm md:text-base opacity-80">Event Categories</div>
+                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">{stats.totalCategories}</div>
+                <div className="text-sm md:text-base opacity-80">Categories</div>
               </div>
               <div className="text-center">
-                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">1000+</div>
-                <div className="text-sm md:text-base opacity-80">Dishes Featured</div>
+                <div className="text-3xl md:text-4xl font-bold text-accent mb-2">{stats.featuredImages}</div>
+                <div className="text-sm md:text-base opacity-80">Featured Images</div>
               </div>
               <div className="text-center">
                 <div className="text-3xl md:text-4xl font-bold text-accent mb-2">24/7</div>
@@ -218,75 +242,81 @@ const Gallery = () => {
           </div>
 
           {/* Enhanced Gallery Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {filteredImages.map((image, index) => (
-              <div
-                key={`${image.src}-${index}`}
-                className={`group relative cursor-pointer overflow-hidden rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl ${
-                  image.featured ? "sm:col-span-2 lg:col-span-2 xl:col-span-2 lg:row-span-2" : ""
-                } ${
-                  image.size === "wide" ? "sm:col-span-2 lg:col-span-2 xl:col-span-2" : ""
-                } ${
-                  image.size === "tall" ? "sm:row-span-2 lg:row-span-2 xl:row-span-2" : ""
-                }`}
-                onClick={() => handleImageClick(image.src, index)}
-              >
-                <img
-                  src={image.src}
-                  alt={image.alt}
-                  className={`w-full object-cover transition-all duration-500 group-hover:scale-110 ${
-                    image.size === "tall" ? "h-96 md:h-[500px]" : "h-64 md:h-80"
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="w-12 h-12 border-4 border-primary/30 border-t-primary rounded-full animate-spin"></div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {filteredImages.map((image, index) => (
+                <div
+                  key={`${image._id}-${index}`}
+                  className={`group relative cursor-pointer overflow-hidden rounded-2xl card-shadow hover:scale-[1.02] transition-all duration-500 hover:shadow-2xl ${
+                    image.featured ? "sm:col-span-2 lg:col-span-2 xl:col-span-2 lg:row-span-2" : ""
+                  } ${
+                    image.size === "wide" ? "sm:col-span-2 lg:col-span-2 xl:col-span-2" : ""
+                  } ${
+                    image.size === "tall" ? "sm:row-span-2 lg:row-span-2 xl:row-span-2" : ""
                   }`}
-                  loading="lazy"
-                />
-                
-                {/* Enhanced Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
-                  <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="inline-flex items-center gap-1 bg-accent/20 backdrop-blur-sm border border-accent/30 rounded-full px-3 py-1 text-xs font-medium">
-                        <Star className="h-3 w-3" />
-                        {image.category}
-                      </span>
-                      {image.featured && (
-                        <span className="inline-flex items-center gap-1 bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/30 rounded-full px-3 py-1 text-xs font-medium text-yellow-300">
-                          <Award className="h-3 w-3" />
-                          Featured
-                        </span>
-                      )}
-                    </div>
-                    <h3 className="text-lg font-bold mb-2 line-clamp-2">{image.alt}</h3>
-                    <div className="flex items-center gap-4 text-sm opacity-80">
-                      <span className="flex items-center gap-1">
-                        <Eye className="h-4 w-4" />
-                        View Details
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <ZoomIn className="h-4 w-4" />
-                        Zoom
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Zoom Icon */}
-                  <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
-                    <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <ZoomIn className="h-5 w-5 text-white" />
-                    </div>
-                  </div>
-                </div>
+                  onClick={() => handleImageClick(image.image, index)}
+                >
+                  <img
+                    src={image.image}
+                    alt={image.alt}
+                    className={`w-full object-cover transition-all duration-500 group-hover:scale-110 ${
+                      image.size === "tall" ? "h-96 md:h-[500px]" : "h-64 md:h-80"
+                    }`}
+                    loading="lazy"
+                  />
 
-                {/* Featured Badge */}
-                {image.featured && (
-                  <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
-                    <div className="w-8 h-8 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                      <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                  {/* Enhanced Overlay */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300">
+                    <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="inline-flex items-center gap-1 bg-accent/20 backdrop-blur-sm border border-accent/30 rounded-full px-3 py-1 text-xs font-medium">
+                          <Star className="h-3 w-3" />
+                          {image.category}
+                        </span>
+                        {image.featured && (
+                          <span className="inline-flex items-center gap-1 bg-yellow-500/20 backdrop-blur-sm border border-yellow-500/30 rounded-full px-3 py-1 text-xs font-medium text-yellow-300">
+                            <Award className="h-3 w-3" />
+                            Featured
+                          </span>
+                        )}
+                      </div>
+                      <h3 className="text-lg font-bold mb-2 line-clamp-2">{image.alt}</h3>
+                      <div className="flex items-center gap-4 text-sm opacity-80">
+                        <span className="flex items-center gap-1">
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <ZoomIn className="h-4 w-4" />
+                          Zoom
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Zoom Icon */}
+                    <div className="absolute top-4 right-4 opacity-0 group-hover:opacity-100 transition-all duration-300 transform translate-y-2 group-hover:translate-y-0">
+                      <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <ZoomIn className="h-5 w-5 text-white" />
+                      </div>
                     </div>
                   </div>
-                )}
-              </div>
-            ))}
-          </div>
+
+                  {/* Featured Badge */}
+                  {image.featured && (
+                    <div className="absolute top-4 left-4 opacity-0 group-hover:opacity-100 transition-all duration-300">
+                      <div className="w-8 h-8 bg-yellow-500/20 backdrop-blur-sm rounded-full flex items-center justify-center">
+                        <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
 
           {/* Load More Button */}
           <div className="text-center mt-16">

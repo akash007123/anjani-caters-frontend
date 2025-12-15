@@ -259,7 +259,7 @@ const Home = () => {
           }}
           setApi={setApi}
         >
-          <CarouselContent className=" sm:mt-20">
+          <CarouselContent className=" ">
             {heroSlides.map((slide) => (
               <CarouselItem key={slide.id} className="relative h-screen">
                 <div className="relative w-full h-full flex items-center justify-center overflow-hidden">

@@ -21,6 +21,7 @@ import AdminProfilePage from "./pages/AdminProfilePage";
 import AdminAddUsersPage from "./pages/AdminAddUsersPage";
 import AdminBlogPage from "./pages/AdminBlogPage";
 import AdminTestimonialsPage from "./pages/AdminTestimonialsPage";
+import AdminGalleryPage from "./pages/AdminGalleryPage";
 import AdminDashboard from "./components/Admin/AdminDashboard";
 import LoginPage from "./pages/auth/LoginPage";
 import SignupPage from "./pages/auth/SignupPage";
@@ -85,6 +86,11 @@ const App = () => (
               <Route path="/admin/testimonial" element={
                 <ProtectedRoute>
                   <AdminTestimonialsPage />
+                </ProtectedRoute>
+              } />
+              <Route path="/admin/gallery" element={
+                <ProtectedRoute>
+                  <AdminGalleryPage />
                 </ProtectedRoute>
               } />
 
