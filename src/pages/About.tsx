@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { Award, Heart, Star, Users } from "lucide-react";
+import { Helmet } from 'react-helmet-async';
 import chefTeamImage from "@/assets/chef-team.jpg";
 
 const About = () => {
@@ -28,7 +29,16 @@ const About = () => {
   ];
 
   return (
-    <div className="min-h-screen ">
+    <>
+      <Helmet>
+        <title>About Us - Anjani Caters | Premium Catering Services</title>
+        <meta name="description" content="Discover the story behind Anjani Caters, a leading premium catering service with over 15 years of experience in creating exceptional culinary experiences for weddings, corporate events, and special celebrations." />
+        <meta name="keywords" content="about Anjani Caters, premium catering, wedding catering, event catering, culinary excellence, chef team, catering services" />
+        <meta property="og:title" content="About Us - Anjani Caters" />
+        <meta property="og:description" content="Learn about our passion for culinary excellence and our commitment to creating unforgettable dining experiences." />
+        <meta property="og:type" content="website" />
+      </Helmet>
+      <div className="min-h-screen ">
       {/* Hero Section */}
       <section className="relative py-16 md:py-32 overflow-hidden">
         {/* Background Image with Overlay */}
@@ -861,7 +871,8 @@ const About = () => {
         </div>
       </section>
     </div>
-  );
+  </>
+);
 };
 
 export default About;
