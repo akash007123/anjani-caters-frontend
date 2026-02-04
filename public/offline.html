@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Offline - Anjani events</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        font-family: 'Inter', system-ui, sans-serif;
+        background: linear-gradient(135deg, #6B2D3D 0%, #8B3A4F 100%);
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        text-align: center;
+        padding: 20px;
+      }
+      .container {
+        max-width: 500px;
+      }
+      .icon {
+        font-size: 80px;
+        margin-bottom: 20px;
+      }
+      h1 {
+        font-family: 'Playfair Display', serif;
+        font-size: 2.5rem;
+        margin-bottom: 16px;
+      }
+      p {
+        font-size: 1.1rem;
+        opacity: 0.9;
+        margin-bottom: 30px;
+        line-height: 1.6;
+      }
+      .btn {
+        display: inline-block;
+        padding: 14px 32px;
+        background: #d4a853;
+        color: #1a1a1a;
+        text-decoration: none;
+        border-radius: 8px;
+        font-weight: 600;
+        transition: transform 0.2s, box-shadow 0.2s;
+      }
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(212, 168, 83, 0.4);
+      }
+      .features {
+        margin-top: 40px;
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+      .feature {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 15px 25px;
+        border-radius: 10px;
+        font-size: 0.9rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="icon">📡</div>
+      <h1>You're Offline</h1>
+      <p>It looks like you've lost your internet connection. Don't worry, your event planning journey is still waiting for you!</p>
+      <a href="/" class="btn">Try Again</a>
+      
+      <div class="features">
+        <div class="feature">💒 Wedding Planning</div>
+        <div class="feature">🍽️ Catering Services</div>
+        <div class="feature">🎉 Event Management</div>
+      </div>
+    </div>
+    
+    <script>
+      // Try to detect when back online
+      window.addEventListener('online', () => {
+        window.location.reload();
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,70 @@
+# Robots.txt for Anjani Events - Event Management & Catering
+# Last Updated: 2024
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: http://anjanievents.in/sitemap.xml
+Sitemap: http://anjanievents.in/sitemap-index.xml
+
+# Disallow admin/private pages
+Disallow: /admin/
+Disallow: /api/
+Disallow: /private/
+Disallow: /404
+
+# Allow all crawlable content
+Allow: /*
+
+# Google-specific
+User-agent: Googlebot
+Allow: /
+Sitemap: http://anjanievents.in/sitemap.xml
+
+# Bing-specific
+User-agent: Bingbot
+Allow: /
+Sitemap: http://anjanievents.in/sitemap.xml
+
+# Other search engines
+User-agent: Yandex
+Allow: /
+Sitemap: http://anjanievents.in/sitemap.xml
+
+User-agent: DuckDuckBot
+Allow: /
+Sitemap: http://anjanievents.in/sitemap.xml
+
+User-agent: Baidu
+Allow: /
+Sitemap: http://anjanievents.in/sitemap.xml
+
+# Social Media Bots
+User-agent: Twitterbot
+Allow: /
+
+User-agent: Facebookexternalhit
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
+
+User-agent: Pinterestbot
+Allow: /
+
+# AI Crawlers (optional - can be blocked if preferred)
+User-agent: GPTBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Anthropic-AI
+Allow: /
+
+# Performance - Crawl-delay for all bots (optional)
+# Crawl-delay: 10
+
+# Host directive
+Host: http://anjanievents.in/
