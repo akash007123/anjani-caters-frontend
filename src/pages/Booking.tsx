@@ -83,14 +83,36 @@ const Booking = () => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     
-    // Track form submission
-    trackFormSubmission('Booking Form');
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    // Send to WhatsApp
-    const message = `
+    try {
+      // Track form submission
+      trackFormSubmission('Booking Form');
+      
+      // Submit to API
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          eventType: formData.eventType,
+          guestCount: parseInt(formData.guestCount),
+          eventDate: date?.toISOString(),
+          timeSlot: formData.timeSlot,
+          budget: formData.budget,
+          name: formData.name,
+          phone: formData.phone,
+          email: formData.email,
+          preferredContact: formData.preferredContact,
+          specialRequirements: formData.specialRequirements,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to submit booking');
+      }
+      
+      // Send to WhatsApp
+      const message = `
 *New Booking Request*
 
 *Event Details:*
@@ -107,17 +129,21 @@ const Booking = () => {
 
 *Special Requirements:*
 ${formData.specialRequirements || 'None'}
-    `.trim();
+      `.trim();
 
-    const whatsappUrl = `https://wa.me/919685533878?text=${encodeURIComponent(message)}`;
-    
-    setIsSubmitting(false);
-    setIsSubmitted(true);
-    toast.success('Booking submitted successfully!');
-    
-    // Open WhatsApp
-    trackWhatsAppClick();
-    window.open(whatsappUrl, '_blank');
+      const whatsappUrl = `https://wa.me/919685533878?text=${encodeURIComponent(message)}`;
+      
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+      toast.success('Booking submitted successfully!');
+      
+      // Open WhatsApp
+      trackWhatsAppClick();
+      window.open(whatsappUrl, '_blank');
+    } catch (error) {
+      setIsSubmitting(false);
+      toast.error('Failed to submit booking. Please try again.');
+    }
   };
 
   if (isSubmitted) {

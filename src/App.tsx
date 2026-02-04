@@ -7,6 +7,10 @@ import { HelmetProvider } from 'react-helmet-async';
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import Layout from "./components/layout/Layout";
+import AdminLayout from "./components/layout/AdminLayout";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminContacts from "./pages/admin/AdminContacts";
+import AdminBookings from "./pages/admin/AdminBookings";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -43,45 +47,62 @@ const pageVariants = {
 
 const AnimatedRoutes = () => {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
+
+  if (isAdminRoute) {
+    return (
+      <Routes location={location} key={location.pathname}>
+        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
+        <Route path="/admin/contacts" element={<AdminLayout><AdminContacts /></AdminLayout>} />
+        <Route path="/admin/bookings" element={<AdminLayout><AdminBookings /></AdminLayout>} />
+        <Route path="/admin/analytics" element={<AdminLayout><div className="p-8">Analytics Coming Soon</div></AdminLayout>} />
+        <Route path="/admin/users" element={<AdminLayout><div className="p-8">Users Coming Soon</div></AdminLayout>} />
+        <Route path="/admin/settings" element={<AdminLayout><div className="p-8">Settings Coming Soon</div></AdminLayout>} />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    );
+  }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
-      <motion.div
-        key={location.pathname}
-        variants={pageVariants}
-        initial="initial"
-        animate="animate"
-        exit="exit"
-        transition={{ duration: 0.3 }}
-        className="min-h-screen"
-      >
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<Index />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/services" element={<Services />} />
-          <Route path="/services/events" element={<EventServices />} />
-          <Route path="/services/catering" element={<CateringServices />} />
-          {/* Programmatic SEO Routes - Service × Location Pages */}
-          <Route path="/services/wedding-catering/:location" element={<ServiceLocationPage serviceSlug="wedding-catering" />} />
-          <Route path="/services/corporate-events/:location" element={<ServiceLocationPage serviceSlug="corporate-events" />} />
-          <Route path="/services/birthday-parties/:location" element={<ServiceLocationPage serviceSlug="birthday-parties" />} />
-          <Route path="/services/religious-ceremonies/:location" element={<ServiceLocationPage serviceSlug="religious-ceremonies" />} />
-          <Route path="/services/social-gatherings/:location" element={<ServiceLocationPage serviceSlug="social-gatherings" />} />
-          <Route path="/services/house-warming/:location" element={<ServiceLocationPage serviceSlug="house-warming" />} />
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/gallery" element={<Gallery />} />
-          <Route path="/testimonials" element={<Testimonials />} />
-          <Route path="/blogs" element={<Blogs />} />
-          <Route path="/blogs/:slug" element={<BlogPost />} />
-          <Route path="/get-quote" element={<GetQuote />} />
-          <Route path="/booking" element={<Booking />} />
-          <Route path="/contact" element={<Contact />} />
-          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-          <Route path="/terms-conditions" element={<TermsConditions />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </motion.div>
-    </AnimatePresence>
+    <Layout>
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.div
+          key={location.pathname}
+          variants={pageVariants}
+          initial="initial"
+          animate="animate"
+          exit="exit"
+          transition={{ duration: 0.3 }}
+          className="min-h-screen"
+        >
+          <Routes location={location} key={location.pathname}>
+            <Route path="/" element={<Index />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/services/events" element={<EventServices />} />
+            <Route path="/services/catering" element={<CateringServices />} />
+            {/* Programmatic SEO Routes - Service × Location Pages */}
+            <Route path="/services/wedding-catering/:location" element={<ServiceLocationPage serviceSlug="wedding-catering" />} />
+            <Route path="/services/corporate-events/:location" element={<ServiceLocationPage serviceSlug="corporate-events" />} />
+            <Route path="/services/birthday-parties/:location" element={<ServiceLocationPage serviceSlug="birthday-parties" />} />
+            <Route path="/services/religious-ceremonies/:location" element={<ServiceLocationPage serviceSlug="religious-ceremonies" />} />
+            <Route path="/services/social-gatherings/:location" element={<ServiceLocationPage serviceSlug="social-gatherings" />} />
+            <Route path="/services/house-warming/:location" element={<ServiceLocationPage serviceSlug="house-warming" />} />
+            <Route path="/menu" element={<Menu />} />
+            <Route path="/gallery" element={<Gallery />} />
+            <Route path="/testimonials" element={<Testimonials />} />
+            <Route path="/blogs" element={<Blogs />} />
+            <Route path="/blogs/:slug" element={<BlogPost />} />
+            <Route path="/get-quote" element={<GetQuote />} />
+            <Route path="/booking" element={<Booking />} />
+            <Route path="/contact" element={<Contact />} />
+            <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+            <Route path="/terms-conditions" element={<TermsConditions />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
+        </motion.div>
+      </AnimatePresence>
+    </Layout>
   );
 };
 
@@ -93,9 +114,7 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <Layout>
-              <AnimatedRoutes />
-            </Layout>
+            <AnimatedRoutes />
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>
