@@ -14,6 +14,7 @@ import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
 import AdminUsers from "./pages/admin/AdminUsers";
+import AdminSettings from "./pages/admin/AdminSettings";
 import Login from "./pages/admin/Login";
 import Register from "./pages/admin/Register";
 import Index from "./pages/Index";
@@ -62,7 +63,7 @@ const AnimatedRoutes = () => {
         <Route element={<GuestRoute />}>
           <Route path="/admin/login" element={<Login />} />
         </Route>
-        {/* <Route path="/admin/register" element={<Register />} /> */}
+        <Route path="/admin/register" element={<Register />} />
         
         {/* Protected admin routes */}
         <Route element={<ProtectedRoute />}>
@@ -72,7 +73,7 @@ const AnimatedRoutes = () => {
             <Route path="/admin/bookings" element={<AdminBookings />} />
             <Route path="/admin/analytics" element={<div className="p-8">Analytics Coming Soon</div>} />
             <Route path="/admin/users" element={<AdminUsers />} />
-            <Route path="/admin/settings" element={<div className="p-8">Settings Coming Soon</div>} />
+            <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
         </Route>
         

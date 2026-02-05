@@ -33,6 +33,7 @@ interface AuthResponse {
 
 interface AuthContextType {
   user: AdminUser | null;
+  setUser: (user: AdminUser | null) => void;
   loading: boolean;
   error: string | null;
   login: (emailOrUsernameOrMobile: string, password: string) => Promise<void>;
@@ -214,6 +215,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const value: AuthContextType = {
     user,
+    setUser,
     loading,
     error,
     login,

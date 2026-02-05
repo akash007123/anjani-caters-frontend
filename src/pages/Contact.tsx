@@ -42,7 +42,7 @@ const Contact = () => {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch(`${API_URL}b/contacts`, {
+      const response = await fetch(`${API_URL}/contacts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
