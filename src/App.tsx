@@ -13,6 +13,7 @@ import GuestRoute from "./components/auth/GuestRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
+import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
 import Login from "./pages/admin/Login";
@@ -71,7 +72,7 @@ const AnimatedRoutes = () => {
             <Route path="/admin" element={<AdminDashboard />} />
             <Route path="/admin/contacts" element={<AdminContacts />} />
             <Route path="/admin/bookings" element={<AdminBookings />} />
-            <Route path="/admin/analytics" element={<div className="p-8">Analytics Coming Soon</div>} />
+            <Route path="/admin/analytics" element={<AdminAnalytics />} />
             <Route path="/admin/users" element={<AdminUsers />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
