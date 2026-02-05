@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from "react";
-import { Edit2, Trash2, MoreVertical, RefreshCw, X, Upload, Eye, EyeOff, Loader2 } from "lucide-react";
+import { Edit2, Trash2, MoreVertical, RefreshCw, X, Upload, Eye, EyeOff, Loader2, User, Mail, Phone, MapPin, Calendar, Shield } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -31,6 +31,16 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
 import { toast } from "sonner";
 import { useAuth } from "../../contexts/AuthContext";
 import { getAllCountries, getStatesOfCountry, getCitiesOfState } from "../../lib/countries-states-cities";
@@ -38,8 +48,8 @@ import type { ICountry, IState, ICity } from "../../lib/countries-states-cities"
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5001/api';
 
-// Add User Schema
-const addUserSchema = z.object({
+// Add User Schema (base object - without refine for partial support)
+const addUserSchemaBase = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters'),
   email: z.string().email('Please enter a valid email'),
   username: z.string().min(3, 'Username must be at least 3 characters'),
@@ -53,7 +63,13 @@ const addUserSchema = z.object({
   state: z.string().min(1, 'Please select a state'),
   city: z.string().min(1, 'Please select a city'),
   role: z.enum(['admin', 'sub-admin', 'manager'])
-}).refine((data) => data.password === data.confirmPassword, {
+});
+
+// Partial schema for edit form (all fields optional)
+const editUserSchema = addUserSchemaBase.partial();
+
+// Full schema with password match validation
+const addUserSchema = addUserSchemaBase.refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
 });
@@ -64,6 +80,14 @@ interface User {
   _id: string;
   name: string;
   email: string;
+  username: string;
+  mobile: string;
+  dateOfBirth: string;
+  gender: "male" | "female" | "other" | "prefer_not_to_say";
+  address: string;
+  country: string;
+  state: string;
+  city: string;
   role: "admin" | "sub-admin" | "manager";
   profilePic?: string;
   createdAt: string;
@@ -545,12 +569,662 @@ const AddUserModal = ({
   );
 };
 
+// View User Modal Component
+const ViewUserModal = ({
+  open,
+  onOpenChange,
+  user
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: User;
+}) => {
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString("en-IN", {
+      day: "2-digit",
+      month: "short",
+      year: "numeric",
+    });
+  };
+
+  const getRoleBadgeColor = (role: string) => {
+    switch (role) {
+      case "admin":
+        return "bg-purple-100 text-purple-800";
+      case "sub-admin":
+        return "bg-blue-100 text-blue-800";
+      case "manager":
+        return "bg-green-100 text-green-800";
+      default:
+        return "bg-gray-100 text-gray-800";
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-3">
+            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center">
+              {user.profilePic ? (
+                <img
+                  src={user.profilePic}
+                  alt={user.name}
+                  className="w-12 h-12 rounded-full object-cover"
+                />
+              ) : (
+                <User className="w-6 h-6 text-gray-500" />
+              )}
+            </div>
+            <div>
+              <h3 className="text-lg font-semibold">{user.name}</h3>
+              <span
+                className={`inline-block px-2 py-0.5 text-xs rounded-full ${getRoleBadgeColor(
+                  user.role
+                )}`}
+              >
+                {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace("-", " ")}
+              </span>
+            </div>
+          </DialogTitle>
+        </DialogHeader>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          <div className="space-y-4">
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Mail className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Email</p>
+                <p className="text-sm font-medium">{user.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <User className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Username</p>
+                <p className="text-sm font-medium">{user.username}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Phone className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Mobile</p>
+                <p className="text-sm font-medium">{user.mobile}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Date of Birth</p>
+                <p className="text-sm font-medium">{formatDate(user.dateOfBirth)}</p>
+              </div>
+            </div>
+          </div>
+          <div className="space-y-4">
+            <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+              <MapPin className="w-5 h-5 text-gray-500 mt-0.5" />
+              <div>
+                <p className="text-xs text-gray-500">Address</p>
+                <p className="text-sm font-medium">
+                  {user.address}, {user.city}, {user.state}, {user.country}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Shield className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Gender</p>
+                <p className="text-sm font-medium capitalize">{user.gender.replace("_", " ")}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Created At</p>
+                <p className="text-sm font-medium">{formatDate(user.createdAt)}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
+              <Calendar className="w-5 h-5 text-gray-500" />
+              <div>
+                <p className="text-xs text-gray-500">Last Login</p>
+                <p className="text-sm font-medium">
+                  {user.lastLogin ? formatDate(user.lastLogin) : "Never"}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="flex justify-end pt-4 border-t">
+          <Button variant="outline" onClick={() => onOpenChange(false)}>
+            Close
+          </Button>
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+// Delete User Modal Component
+const DeleteUserModal = ({
+  open,
+  onOpenChange,
+  onConfirm
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onConfirm: () => void;
+}) => {
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleConfirm = async () => {
+    setIsDeleting(true);
+    try {
+      await onConfirm();
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  return (
+    <AlertDialog open={open} onOpenChange={onOpenChange}>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+              <Trash2 className="w-5 h-5 text-red-600" />
+            </div>
+            Delete User
+          </AlertDialogTitle>
+          <AlertDialogDescription>
+            Are you sure you want to delete this user? This action cannot be undone and the
+            user will no longer be able to access the system.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(e) => {
+              e.preventDefault();
+              handleConfirm();
+            }}
+            className="bg-red-600 hover:bg-red-700"
+            disabled={isDeleting}
+          >
+            {isDeleting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Deleting...
+              </>
+            ) : (
+              "Delete"
+            )}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+};
+
+// Edit User Modal Component
+const EditUserModal = ({
+  open,
+  onOpenChange,
+  user,
+  onUserUpdated
+}: {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  user: User;
+  onUserUpdated: () => void;
+}) => {
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [profilePic, setProfilePic] = useState<string | null>(user.profilePic || null);
+  const [profilePicFile, setProfilePicFile] = useState<File | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const [selectedCountryId, setSelectedCountryId] = useState<number | null>(
+    user.country ? (() => {
+      const countries = getAllCountries();
+      const country = countries.find((c: ICountry) => c.name === user.country);
+      return country ? country.id : null;
+    })() : null
+  );
+  const [selectedStateId, setSelectedStateId] = useState<number | null>(
+    user.state ? (() => {
+      if (selectedCountryId) {
+        const states = getStatesOfCountry(selectedCountryId);
+        const state = states.find((s: IState) => s.name === user.state);
+        return state ? state.id : null;
+      }
+      return null;
+    })() : null
+  );
+  const [countries, setCountries] = useState<ICountry[]>([]);
+  const [states, setStates] = useState<IState[]>([]);
+  const [cities, setCities] = useState<ICity[]>([]);
+
+  // Load countries on mount
+  useEffect(() => {
+    const loadCountries = () => {
+      try {
+        const allCountries = getAllCountries();
+        setCountries(allCountries);
+      } catch (error) {
+        console.error('Error loading countries:', error);
+        toast.error('Failed to load countries');
+      }
+    };
+    loadCountries();
+  }, []);
+
+  // Load states when country changes
+  useEffect(() => {
+    if (selectedCountryId) {
+      try {
+        const countryStates = getStatesOfCountry(selectedCountryId);
+        setStates(countryStates);
+        setCities([]);
+      } catch (error) {
+        console.error('Error loading states:', error);
+        toast.error('Failed to load states');
+      }
+    } else {
+      setStates([]);
+      setCities([]);
+    }
+  }, [selectedCountryId]);
+
+  // Load cities when state changes
+  useEffect(() => {
+    if (selectedStateId) {
+      try {
+        const stateCities = getCitiesOfState(selectedStateId);
+        setCities(stateCities);
+      } catch (error) {
+        console.error('Error loading cities:', error);
+        toast.error('Failed to load cities');
+      }
+    } else {
+      setCities([]);
+    }
+  }, [selectedStateId]);
+
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    watch,
+    formState: { errors }
+  } = useForm<Partial<AddUserFormData>>({
+    resolver: zodResolver(editUserSchema),
+    defaultValues: {
+      name: user.name,
+      email: user.email,
+      username: user.username,
+      mobile: user.mobile,
+      dateOfBirth: user.dateOfBirth ? new Date(user.dateOfBirth).toISOString().split('T')[0] : '',
+      gender: user.gender as AddUserFormData['gender'],
+      address: user.address,
+      country: user.country,
+      state: user.state,
+      city: user.city,
+      role: user.role as AddUserFormData['role'],
+    }
+  });
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('File size must be less than 5MB');
+        return;
+      }
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setProfilePic(event.target?.result as string);
+      };
+      reader.readAsDataURL(file);
+      setProfilePicFile(file);
+    }
+  };
+
+  const removeProfilePic = () => {
+    setProfilePic(null);
+    setProfilePicFile(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const onSubmit = async (data: Partial<AddUserFormData>) => {
+    setIsLoading(true);
+    try {
+      const dateOfBirth = data.dateOfBirth ? new Date(data.dateOfBirth).toISOString() : undefined;
+      
+      const apiData = {
+        name: data.name,
+        email: data.email,
+        username: data.username,
+        mobile: data.mobile,
+        dateOfBirth,
+        gender: data.gender,
+        address: data.address,
+        country: data.country,
+        state: data.state,
+        city: data.city,
+        role: data.role,
+        profilePic: profilePic || undefined
+      };
+
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(`${API_URL}/auth/users/${user._id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(apiData),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success('User updated successfully!');
+        onOpenChange(false);
+        onUserUpdated();
+      } else {
+        toast.error(result.message || 'Failed to update user');
+      }
+    } catch (error) {
+      toast.error('Error updating user');
+      console.error('Error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle>Edit User</DialogTitle>
+          <DialogDescription>
+            Update user information for {user.name}
+          </DialogDescription>
+        </DialogHeader>
+        
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          {/* Profile Picture */}
+          <div className="flex flex-col items-center space-y-4">
+            <div className="relative">
+              {profilePic ? (
+                <div className="relative">
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    className="w-24 h-24 rounded-full object-cover border-2 border-gray-200"
+                  />
+                  <button
+                    type="button"
+                    onClick={removeProfilePic}
+                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                </div>
+              ) : (
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-24 h-24 rounded-full bg-gray-100 border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-gray-400 transition-colors"
+                >
+                  <Upload className="h-8 w-8 text-gray-400" />
+                </div>
+              )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </div>
+            <p className="text-sm text-gray-500">Upload profile picture (max 5MB)</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Name */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-name">Full Name *</Label>
+              <Input
+                id="edit-name"
+                placeholder="Enter full name"
+                {...register('name')}
+                className={errors.name ? 'border-red-500' : ''}
+              />
+              {errors.name && <p className="text-sm text-red-500">{errors.name.message}</p>}
+            </div>
+
+            {/* Email */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-email">Email *</Label>
+              <Input
+                id="edit-email"
+                type="email"
+                placeholder="Enter email"
+                {...register('email')}
+                className={errors.email ? 'border-red-500' : ''}
+              />
+              {errors.email && <p className="text-sm text-red-500">{errors.email.message}</p>}
+            </div>
+
+            {/* Username */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-username">Username *</Label>
+              <Input
+                id="edit-username"
+                placeholder="Username"
+                {...register('username')}
+                className={errors.username ? 'border-red-500' : ''}
+              />
+              {errors.username && <p className="text-sm text-red-500">{errors.username.message}</p>}
+            </div>
+
+            {/* Mobile */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-mobile">Mobile Number *</Label>
+              <Input
+                id="edit-mobile"
+                placeholder="Enter mobile number"
+                {...register('mobile')}
+                className={errors.mobile ? 'border-red-500' : ''}
+              />
+              {errors.mobile && <p className="text-sm text-red-500">{errors.mobile.message}</p>}
+            </div>
+
+            {/* Date of Birth */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-dateOfBirth">Date of Birth *</Label>
+              <Input
+                id="edit-dateOfBirth"
+                type="date"
+                {...register('dateOfBirth')}
+                className={errors.dateOfBirth ? 'border-red-500' : ''}
+              />
+              {errors.dateOfBirth && <p className="text-sm text-red-500">{errors.dateOfBirth.message}</p>}
+            </div>
+
+            {/* Gender */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-gender">Gender *</Label>
+              <Select
+                onValueChange={(value) => setValue('gender', value as AddUserFormData['gender'])}
+                defaultValue={watch('gender')}
+              >
+                <SelectTrigger className={errors.gender ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select gender" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="male">Male</SelectItem>
+                  <SelectItem value="female">Female</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                  <SelectItem value="prefer_not_to_say">Prefer not to say</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.gender && <p className="text-sm text-red-500">{errors.gender.message}</p>}
+            </div>
+
+            {/* Role */}
+            <div className="space-y-2">
+              <Label htmlFor="edit-role">Role *</Label>
+              <Select
+                onValueChange={(value) => setValue('role', value as AddUserFormData['role'])}
+                defaultValue={watch('role')}
+              >
+                <SelectTrigger className={errors.role ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="admin">Admin</SelectItem>
+                  <SelectItem value="sub-admin">Sub-admin</SelectItem>
+                  <SelectItem value="manager">Manager</SelectItem>
+                </SelectContent>
+              </Select>
+              {errors.role && <p className="text-sm text-red-500">{errors.role.message}</p>}
+            </div>
+          </div>
+
+          {/* Address */}
+          <div className="space-y-2">
+            <Label htmlFor="edit-address">Address *</Label>
+            <Input
+              id="edit-address"
+              placeholder="Enter full address"
+              {...register('address')}
+              className={errors.address ? 'border-red-500' : ''}
+            />
+            {errors.address && <p className="text-sm text-red-500">{errors.address.message}</p>}
+          </div>
+
+          {/* Country, State, City */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="edit-country">Country *</Label>
+              <Select
+                onValueChange={(value) => {
+                  const country = countries.find((c: ICountry) => Number(c.id) === Number(value));
+                  setSelectedCountryId(country ? country.id : null);
+                  setSelectedStateId(null);
+                  setValue('country', country?.name || value);
+                  setValue('state', '');
+                  setValue('city', '');
+                }}
+                value={selectedCountryId?.toString() || ''}
+              >
+                <SelectTrigger className={errors.country ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select country" />
+                </SelectTrigger>
+                <SelectContent>
+                  {countries.map((country) => (
+                    <SelectItem key={country.iso2} value={country.id.toString()}>
+                      {country.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.country && <p className="text-sm text-red-500">{errors.country.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-state">State/Province *</Label>
+              <Select
+                onValueChange={(value) => {
+                  const state = states.find((s: IState) => Number(s.id) === Number(value));
+                  setSelectedStateId(state ? state.id : null);
+                  setValue('state', state?.name || value);
+                  setValue('city', '');
+                }}
+                value={selectedStateId?.toString() || ''}
+                disabled={!selectedCountryId}
+              >
+                <SelectTrigger className={errors.state ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select state" />
+                </SelectTrigger>
+                <SelectContent>
+                  {states.map((state) => (
+                    <SelectItem key={state.state_code} value={state.id.toString()}>
+                      {state.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.state && <p className="text-sm text-red-500">{errors.state.message}</p>}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-city">City *</Label>
+              <Select
+                onValueChange={(value) => {
+                  const city = cities.find((c: ICity) => Number(c.id) === Number(value));
+                  setValue('city', city?.name || value);
+                }}
+                defaultValue={user.city}
+                disabled={!selectedStateId}
+              >
+                <SelectTrigger className={errors.city ? 'border-red-500' : ''}>
+                  <SelectValue placeholder="Select city" />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map((city) => (
+                    <SelectItem key={city.id} value={city.name}>
+                      {city.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              {errors.city && <p className="text-sm text-red-500">{errors.city.message}</p>}
+            </div>
+          </div>
+
+          <div className="flex justify-end space-x-4 pt-4 border-t">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Updating...
+                </>
+              ) : (
+                'Update User'
+              )}
+            </Button>
+          </div>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
 const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [isAddUserModalOpen, setIsAddUserModalOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [isViewModalOpen, setIsViewModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [deleteUserId, setDeleteUserId] = useState<string | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const { user: currentUser } = useAuth();
 
   // Fetch users from API
@@ -625,16 +1299,49 @@ const AdminUsers = () => {
     return matchesSearch && matchesRole;
   });
 
-  const handleDelete = async (userId: string) => {
-    if (!confirm("Are you sure you want to delete this user?")) return;
-
-    toast.error("Delete endpoint not implemented yet");
-    console.log("Delete user:", userId);
+  const handleView = (user: User) => {
+    setSelectedUser(user);
+    setIsViewModalOpen(true);
   };
 
-  const handleEdit = (userId: string) => {
-    toast.info("Edit functionality coming soon");
-    console.log("Edit user:", userId);
+  const handleEdit = (user: User) => {
+    setSelectedUser(user);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (userId: string) => {
+    setDeleteUserId(userId);
+    setIsDeleteModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (!deleteUserId) return;
+
+    try {
+      const token = localStorage.getItem("adminToken");
+      const response = await fetch(`${API_URL}/auth/users/${deleteUserId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        toast.success("User deleted successfully!");
+        fetchUsers();
+      } else {
+        toast.error(result.message || "Failed to delete user");
+      }
+    } catch (error) {
+      toast.error("Error deleting user");
+      console.error("Error:", error);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setDeleteUserId(null);
+    }
   };
 
   return (
@@ -759,12 +1466,16 @@ const AdminUsers = () => {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => handleEdit(user._id)}>
+                        <DropdownMenuItem onClick={() => handleView(user)}>
+                          <Eye className="w-4 h-4 mr-2" />
+                          View
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => handleEdit(user)}>
                           <Edit2 className="w-4 h-4 mr-2" />
                           Edit
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDelete(user._id)}
+                          onClick={() => handleDeleteClick(user._id)}
                           className="text-red-600"
                         >
                           <Trash2 className="w-4 h-4 mr-2" />
@@ -845,6 +1556,32 @@ const AdminUsers = () => {
         open={isAddUserModalOpen}
         onOpenChange={setIsAddUserModalOpen}
         onUserAdded={fetchUsers}
+      />
+
+      {/* View User Modal */}
+      {selectedUser && (
+        <ViewUserModal
+          open={isViewModalOpen}
+          onOpenChange={setIsViewModalOpen}
+          user={selectedUser}
+        />
+      )}
+
+      {/* Edit User Modal */}
+      {selectedUser && (
+        <EditUserModal
+          open={isEditModalOpen}
+          onOpenChange={setIsEditModalOpen}
+          user={selectedUser}
+          onUserUpdated={fetchUsers}
+        />
+      )}
+
+      {/* Delete User Modal */}
+      <DeleteUserModal
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        onConfirm={confirmDelete}
       />
     </div>
   );

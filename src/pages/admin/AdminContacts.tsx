@@ -33,6 +33,17 @@ import {
   TableRow
 } from "@/components/ui/table";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -79,6 +90,7 @@ const AdminContacts = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [selectedContact, setSelectedContact] = useState<Contact | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [contactToDelete, setContactToDelete] = useState<Contact | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [pagination, setPagination] = useState({
     page: 1,
@@ -141,11 +153,15 @@ const AdminContacts = () => {
     }
   };
 
-  const handleDeleteContact = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this contact?")) return;
+  const handleDeleteContact = (contact: Contact) => {
+    setContactToDelete(contact);
+  };
+
+  const confirmDelete = async () => {
+    if (!contactToDelete) return;
 
     try {
-      const response = await fetch(`${API_URL}/contacts/${id}`, {
+      const response = await fetch(`${API_URL}/contacts/${contactToDelete._id}`, {
         method: "DELETE"
       });
       const data = await response.json();
@@ -159,6 +175,8 @@ const AdminContacts = () => {
     } catch (error) {
       toast.error("Error deleting contact");
       console.error("Error:", error);
+    } finally {
+      setContactToDelete(null);
     }
   };
 
@@ -554,7 +572,7 @@ const AdminContacts = () => {
                                 className="text-red-600"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  handleDeleteContact(contact._id);
+                                  handleDeleteContact(contact);
                                 }}
                               >
                                 <Trash2 className="w-4 h-4 mr-2" />
@@ -731,7 +749,7 @@ const AdminContacts = () => {
                   <Button
                     variant="destructive"
                     onClick={() => {
-                      handleDeleteContact(selectedContact._id);
+                      handleDeleteContact(selectedContact);
                       setIsModalOpen(false);
                     }}
                   >
@@ -744,6 +762,30 @@ const AdminContacts = () => {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!contactToDelete} onOpenChange={(open) => !open && setContactToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-500" />
+              Delete Contact
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete contact from <span className="font-medium">{contactToDelete?.name}</span>? 
+              This action cannot be undone and will permanently remove this contact and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setContactToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

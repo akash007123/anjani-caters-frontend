@@ -88,7 +88,7 @@ const Booking = () => {
       trackFormSubmission('Booking Form');
       
       // Submit to API
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/api/bookings`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000'}/bookings`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

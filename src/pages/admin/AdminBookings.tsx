@@ -31,6 +31,17 @@ import {
   TableRow
 } from "@/components/ui/table";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import {
   Dialog,
   DialogContent,
   DialogHeader,
@@ -112,6 +123,7 @@ const AdminBookings = () => {
     status: "",
     notes: ""
   });
+  const [bookingToDelete, setBookingToDelete] = useState<Booking | null>(null);
 
   const fetchBookings = async () => {
     setLoading(true);
@@ -198,11 +210,15 @@ const AdminBookings = () => {
     }
   };
 
-  const handleDeleteBooking = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this booking?")) return;
+  const handleDeleteBooking = (booking: Booking) => {
+    setBookingToDelete(booking);
+  };
+
+  const confirmDeleteBooking = async () => {
+    if (!bookingToDelete) return;
 
     try {
-      const response = await fetch(`${API_URL}/bookings/${id}`, {
+      const response = await fetch(`${API_URL}/bookings/${bookingToDelete._id}`, {
         method: "DELETE"
       });
       const data = await response.json();
@@ -216,6 +232,8 @@ const AdminBookings = () => {
     } catch (error) {
       toast.error("Error deleting booking");
       console.error("Error:", error);
+    } finally {
+      setBookingToDelete(null);
     }
   };
 
@@ -598,7 +616,7 @@ const AdminBookings = () => {
                               size="icon"
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleDeleteBooking(booking._id);
+                                handleDeleteBooking(booking);
                               }}
                             >
                               <Trash2 className="w-4 h-4 text-red-500" />
@@ -795,6 +813,30 @@ const AdminBookings = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={!!bookingToDelete} onOpenChange={(open) => !open && setBookingToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-500" />
+              Delete Booking
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the booking from <span className="font-medium">{bookingToDelete?.name}</span>? 
+              This action cannot be undone and will permanently remove this booking and all associated data.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => setBookingToDelete(null)}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDeleteBooking} className="bg-red-500 hover:bg-red-600">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

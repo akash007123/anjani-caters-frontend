@@ -9,6 +9,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/layout/AdminLayout";
 import ProtectedRoute from "./components/auth/ProtectedRoute";
+import GuestRoute from "./components/auth/GuestRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
@@ -57,8 +58,10 @@ const AnimatedRoutes = () => {
   if (isAdminRoute) {
     return (
       <Routes location={location} key={location.pathname}>
-        {/* Public admin routes */}
-        <Route path="/admin/login" element={<Login />} />
+        {/* Public admin routes - only accessible by guest users */}
+        <Route element={<GuestRoute />}>
+          <Route path="/admin/login" element={<Login />} />
+        </Route>
         {/* <Route path="/admin/register" element={<Register />} /> */}
         
         {/* Protected admin routes */}
