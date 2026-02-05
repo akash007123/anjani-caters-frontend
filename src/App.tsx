@@ -8,9 +8,12 @@ import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AnimatePresence, motion } from "framer-motion";
 import Layout from "./components/layout/Layout";
 import AdminLayout from "./components/layout/AdminLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import AdminContacts from "./pages/admin/AdminContacts";
 import AdminBookings from "./pages/admin/AdminBookings";
+import Login from "./pages/admin/Login";
+import Register from "./pages/admin/Register";
 import Index from "./pages/Index";
 import About from "./pages/About";
 import Services from "./pages/Services";
@@ -28,6 +31,7 @@ import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsConditions from "./pages/TermsConditions";
 import NotFound from "./pages/NotFound";
 import ServiceLocationPage from "./components/seo/ProgrammaticSEO";
+import { AuthProvider } from "./contexts/AuthContext";
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -52,12 +56,23 @@ const AnimatedRoutes = () => {
   if (isAdminRoute) {
     return (
       <Routes location={location} key={location.pathname}>
-        <Route path="/admin" element={<AdminLayout><AdminDashboard /></AdminLayout>} />
-        <Route path="/admin/contacts" element={<AdminLayout><AdminContacts /></AdminLayout>} />
-        <Route path="/admin/bookings" element={<AdminLayout><AdminBookings /></AdminLayout>} />
-        <Route path="/admin/analytics" element={<AdminLayout><div className="p-8">Analytics Coming Soon</div></AdminLayout>} />
-        <Route path="/admin/users" element={<AdminLayout><div className="p-8">Users Coming Soon</div></AdminLayout>} />
-        <Route path="/admin/settings" element={<AdminLayout><div className="p-8">Settings Coming Soon</div></AdminLayout>} />
+        {/* Public admin routes */}
+        <Route path="/admin/login" element={<Login />} />
+        <Route path="/admin/register" element={<Register />} />
+        
+        {/* Protected admin routes */}
+        <Route element={<ProtectedRoute />}>
+          <Route element={<AdminLayout />}>
+            <Route path="/admin" element={<AdminDashboard />} />
+            <Route path="/admin/contacts" element={<AdminContacts />} />
+            <Route path="/admin/bookings" element={<AdminBookings />} />
+            <Route path="/admin/analytics" element={<div className="p-8">Analytics Coming Soon</div>} />
+            <Route path="/admin/users" element={<div className="p-8">Users Coming Soon</div>} />
+            <Route path="/admin/settings" element={<div className="p-8">Settings Coming Soon</div>} />
+          </Route>
+        </Route>
+        
+        {/* Catch all */}
         <Route path="*" element={<NotFound />} />
       </Routes>
     );
@@ -114,7 +129,9 @@ const App = () => (
           <Toaster />
           <Sonner />
           <BrowserRouter>
-            <AnimatedRoutes />
+            <AuthProvider>
+              <AnimatedRoutes />
+            </AuthProvider>
           </BrowserRouter>
         </TooltipProvider>
       </ThemeProvider>

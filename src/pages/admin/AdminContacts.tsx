@@ -91,7 +91,7 @@ const AdminContacts = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/contacts?page=${pagination.page}&limit=${pagination.limit}`
+        `${API_URL}/contacts?page=${pagination.page}&limit=${pagination.limit}`
       );
       const data = await response.json();
 
@@ -128,7 +128,7 @@ const AdminContacts = () => {
 
   const updateContactStatus = async (id: string, status: string) => {
     try {
-      await fetch(`${API_URL}/api/contacts/${id}`, {
+      await fetch(`${API_URL}/contacts/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
@@ -145,7 +145,7 @@ const AdminContacts = () => {
     if (!confirm("Are you sure you want to delete this contact?")) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/contacts/${id}`, {
+      const response = await fetch(`${API_URL}/contacts/${id}`, {
         method: "DELETE"
       });
       const data = await response.json();
@@ -292,13 +292,13 @@ const AdminContacts = () => {
                     <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       {stat.label}
                     </p>
-                    <p className={cn("text-2xl font-bold mt-2", stat.color)}>
+                    <div className={cn("text-2xl font-bold mt-2", stat.color)}>
                       {loading ? (
                         <Skeleton className="h-8 w-16" />
                       ) : (
                         stat.value
                       )}
-                    </p>
+                    </div>
                   </div>
                   {stat.icon && (
                     <div className={cn("p-3 rounded-full", stat.color.replace("text", "bg").replace("-600", "-100"))}>

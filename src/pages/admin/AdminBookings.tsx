@@ -117,7 +117,7 @@ const AdminBookings = () => {
     setLoading(true);
     try {
       const response = await fetch(
-        `${API_URL}/api/bookings?page=${pagination.page}&limit=${pagination.limit}`
+        `${API_URL}/bookings?page=${pagination.page}&limit=${pagination.limit}`
       );
       const data = await response.json();
 
@@ -163,7 +163,7 @@ const AdminBookings = () => {
 
   const updateBookingStatus = async (id: string, status: string) => {
     try {
-      await fetch(`${API_URL}/api/bookings/${id}`, {
+      await fetch(`${API_URL}/bookings/${id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ status })
@@ -178,7 +178,7 @@ const AdminBookings = () => {
     if (!editingBooking) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/bookings/${editingBooking._id}`, {
+      const response = await fetch(`${API_URL}/bookings/${editingBooking._id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(editForm)
@@ -202,7 +202,7 @@ const AdminBookings = () => {
     if (!confirm("Are you sure you want to delete this booking?")) return;
 
     try {
-      const response = await fetch(`${API_URL}/api/bookings/${id}`, {
+      const response = await fetch(`${API_URL}/bookings/${id}`, {
         method: "DELETE"
       });
       const data = await response.json();

@@ -27,6 +27,7 @@ interface Contact {
 interface Booking {
   _id: string;
   eventType: string;
+  guestCount: number;
   name: string;
   eventDate: string;
   status: string;
