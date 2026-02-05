@@ -73,14 +73,14 @@ const AdminDashboard = () => {
     setLoading(true);
     try {
       // Fetch stats
-      const statsResponse = await fetch(`${API_URL}/api/contacts/stats`);
+      const statsResponse = await fetch(`${API_URL}/contacts/stats`);
       const statsData = await statsResponse.json();
       if (statsData.success) {
         setStats(statsData.data);
       }
 
       // Fetch booking stats
-      const bookingStatsResponse = await fetch(`${API_URL}/api/bookings/stats`);
+      const bookingStatsResponse = await fetch(`${API_URL}/bookings/stats`);
       const bookingStatsData = await bookingStatsResponse.json();
       if (bookingStatsData.success) {
         setBookingStats({
@@ -93,14 +93,14 @@ const AdminDashboard = () => {
       }
 
       // Fetch recent contacts (5 most recent)
-      const contactsResponse = await fetch(`${API_URL}/api/contacts?limit=5`);
+      const contactsResponse = await fetch(`${API_URL}/contacts?limit=5`);
       const contactsData = await contactsResponse.json();
       if (contactsData.success) {
         setRecentContacts(contactsData.data);
       }
 
       // Fetch recent bookings (5 most recent)
-      const bookingsResponse = await fetch(`${API_URL}/api/bookings?limit=5`);
+      const bookingsResponse = await fetch(`${API_URL}/bookings?limit=5`);
       const bookingsData = await bookingsResponse.json();
       if (bookingsData.success) {
         setRecentBookings(bookingsData.data);
