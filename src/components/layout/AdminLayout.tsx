@@ -99,7 +99,7 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b">
             <Link to="/admin" className="flex items-center gap-2">
-              <span className="text-xl font-bold text-primary">Admin Panel</span>
+              <img src="../icon.png" alt="logo" className="w-10" /><span className="text-xl font-bold text-primary">Admin Panel</span>
             </Link>
             <Button
               variant="ghost"
