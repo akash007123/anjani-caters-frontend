@@ -81,10 +81,20 @@ const CustomBooking = () => {
     { name: "", description: "", quantity: 1, unit: "plate" },
   ]);
 
+  // Date filter state
+  const [dateFilter, setDateFilter] = useState({
+    fromDate: "",
+    toDate: "",
+  });
+
   // Fetch bookings
   const fetchBookings = async () => {
     try {
-      const response = await fetch(`${API_URL}/custom-bookings`, {
+      const params = new URLSearchParams();
+      if (dateFilter.fromDate) params.append('fromDate', dateFilter.fromDate);
+      if (dateFilter.toDate) params.append('toDate', dateFilter.toDate);
+      
+      const response = await fetch(`${API_URL}/custom-bookings?${params.toString()}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -104,7 +114,7 @@ const CustomBooking = () => {
 
   useEffect(() => {
     fetchBookings();
-  }, [token]);
+  }, [token, dateFilter.fromDate, dateFilter.toDate]);
 
   // Handle form input changes
   const handleInputChange = (
@@ -327,6 +337,47 @@ const CustomBooking = () => {
           <h1 className="text-2xl font-bold text-gray-900">Custom Bookings</h1>
           <p className="text-gray-600">Manage your custom event bookings</p>
         </div>
+        
+        {/* Date Filter */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2">
+            <Input
+              type="date"
+              placeholder="From Date"
+              value={dateFilter.fromDate}
+              onChange={(e) => setDateFilter((prev) => ({ ...prev, fromDate: e.target.value }))}
+              className="w-36"
+            />
+            <span className="text-gray-500">to</span>
+            <Input
+              type="date"
+              placeholder="To Date"
+              value={dateFilter.toDate}
+              min={dateFilter.fromDate || undefined}
+              onChange={(e) => setDateFilter((prev) => ({ ...prev, toDate: e.target.value }))}
+              className="w-36"
+            />
+          </div>
+          <Button
+            variant="outline"
+            onClick={fetchBookings}
+            disabled={loading}
+          >
+            Filter
+          </Button>
+          {(dateFilter.fromDate || dateFilter.toDate) && (
+            <Button
+              variant="ghost"
+              onClick={() => {
+                setDateFilter({ fromDate: "", toDate: "" });
+                fetchBookings();
+              }}
+            >
+              Clear
+            </Button>
+          )}
+        </div>
+
         <Button
           onClick={() => {
             resetForm();
