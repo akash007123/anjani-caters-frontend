@@ -31,7 +31,9 @@ import {
   Minimize2,
   IndianRupee,
   HelpCircle,
-  Info
+  Info,
+  Utensils,
+  ShoppingCart
 } from "lucide-react";
 import {
   Card,
@@ -83,7 +85,7 @@ import {
   LabelList
 } from "recharts";
 
-const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 interface ContactStats {
   total: number;
@@ -140,6 +142,42 @@ interface EventTypeData {
 }
 
 interface StatusDataItem {
+  status: string;
+  count: number;
+  percentage: number;
+  color: string;
+}
+
+interface CustomBookingItem {
+  _id: string;
+  clientName: string;
+  clientEmail: string;
+  clientMobile: string;
+  eventDate: string;
+  venue: string;
+  totalAmount: number;
+  advanceAmount: number;
+  status: string;
+  menu: { name: string; quantity: number }[];
+  createdAt: string;
+}
+
+interface CustomBookingStats {
+  total: number;
+  pending: number;
+  confirmed: number;
+  inProgress: number;
+  completed: number;
+  cancelled: number;
+}
+
+interface CustomBookingMonthlyData {
+  month: string;
+  bookings: number;
+  revenue: number;
+}
+
+interface CustomBookingStatusData {
   status: string;
   count: number;
   percentage: number;
@@ -324,23 +362,74 @@ const AdminAnalytics = () => {
   const [funnelData, setFunnelData] = useState<FunnelData[]>([]);
   const [heatMapData, setHeatMapData] = useState<HeatMapData[]>([]);
   const [sourceData, setSourceData] = useState<{ name: string; value: number }[]>([]);
+  const [customBookings, setCustomBookings] = useState<CustomBookingItem[]>([]);
+  const [customBookingStats, setCustomBookingStats] = useState<CustomBookingStats>({
+    total: 0,
+    pending: 0,
+    confirmed: 0,
+    inProgress: 0,
+    completed: 0,
+    cancelled: 0
+  });
+  const [customBookingMonthlyData, setCustomBookingMonthlyData] = useState<CustomBookingMonthlyData[]>([]);
+  const [customBookingStatusData, setCustomBookingStatusData] = useState<CustomBookingStatusData[]>([]);
+  const [customBookingRevenueData, setCustomBookingRevenueData] = useState<{ name: string; value: number }[]>([]);
+  const token = localStorage.getItem('adminToken');
+
+  const getAuthHeaders = () => ({
+    Authorization: `Bearer ${token}`,
+  });
 
   const fetchAnalyticsData = useCallback(async () => {
     setLoading(true);
     try {
-      const [contactsStatsRes, bookingsStatsRes, bookingsRes, contactsRes] = await Promise.all([
-        fetch(`${API_URL}/contacts/stats`),
-        fetch(`${API_URL}/bookings/stats`),
-        fetch(`${API_URL}/bookings?limit=1000`),
-        fetch(`${API_URL}/contacts?limit=1000`)
+      const [contactsStatsRes, bookingsStatsRes, bookingsRes, contactsRes, customBookingsRes] = await Promise.all([
+        fetch(`${API_URL}/contacts/stats`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/bookings/stats`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/bookings?limit=1000`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/contacts?limit=1000`, { headers: getAuthHeaders() }),
+        fetch(`${API_URL}/custom-bookings?limit=1000`, { headers: getAuthHeaders() })
       ]);
 
-      const [contactsStats, bookingsStats, bookingsData, contactsAll] = await Promise.all([
+      const [contactsStats, bookingsStats, bookingsData, contactsAll, customBookingsData] = await Promise.all([
         contactsStatsRes.json(),
         bookingsStatsRes.json(),
         bookingsRes.json(),
-        contactsRes.json()
+        contactsRes.json(),
+        customBookingsRes.json()
       ]);
+
+      // Process custom bookings data
+      if (customBookingsData.success) {
+        const customBookings = customBookingsData.data || [];
+        setCustomBookings(customBookings);
+        
+        // Calculate custom booking stats
+        const stats: CustomBookingStats = {
+          total: customBookings.length,
+          pending: customBookings.filter((b: CustomBookingItem) => b.status === 'pending').length,
+          confirmed: customBookings.filter((b: CustomBookingItem) => b.status === 'confirmed').length,
+          inProgress: customBookings.filter((b: CustomBookingItem) => b.status === 'in-progress').length,
+          completed: customBookings.filter((b: CustomBookingItem) => b.status === 'completed').length,
+          cancelled: customBookings.filter((b: CustomBookingItem) => b.status === 'cancelled').length
+        };
+        setCustomBookingStats(stats);
+        
+        // Process monthly data for custom bookings
+        setCustomBookingMonthlyData(processCustomBookingMonthlyData(customBookings));
+        
+        // Process status data for custom bookings
+        setCustomBookingStatusData(processCustomBookingStatusData(customBookings));
+        
+        // Process revenue data
+        const revenueByStatus = [
+          { name: 'Pending', value: customBookings.filter((b: CustomBookingItem) => b.status === 'pending').reduce((sum: number, b: CustomBookingItem) => sum + b.totalAmount, 0) },
+          { name: 'Confirmed', value: customBookings.filter((b: CustomBookingItem) => b.status === 'confirmed').reduce((sum: number, b: CustomBookingItem) => sum + b.totalAmount, 0) },
+          { name: 'In Progress', value: customBookings.filter((b: CustomBookingItem) => b.status === 'in-progress').reduce((sum: number, b: CustomBookingItem) => sum + b.totalAmount, 0) },
+          { name: 'Completed', value: customBookings.filter((b: CustomBookingItem) => b.status === 'completed').reduce((sum: number, b: CustomBookingItem) => sum + b.totalAmount, 0) }
+        ];
+        setCustomBookingRevenueData(revenueByStatus);
+      }
 
       if (contactsStats.success) {
         setStats(prev => ({
@@ -557,6 +646,45 @@ const AdminAnalytics = () => {
     return Object.entries(sources).map(([name, value]) => ({ name, value }));
   };
 
+  // Custom Booking Processing Functions
+  function processCustomBookingMonthlyData(bookings: CustomBookingItem[]): CustomBookingMonthlyData[] {
+    const months: Record<string, CustomBookingMonthlyData> = {};
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+
+    const now = new Date();
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      const key = monthNames[date.getMonth()];
+      months[key] = { month: key, bookings: 0, revenue: 0 };
+    }
+
+    bookings.forEach(booking => {
+      const date = new Date(booking.createdAt);
+      const month = monthNames[date.getMonth()];
+      if (months[month]) {
+        months[month].bookings++;
+        months[month].revenue += booking.totalAmount || 0;
+      }
+    });
+
+    return Object.values(months);
+  }
+
+  function processCustomBookingStatusData(bookings: CustomBookingItem[]): CustomBookingStatusData[] {
+    const counts: Record<string, number> = {};
+    bookings.forEach(booking => {
+      counts[booking.status] = (counts[booking.status] || 0) + 1;
+    });
+
+    const total = bookings.length || 1;
+    return Object.entries(counts).map(([status, count]) => ({
+      status,
+      count,
+      percentage: Math.round((count / total) * 100),
+      color: getStatusColor(status)
+    })).sort((a, b) => b.count - a.count);
+  }
+
   const generateHeatMapData = (bookings: BookingItem[]): HeatMapData[] => {
     const data: HeatMapData[] = [];
     const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -728,7 +856,7 @@ const AdminAnalytics = () => {
         </div>
 
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
@@ -807,6 +935,19 @@ const AdminAnalytics = () => {
               <span className="text-sm text-red-600">-3%</span>
             </div>
           </motion.div>
+          <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="p-2 bg-purple-100 rounded-lg">
+                <Utensils className="w-5 h-5 text-purple-600" />
+              </div>
+              <span className="text-sm text-slate-600">Custom</span>
+            </div>
+            <p className="text-2xl font-bold text-slate-900">{customBookingStats.total}</p>
+            <div className="flex items-center gap-1 mt-1">
+              <ArrowUpRight className="w-4 h-4 text-green-500" />
+              <span className="text-sm text-green-600">+18%</span>
+            </div>
+          </motion.div>
         </div>
 
         {/* Main Tabs */}
@@ -819,6 +960,10 @@ const AdminAnalytics = () => {
             <TabsTrigger value="bookings" className="flex items-center gap-2 px-6 py-3">
               <Calendar className="w-4 h-4" />
               Bookings
+            </TabsTrigger>
+            <TabsTrigger value="custom-bookings" className="flex items-center gap-2 px-6 py-3">
+              <Utensils className="w-4 h-4" />
+              Custom Bookings
             </TabsTrigger>
             <TabsTrigger value="contacts" className="flex items-center gap-2 px-6 py-3">
               <Users className="w-4 h-4" />
@@ -1698,6 +1843,258 @@ const AdminAnalytics = () => {
                             />
                           </RadialBarChart>
                         </ResponsiveContainer>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          </motion.div>
+
+          {/* Custom Bookings Tab */}
+          <motion.div
+            key="custom-bookings"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <TabsContent value="custom-bookings" className="space-y-6">
+              {/* Custom Booking KPI Cards */}
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-blue-100 rounded-lg">
+                      <Utensils className="w-5 h-5 text-blue-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">Total Custom</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.total}</p>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-yellow-100 rounded-lg">
+                      <Clock className="w-5 h-5 text-yellow-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">Pending</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.pending}</p>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-green-100 rounded-lg">
+                      <CheckCircle className="w-5 h-5 text-green-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">Confirmed</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.confirmed}</p>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-purple-100 rounded-lg">
+                      <Activity className="w-5 h-5 text-purple-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">In Progress</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.inProgress}</p>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-cyan-100 rounded-lg">
+                      <IndianRupee className="w-5 h-5 text-cyan-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">Completed</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.completed}</p>
+                </motion.div>
+                <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="p-2 bg-red-100 rounded-lg">
+                      <TrendingDown className="w-5 h-5 text-red-600" />
+                    </div>
+                    <span className="text-sm text-slate-600">Cancelled</span>
+                  </div>
+                  <p className="text-2xl font-bold text-slate-900">{customBookingStats.cancelled}</p>
+                </motion.div>
+              </div>
+
+              {/* Custom Booking Graphs */}
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* Monthly Custom Bookings Trend */}
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <TrendingUp className="w-5 h-5" />
+                      Custom Bookings & Revenue Trend
+                    </CardTitle>
+                    <CardDescription>Track custom booking orders and revenue over the past 12 months</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <Skeleton className="h-[300px] w-full rounded-lg" />
+                    ) : (
+                      <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <ComposedChart data={customBookingMonthlyData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                            <defs>
+                              <linearGradient id="colorCustomBookings" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                              </linearGradient>
+                              <linearGradient id="colorCustomRevenue" x1="0" y1="0" x2="0" y2="1">
+                                <stop offset="5%" stopColor="#22c55e" stopOpacity={0.3} />
+                                <stop offset="95%" stopColor="#22c55e" stopOpacity={0} />
+                              </linearGradient>
+                            </defs>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis dataKey="month" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                            <YAxis yAxisId="left" stroke="#888" fontSize={12} tickLine={false} axisLine={false} />
+                            <YAxis yAxisId="right" orientation="right" stroke="#888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(value)} />
+                            <RechartsTooltip
+                              contentStyle={{ 
+                                backgroundColor: "#fff", 
+                                border: "1px solid #e0e0e0", 
+                                borderRadius: "8px", 
+                                boxShadow: "0 4px 6px rgba(0,0,0,0.1)" 
+                              }}
+                              formatter={(value: number, name: string) => [name === 'revenue' ? formatCurrency(value) : value, name === 'bookings' ? 'Bookings' : 'Revenue']}
+                            />
+                            <Legend />
+                            <Area 
+                              yAxisId="left"
+                              type="monotone" 
+                              dataKey="bookings" 
+                              stroke="#8b5cf6" 
+                              strokeWidth={3} 
+                              fillOpacity={1} 
+                              fill="url(#colorCustomBookings)" 
+                              name="Bookings"
+                            />
+                            <Line
+                              yAxisId="right"
+                              type="monotone" 
+                              dataKey="revenue" 
+                              stroke="#22c55e" 
+                              strokeWidth={3} 
+                              dot={{ fill: '#22c55e', strokeWidth: 2 }}
+                              name="Revenue"
+                            />
+                          </ComposedChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Custom Booking Status Distribution */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <PieChart className="w-5 h-5" />
+                      Custom Booking Status
+                    </CardTitle>
+                    <CardDescription>Breakdown of custom bookings by current status</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <Skeleton className="h-[300px] w-full rounded-lg" />
+                    ) : (
+                      <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <RechartsPieChart>
+                            <RechartsTooltip
+                              contentStyle={{ 
+                                backgroundColor: "#fff", 
+                                border: "1px solid #e0e0e0", 
+                                borderRadius: "8px", 
+                                boxShadow: "0 4px 6px rgba(0,0,0,0.1)" 
+                              }}
+                              formatter={(value: number, name: string) => [value, name]}
+                            />
+                            <Legend />
+                            <Pie
+                              data={customBookingStatusData}
+                              cx="50%"
+                              cy="50%"
+                              innerRadius={60}
+                              outerRadius={100}
+                              paddingAngle={2}
+                              dataKey="count"
+                              nameKey="status"
+                              label={({ status, percentage }) => `${status}: ${percentage}%`}
+                            >
+                              {customBookingStatusData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={entry.color} />
+                              ))}
+                            </Pie>
+                          </RechartsPieChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Custom Booking Revenue by Status */}
+                <Card>
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <IndianRupee className="w-5 h-5" />
+                      Revenue by Status
+                    </CardTitle>
+                    <CardDescription>Revenue generated from custom bookings by status</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <Skeleton className="h-[300px] w-full rounded-lg" />
+                    ) : (
+                      <div className="h-[300px] w-full">
+                        <ResponsiveContainer width="100%" height="100%">
+                          <BarChart data={customBookingRevenueData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
+                            <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                            <XAxis 
+                              dataKey="name" 
+                              stroke="#888" 
+                              fontSize={11} 
+                              tickLine={false} 
+                              axisLine={false} 
+                            />
+                            <YAxis stroke="#888" fontSize={12} tickLine={false} axisLine={false} tickFormatter={(value) => formatCurrency(value)} />
+                            <RechartsTooltip
+                              contentStyle={{ 
+                                backgroundColor: "#fff", 
+                                border: "1px solid #e0e0e0", 
+                                borderRadius: "8px", 
+                                boxShadow: "0 4px 6px rgba(0,0,0,0.1)" 
+                              }}
+                              formatter={(value: number) => [formatCurrency(value), "Revenue"]}
+                            />
+                            <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                              {customBookingRevenueData.map((entry, index) => (
+                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                              ))}
+                            </Bar>
+                          </BarChart>
+                        </ResponsiveContainer>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+
+                {/* Custom Booking Status Polar Area Chart */}
+                <Card className="lg:col-span-2">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2">
+                      <Activity className="w-5 h-5" />
+                      Custom Booking Status Overview
+                    </CardTitle>
+                    <CardDescription>Visual overview of all custom booking statuses</CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    {loading ? (
+                      <Skeleton className="h-[350px] w-full rounded-lg" />
+                    ) : (
+                      <div className="h-[350px] w-full flex justify-center">
+                        <PolarAreaChartComponent data={customBookingStatusData} />
                       </div>
                     )}
                   </CardContent>
