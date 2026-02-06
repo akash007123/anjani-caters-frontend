@@ -11,7 +11,8 @@ import {
   Users,
   BarChart3,
   Home,
-  Calendar
+  Calendar,
+  Briefcase
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -31,6 +32,7 @@ const navigation: NavItem[] = [
   { name: "Bookings", href: "/admin/bookings", icon: Calendar },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Users", href: "/admin/users", icon: Users, roles: ["admin", "sub-admin"] },
+  { name: "Employees", href: "/admin/employees", icon: Briefcase, roles: ["admin", "sub-admin"] },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

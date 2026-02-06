@@ -16,6 +16,7 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import Employees from "./pages/admin/Employees";
 import Login from "./pages/admin/Login";
 import Register from "./pages/admin/Register";
 import Index from "./pages/Index";
@@ -74,6 +75,7 @@ const AnimatedRoutes = () => {
             <Route path="/admin/bookings" element={<AdminBookings />} />
             <Route path="/admin/analytics" element={<AdminAnalytics />} />
             <Route path="/admin/users" element={<AdminUsers />} />
+            <Route path="/admin/employees" element={<Employees />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
           </Route>
         </Route>
