@@ -12,7 +12,8 @@ import {
   BarChart3,
   Home,
   Calendar,
-  Briefcase
+  Briefcase,
+  Cross
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,6 +31,7 @@ const navigation: NavItem[] = [
   { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
   { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
   { name: "Bookings", href: "/admin/bookings", icon: Calendar },
+  { name: "Custom Bookings", href: "/admin/custom-booking", icon: Cross },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Users", href: "/admin/users", icon: Users, roles: ["admin", "sub-admin"] },
   { name: "Employees", href: "/admin/employees", icon: Briefcase, roles: ["admin", "sub-admin"] },
