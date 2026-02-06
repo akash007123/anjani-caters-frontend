@@ -35,6 +35,8 @@ import {
   X,
   FileText,
   Loader2,
+  Search,
+  Filter,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -102,13 +104,26 @@ const Employees = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [selectedDepartment, setSelectedDepartment] = useState("");
 
-  // Fetch employees from API
+  // Fetch employees from API with filters
   const fetchEmployees = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`${API_BASE_URL}/employees`);
+      // Build query params
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) {
+        params.append("search", searchQuery.trim());
+      }
+      if (selectedDepartment && selectedDepartment !== "all") {
+        params.append("department", selectedDepartment);
+      }
+
+      const url = `${API_BASE_URL}/employees${params.toString() ? `?${params.toString()}` : ""}`;
+      const response = await fetch(url);
       const data = await response.json();
+
       if (data.success) {
         setEmployees(data.data);
       } else {
@@ -120,10 +135,15 @@ const Employees = () => {
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [searchQuery, selectedDepartment]);
 
+  // Debounce search to avoid too many API calls
   useEffect(() => {
-    fetchEmployees();
+    const timer = setTimeout(() => {
+      fetchEmployees();
+    }, 300);
+
+    return () => clearTimeout(timer);
   }, [fetchEmployees]);
 
   const handleAddEmployee = () => {
@@ -216,20 +236,12 @@ const Employees = () => {
       const data = await response.json();
 
       if (data.success) {
-        if (editingId) {
-          setEmployees(
-            employees.map((emp) =>
-              emp._id === editingId ? data.data : emp
-            )
-          );
-          toast.success("Employee updated successfully");
-        } else {
-          setEmployees([data.data, ...employees]);
-          toast.success("Employee added successfully");
-        }
+        toast.success(editingId ? "Employee updated successfully" : "Employee added successfully");
         setIsModalOpen(false);
         setFormData({});
         setEditingId(null);
+        // Refresh the employee list
+        fetchEmployees();
       } else {
         toast.error(data.message || "Failed to save employee");
       }
@@ -258,6 +270,11 @@ const Employees = () => {
       .slice(0, 2);
   };
 
+  const clearFilters = () => {
+    setSearchQuery("");
+    setSelectedDepartment("");
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -270,6 +287,59 @@ const Employees = () => {
           <Plus className="w-4 h-4" />
           Add Employee
         </Button>
+      </div>
+
+      {/* Filters */}
+      <div className="bg-white rounded-lg shadow p-4">
+        <div className="flex flex-col md:flex-row gap-4">
+          {/* Search Input */}
+          <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
+            <Input
+              placeholder="Search by name, email, or mobile..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+
+          {/* Department Filter */}
+          <div className="w-full md:w-64">
+            <Select
+              value={selectedDepartment}
+              onValueChange={setSelectedDepartment}
+            >
+              <SelectTrigger>
+                <div className="flex items-center gap-2">
+                  <Filter className="w-4 h-4" />
+                  <SelectValue placeholder="All Departments" />
+                </div>
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Departments</SelectItem>
+                {departments.map((dept) => (
+                  <SelectItem key={dept} value={dept}>
+                    {dept}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Clear Filters Button */}
+          {(searchQuery || selectedDepartment) && (
+            <Button variant="outline" onClick={clearFilters}>
+              <X className="w-4 h-4 mr-1" />
+              Clear
+            </Button>
+          )}
+        </div>
+
+        {/* Results count */}
+        <div className="mt-2 text-sm text-gray-500">
+          Showing {employees.length} employee{employees.length !== 1 ? "s" : ""}
+          {(searchQuery || selectedDepartment) && " with current filters"}
+        </div>
       </div>
 
       {/* Table */}
@@ -337,7 +407,17 @@ const Employees = () => {
               {employees.length === 0 && (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8">
-                    No employees found. Add an employee to get started.
+                    {searchQuery || selectedDepartment ? (
+                      <div className="flex flex-col items-center gap-2">
+                        <Search className="w-8 h-8 text-gray-400" />
+                        <p>No employees found matching your criteria</p>
+                        <Button variant="link" onClick={clearFilters}>
+                          Clear filters
+                        </Button>
+                      </div>
+                    ) : (
+                      "No employees found. Add an employee to get started."
+                    )}
                   </TableCell>
                 </TableRow>
               )}
@@ -376,9 +456,9 @@ const Employees = () => {
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={() =>
-                      document.getElementById("profile-pic-upload")?.click()
-                    }
+                    onClick={() => {
+                      document.getElementById("profile-pic-upload")?.click();
+                    }}
                   >
                     <Upload className="w-4 h-4 mr-1" />
                     Upload

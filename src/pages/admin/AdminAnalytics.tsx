@@ -29,6 +29,7 @@ import {
   Tablet,
   Maximize2,
   Minimize2,
+  IndianRupee,
   HelpCircle,
   Info
 } from "lucide-react";
@@ -744,7 +745,7 @@ const AdminAnalytics = () => {
           <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-green-100 rounded-lg">
-                <DollarSign className="w-5 h-5 text-green-600" />
+                <IndianRupee className="w-5 h-5 text-green-600" />
               </div>
               <span className="text-sm text-slate-600">Total Revenue</span>
             </div>
