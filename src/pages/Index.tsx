@@ -1,19 +1,29 @@
-import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Star, Users, Calendar, Award, ChevronRight } from 'lucide-react';
-import SEO, { faqData } from '@/components/SEO';
-import { ScrollReveal, StaggerContainer } from '@/components/animations/ScrollReveal';
-import { TrustBadges } from '@/components/cro/TrustBadges';
-import { ExitIntentPopup } from '@/components/cro/ExitIntentPopup';
-import { LeadMagnetSection } from '@/components/cro/LeadMagnet';
+import { Link } from "react-router-dom";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import {
+  ArrowRight,
+  Star,
+  Users,
+  Calendar,
+  Award,
+  ChevronRight,
+} from "lucide-react";
+import SEO, { faqData } from "@/components/SEO";
+import {
+  ScrollReveal,
+  StaggerContainer,
+} from "@/components/animations/ScrollReveal";
+import { TrustBadges } from "@/components/cro/TrustBadges";
+import { ExitIntentPopup } from "@/components/cro/ExitIntentPopup";
+import { LeadMagnetSection } from "@/components/cro/LeadMagnet";
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from '@/components/ui/accordion';
-import heroWedding from '@/assets/hero-wedding.jpg';
+} from "@/components/ui/accordion";
+import heroWedding from "@/assets/hero-wedding.jpg";
 
 const Index = () => {
   const { scrollY } = useScroll();
@@ -22,88 +32,112 @@ const Index = () => {
 
   const services = [
     {
-      title: 'Wedding Events',
-      description: 'From intimate ceremonies to grand celebrations, we craft your perfect wedding story with meticulous attention to every detail.',
+      title: "Wedding Events",
+      description:
+        "From intimate ceremonies to grand celebrations, we craft your perfect wedding story with meticulous attention to every detail.",
       image: heroWedding,
-      link: '/services/events',
-      icon: ''
+      link: "/services/events",
+      icon: "",
     },
     {
-      title: 'Corporate Events',
-      description: 'Professional event management for conferences, seminars, and corporate gatherings that leave lasting impressions.',
+      title: "Corporate Events",
+      description:
+        "Professional event management for conferences, seminars, and corporate gatherings that leave lasting impressions.",
       image: heroWedding,
-      link: '/services/events',
-      icon: ''
+      link: "/services/events",
+      icon: "",
     },
     {
-      title: 'Catering Services',
-      description: 'Authentic Indian cuisine prepared by master chefs for any occasion, from lavish buffets to intimate gatherings.',
+      title: "Catering Services",
+      description:
+        "Authentic Indian cuisine prepared by master chefs for any occasion, from lavish buffets to intimate gatherings.",
       image: heroWedding,
-      link: '/services/catering',
-      icon: ''
+      link: "/services/catering",
+      icon: "",
     },
     {
-      title: 'Religious Events',
-      description: 'Sacred ceremonies and traditional rituals organized with utmost devotion and cultural authenticity.',
+      title: "Religious Events",
+      description:
+        "Sacred ceremonies and traditional rituals organized with utmost devotion and cultural authenticity.",
       image: heroWedding,
-      link: '/services/events',
-      icon: ''
-    }
+      link: "/services/events",
+      icon: "",
+    },
   ];
 
   const stats = [
-    { number: '500+', label: 'Events Completed', icon: Calendar, color: 'text-primary' },
-    { number: '10,000+', label: 'Happy Guests', icon: Users, color: 'text-secondary' },
-    { number: '15+', label: 'Years Experience', icon: Award, color: 'text-accent' },
-    { number: '4.9', label: 'Average Rating', icon: Star, color: 'text-amber-500' },
+    {
+      number: "500+",
+      label: "Events Completed",
+      icon: Calendar,
+      color: "text-primary",
+    },
+    {
+      number: "10,000+",
+      label: "Happy Guests",
+      icon: Users,
+      color: "text-secondary",
+    },
+    {
+      number: "15+",
+      label: "Years Experience",
+      icon: Award,
+      color: "text-accent",
+    },
+    {
+      number: "4.9",
+      label: "Average Rating",
+      icon: Star,
+      color: "text-amber-500",
+    },
   ];
 
   const testimonials = [
     {
-      name: 'Priya & Rahul Sharma',
-      event: 'Wedding Reception',
-      text: 'Anjani events made our wedding dreams come true. The attention to detail was exceptional! From the decorations to the food, everything was perfect.',
+      name: "Priya & Rahul Sharma",
+      event: "Wedding Reception",
+      text: "Anjani events made our wedding dreams come true. The attention to detail was exceptional! From the decorations to the food, everything was perfect.",
       rating: 5,
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
+      image:
+        "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop",
     },
     {
-      name: 'Anita Desai',
-      event: 'Corporate Event',
-      text: 'Professional team that delivered beyond our expectations. Our annual conference was a huge success thanks to their meticulous planning.',
+      name: "Anita Desai",
+      event: "Corporate Event",
+      text: "Professional team that delivered beyond our expectations. Our annual conference was a huge success thanks to their meticulous planning.",
       rating: 5,
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop'
+      image:
+        "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop",
     },
     {
-      name: 'Rajesh Kumar',
-      event: 'Birthday Celebration',
-      text: 'The catering was absolutely divine. Every guest complimented the food! Highly recommend for any special occasion.',
+      name: "Rajesh Kumar",
+      event: "Birthday Celebration",
+      text: "The catering was absolutely divine. Every guest complimented the food! Highly recommend for any special occasion.",
       rating: 5,
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
-    }
+      image:
+        "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop",
+    },
   ];
 
   return (
     <>
-      <SEO 
+      <SEO
         title="Premium Event Management & Catering Services"
         description="Anjani Events offers exceptional event management and catering services. From dream weddings to corporate events, we create unforgettable celebrations with premium catering, expert planning, and personalized service."
         keywords="event management, catering services, wedding planning, corporate events, Indian catering, best event planners"
         url="http://anjanievents.in/"
         faq={faqData}
       />
-      
+
       <ExitIntentPopup />
 
       {/* Hero Section */}
       <section className="relative min-h-[90vh] flex items-center overflow-hidden">
         {/* Background with Parallax */}
-        <motion.div 
-          style={{ y }}
-          className="absolute inset-0 indian-pattern"
-        >
-          <img 
-            src={heroWedding} 
-            alt="Indian Wedding Celebration" 
+        <motion.div style={{ y }} className="absolute inset-0 indian-pattern">
+          <img
+            src={heroWedding}
+            alt="Indian Wedding Celebration"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-primary/95 via-primary/80 to-primary/60" />
@@ -134,23 +168,26 @@ const Index = () => {
               className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6"
             >
               <span className="w-2 h-2 bg-accent rounded-full animate-pulse" />
-              <span className="text-sm text-white/90">Award-Winning Event Management</span>
+              <span className="text-sm text-white/90">
+                Award-Winning Event Management
+              </span>
             </motion.div>
 
             <h1 className="heading-display text-white mb-6 leading-tight">
               Create Unforgettable
               <span className="block text-gradient-gold">Celebrations</span>
             </h1>
-            
+
             <p className="text-xl text-white/90 mb-8 leading-relaxed max-w-xl">
-              From grand weddings to intimate gatherings, we craft magical experiences 
-              with authentic Indian hospitality and world-class service.
+              From grand weddings to intimate gatherings, we craft magical
+              experiences with authentic Indian hospitality and world-class
+              service.
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 className="bg-accent hover:bg-secondary text-foreground font-semibold px-8 shadow-gold"
               >
                 <Link to="/booking">
@@ -158,15 +195,13 @@ const Index = () => {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 variant="outline"
                 className="border-white/30 text-secondary hover:bg-white/10 px-8"
               >
-                <Link to="/get-quote">
-                  Get Free Quote
-                </Link>
+                <Link to="/get-quote">Get Free Quote</Link>
               </Button>
             </div>
 
@@ -180,7 +215,9 @@ const Index = () => {
                   transition={{ delay: 0.4 + index * 0.1 }}
                   className="text-center"
                 >
-                  <div className="text-3xl font-bold text-white">{stat.number}</div>
+                  <div className="text-3xl font-bold text-white">
+                    {stat.number}
+                  </div>
                   <div className="text-sm text-white/70">{stat.label}</div>
                 </motion.div>
               ))}
@@ -212,10 +249,15 @@ const Index = () => {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <span className="text-accent font-medium mb-2 block">Our Services</span>
-              <h2 className="heading-section mb-4">Comprehensive Event Solutions</h2>
+              <span className="text-accent font-medium mb-2 block">
+                Our Services
+              </span>
+              <h2 className="heading-section mb-4">
+                Comprehensive Event Solutions
+              </h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                From venue selection to final farewell, we handle every detail with precision and care
+                From venue selection to final farewell, we handle every detail
+                with precision and care
               </p>
             </div>
           </ScrollReveal>
@@ -223,7 +265,11 @@ const Index = () => {
           <StaggerContainer>
             <div className="grid md:grid-cols-2 gap-8">
               {services.map((service, index) => (
-                <ScrollReveal key={service.title} direction="up" delay={index * 0.1}>
+                <ScrollReveal
+                  key={service.title}
+                  direction="up"
+                  delay={index * 0.1}
+                >
                   <Link
                     to={service.link}
                     className="group relative overflow-hidden rounded-2xl card-premium block"
@@ -237,12 +283,18 @@ const Index = () => {
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/30 to-transparent" />
                     </div>
-                    
+
                     <div className="absolute bottom-0 left-0 right-0 p-6 text-white">
-                      <span className="text-4xl mb-2 block">{service.icon}</span>
-                      <h3 className="heading-card text-white mb-2">{service.title}</h3>
-                      <p className="text-white/80 text-sm mb-4">{service.description.substring(0, 100)}...</p>
-                      
+                      <span className="text-4xl mb-2 block">
+                        {service.icon}
+                      </span>
+                      <h3 className="heading-card text-white mb-2">
+                        {service.title}
+                      </h3>
+                      <p className="text-white/80 text-sm mb-4">
+                        {service.description.substring(0, 100)}...
+                      </p>
+
                       <div className="flex items-center gap-2 text-accent font-medium text-sm">
                         Learn More
                         <ChevronRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
@@ -266,8 +318,12 @@ const Index = () => {
                   whileHover={{ scale: 1.05 }}
                   className="text-center"
                 >
-                  <stat.icon className={`w-10 h-10 mx-auto mb-4 ${stat.color}`} />
-                  <div className="text-4xl md:text-5xl font-bold mb-2">{stat.number}</div>
+                  <stat.icon
+                    className={`w-10 h-10 mx-auto mb-4 ${stat.color}`}
+                  />
+                  <div className="text-4xl md:text-5xl font-bold mb-2">
+                    {stat.number}
+                  </div>
                   <div className="text-primary-foreground/70">{stat.label}</div>
                 </motion.div>
               </ScrollReveal>
@@ -281,26 +337,38 @@ const Index = () => {
         <div className="container-custom">
           <ScrollReveal direction="up">
             <div className="text-center mb-16">
-              <span className="text-accent font-medium mb-2 block">Testimonials</span>
+              <span className="text-accent font-medium mb-2 block">
+                Testimonials
+              </span>
               <h2 className="heading-section mb-4">What Our Clients Say</h2>
               <p className="text-muted-foreground max-w-2xl mx-auto">
-                Real stories from real clients who trusted us with their special moments
+                Real stories from real clients who trusted us with their special
+                moments
               </p>
             </div>
           </ScrollReveal>
 
           <div className="grid md:grid-cols-3 gap-8">
             {testimonials.map((testimonial, index) => (
-              <ScrollReveal key={testimonial.name} direction="up" delay={index * 0.1}>
+              <ScrollReveal
+                key={testimonial.name}
+                direction="up"
+                delay={index * 0.1}
+              >
                 <div className="card-premium p-6 h-full">
                   <div className="flex items-center gap-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
-                      <Star key={i} className="w-5 h-5 fill-amber-400 text-amber-400" />
+                      <Star
+                        key={i}
+                        className="w-5 h-5 fill-amber-400 text-amber-400"
+                      />
                     ))}
                   </div>
-                  
-                  <p className="text-muted-foreground mb-6 italic">"{testimonial.text}"</p>
-                  
+
+                  <p className="text-muted-foreground mb-6 italic">
+                    "{testimonial.text}"
+                  </p>
+
                   <div className="flex items-center gap-4">
                     <img
                       src={testimonial.image}
@@ -310,7 +378,9 @@ const Index = () => {
                     />
                     <div>
                       <div className="font-semibold">{testimonial.name}</div>
-                      <div className="text-sm text-muted-foreground">{testimonial.event}</div>
+                      <div className="text-sm text-muted-foreground">
+                        {testimonial.event}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -326,7 +396,9 @@ const Index = () => {
           <ScrollReveal direction="up">
             <div className="text-center mb-12">
               <span className="text-accent font-medium mb-2 block">FAQ</span>
-              <h2 className="heading-section mb-4">Frequently Asked Questions</h2>
+              <h2 className="heading-section mb-4">
+                Frequently Asked Questions
+              </h2>
               <p className="text-muted-foreground">
                 Find answers to common questions about our services
               </p>
@@ -358,19 +430,20 @@ const Index = () => {
       <LeadMagnetSection />
 
       {/* CTA Section */}
-      <section className="py-24 bg-primary text-primary-foreground shadow-lg">
-        <div className="container-custom text-center">
+      <section className="py-24 bg-primary text-primary-foreground ">
+        <div className="container-custom text-center shadow-xl border-gray-100 border-2 rounded-xl bg-[#a02c49]">
           <ScrollReveal direction="up">
-            <h2 className="heading-section text-white mb-6">
+            <h2 className="heading-section text-white mb-6 mt-5">
               Ready to Create Your Perfect Event?
             </h2>
             <p className="text-xl text-primary-foreground/80 mb-8 max-w-2xl mx-auto">
-              Let us turn your vision into reality. Contact us today for a personalized consultation.
+              Let us turn your vision into reality. Contact us today for a
+              personalized consultation.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                asChild 
-                size="lg" 
+            <div className="flex flex-wrap justify-center gap-4 mb-5">
+              <Button
+                asChild
+                size="lg"
                 className="bg-accent hover:bg-secondary text-foreground font-semibold px-8 shadow-gold"
               >
                 <Link to="/booking">
@@ -378,20 +451,24 @@ const Index = () => {
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </Button>
-              <Button 
-                asChild 
-                size="lg" 
+              <Button
+                asChild
+                size="lg"
                 variant="outline"
                 className="border-white/30 text-secondary hover:bg-white/10 px-8"
               >
-                <Link to="/contact">
-                  Contact Us
-                </Link>
+                <Link to="/contact">Contact Us</Link>
               </Button>
             </div>
           </ScrollReveal>
         </div>
       </section>
+      <div className="relative">
+        <hr className="border-t-4 border-double border-primary" />
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-3 text-primary text-xl rounded-xl">
+          ✦✦✦✦✦ &nbsp;§&nbsp; ✦✦✦✦✦
+        </span>
+      </div>
     </>
   );
 };
