@@ -13,7 +13,7 @@ const trustItems = [
   },
   {
     icon: Users,
-    title: '500+ Events',
+    title: '10,000+ Events',
     description: 'Successfully completed events',
   },
   {

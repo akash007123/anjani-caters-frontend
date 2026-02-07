@@ -1,18 +1,51 @@
 import { Link } from 'react-router-dom';
-import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send } from 'lucide-react';
+import { Phone, Mail, MapPin, Facebook, Instagram, Twitter, Youtube, Send, CheckCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
+const getApiBase = () => {
+  const base = import.meta.env.VITE_API_URL || 'http://localhost:5001';
+  return base.replace(/\/api\/?$/, '');
+};
+const SUBSCRIBER_API = `${getApiBase()}/api/subscribers/subscribe`;
+
 const Footer = () => {
   const [email, setEmail] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [discountCode, setDiscountCode] = useState('');
 
-  const handleSubscribe = (e: React.FormEvent) => {
+  const handleSubscribe = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email) {
-      toast.success('Thank you for subscribing!');
-      setEmail('');
+    if (!email) return;
+
+    setLoading(true);
+    setSuccess(false);
+
+    try {
+      const response = await fetch(SUBSCRIBER_API, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, source: 'footer' }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setSuccess(true);
+        setDiscountCode(data.discountCode || 'WELCOME10');
+        toast.success('Successfully subscribed!');
+        setEmail('');
+      } else {
+        toast.error(data.error || 'Subscription failed');
+        if (data.discountCode) setDiscountCode(data.discountCode);
+      }
+    } catch (err) {
+      toast.error('Unable to connect. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,18 +149,36 @@ const Footer = () => {
             </ul>
 
             <h5 className="font-medium mb-3">Subscribe to Newsletter</h5>
-            <form onSubmit={handleSubscribe} className="flex gap-2">
-              <Input
-                type="email"
-                placeholder="Your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
-              />
-              <Button type="submit" size="icon" className="bg-accent text-accent-foreground hover:bg-gold-light flex-shrink-0">
-                <Send className="w-4 h-4" />
-              </Button>
-            </form>
+            {success ? (
+              <div className="bg-green-500/20 rounded-lg p-4 text-center">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <CheckCircle className="w-5 h-5 text-green-400" />
+                  <span className="text-green-400 font-medium">Subscribed!</span>
+                </div>
+                <p className="text-sm text-primary-foreground/80">
+                  Code: <code className="font-bold">{discountCode}</code>
+                </p>
+              </div>
+            ) : (
+              <form onSubmit={handleSubscribe} className="flex gap-2">
+                <Input
+                  type="email"
+                  placeholder="Your email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  className="bg-primary-foreground/10 border-primary-foreground/20 text-primary-foreground placeholder:text-primary-foreground/50"
+                  disabled={loading}
+                />
+                <Button type="submit" size="icon" className="bg-accent text-accent-foreground hover:bg-gold-light flex-shrink-0" disabled={loading}>
+                  {loading ? (
+                    <span className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <Send className="w-4 h-4" />
+                  )}
+                </Button>
+              </form>
+            )}
           </div>
         </div>
       </div>

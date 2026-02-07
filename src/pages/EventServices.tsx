@@ -4,23 +4,26 @@ import { Button } from '@/components/ui/button';
 import { ArrowRight, Heart, Building2, Sparkles, MapPin, Cake, Users } from 'lucide-react';
 import SEO from '@/components/SEO';
 import heroWedding from '@/assets/hero-wedding.jpg';
-import corporateEvent from '@/assets/corporate-event.jpg';
+import Wedding from '@/assets/Weddings.webp';
+import corporate from '@/assets/Corporate.webp';
+import destination from '@/assets/destination.webp';
 import religiousEvent from '@/assets/religious-event.jpg';
-import eventDecoration from '@/assets/event-decoration.jpg';
+import Birthday  from '@/assets/Birthday.webp';
+import Parties   from '@/assets/Parties.jpg';
 
 const EventServices = () => {
   const eventTypes = [
     {
       title: 'Wedding Events',
       description: 'From intimate ceremonies to grand celebrations, we create fairy-tale weddings that reflect your love story.',
-      image: heroWedding,
+      image: Wedding,
       icon: Heart,
       features: ['Venue Selection', 'Décor & Styling', 'Mehendi & Sangeet', 'Wedding Day Coordination']
     },
     {
       title: 'Corporate Events',
       description: 'Professional event management for conferences, product launches, and corporate celebrations.',
-      image: corporateEvent,
+      image: corporate,
       icon: Building2,
       features: ['Conference Management', 'Product Launches', 'Team Building', 'Award Ceremonies']
     },
@@ -34,21 +37,21 @@ const EventServices = () => {
     {
       title: 'Destination Weddings',
       description: 'Dream weddings at stunning locations across India and beyond.',
-      image: eventDecoration,
+      image: destination,
       icon: MapPin,
       features: ['Location Scouting', 'Travel Coordination', 'Guest Management', 'Multi-Day Events']
     },
     {
       title: 'Birthday & Celebrations',
       description: 'Memorable celebrations for milestone birthdays and special occasions.',
-      image: eventDecoration,
+      image: Birthday,
       icon: Cake,
       features: ['Themed Parties', 'Entertainment', 'Custom Décor', 'Surprise Planning']
     },
     {
       title: 'Private Parties',
       description: 'Exclusive gatherings and cocktail parties with sophisticated arrangements.',
-      image: corporateEvent,
+      image: Parties ,
       icon: Users,
       features: ['Cocktail Parties', 'Anniversaries', 'Reunions', 'House Parties']
     }

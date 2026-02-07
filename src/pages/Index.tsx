@@ -358,7 +358,7 @@ const Index = () => {
       <LeadMagnetSection />
 
       {/* CTA Section */}
-      <section className="py-24 bg-primary text-primary-foreground">
+      <section className="py-24 bg-primary text-primary-foreground shadow-lg">
         <div className="container-custom text-center">
           <ScrollReveal direction="up">
             <h2 className="heading-section text-white mb-6">

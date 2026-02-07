@@ -13,7 +13,8 @@ import {
   Home,
   Calendar,
   Briefcase,
-  Cross
+  Cross,
+  Mail
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,6 +36,7 @@ const navigation: NavItem[] = [
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
   { name: "Users", href: "/admin/users", icon: Users, roles: ["admin", "sub-admin"] },
   { name: "Employees", href: "/admin/employees", icon: Briefcase, roles: ["admin", "sub-admin"] },
+  { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
   { name: "Settings", href: "/admin/settings", icon: Settings },
 ];
 

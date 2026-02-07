@@ -16,6 +16,7 @@ import AdminBookings from "./pages/admin/AdminBookings";
 import AdminAnalytics from "./pages/admin/AdminAnalytics";
 import AdminUsers from "./pages/admin/AdminUsers";
 import AdminSettings from "./pages/admin/AdminSettings";
+import Subscribers from "./pages/admin/Subscribers";
 import Employees from "./pages/admin/Employees";
 import CustomBooking from "./pages/admin/CustomBooking";
 import Login from "./pages/admin/Login";
@@ -79,6 +80,7 @@ const AnimatedRoutes = () => {
             <Route path="/admin/employees" element={<Employees />} />
             <Route path="/admin/custom-booking" element={<CustomBooking />} />
             <Route path="/admin/settings" element={<AdminSettings />} />
+            <Route path="/admin/subscribers" element={<Subscribers />} />
           </Route>
         </Route>
         
