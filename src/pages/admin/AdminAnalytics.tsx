@@ -856,7 +856,7 @@ const AdminAnalytics = () => {
         </div>
 
         {/* KPI Summary Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-7 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 mb-8">
           <motion.div whileHover={{ scale: 1.05 }} className="bg-white rounded-xl p-4 shadow-sm border border-slate-200">
             <div className="flex items-center gap-2 mb-2">
               <div className="p-2 bg-blue-100 rounded-lg">
