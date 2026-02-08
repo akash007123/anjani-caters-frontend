@@ -1,60 +1,56 @@
 import { motion } from 'framer-motion';
 import { Star, Quote, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import SEO from '@/components/SEO';
+import TestimonialForm from '@/components/TestimonialForm';
+import { useState, useEffect } from 'react';
+
+interface Testimonial {
+  _id: string;
+  name: string;
+  email: string;
+  mobile?: string;
+  designation: string;
+  location: string;
+  profilePic?: string;
+  rating: number;
+  feedback: string;
+  eventType?: string;
+  createdAt: string;
+}
 
 const Testimonials = () => {
-  const testimonials = [
-    {
-      name: 'Priya & Rahul Sharma',
-      event: 'Wedding Reception',
-      location: 'Mumbai',
-      text: 'Anjani events made our wedding dreams come true. From the stunning mandap to the exquisite cuisine, every detail was perfect. Our guests are still talking about it!',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop'
-    },
-    {
-      name: 'Amit Desai',
-      event: 'Corporate Annual Day',
-      location: 'Pune',
-      text: 'Professional, punctual, and perfect. The team handled our 500+ guest corporate event flawlessly. The food was exceptional and the setup was world-class.',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&h=100&fit=crop'
-    },
-    {
-      name: 'Sneha Kapoor',
-      event: 'Destination Wedding',
-      location: 'Udaipur',
-      text: 'They turned our Udaipur wedding into a royal affair. The attention to detail, from mehendi to vidaai, was incredible. Truly memorable!',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop'
-    },
-    {
-      name: 'Rajesh Kumar',
-      event: "Daughter's Birthday",
-      location: 'Delhi',
-      text: "My daughter's 1st birthday was magical thanks to Anjani events. The themed decoration and catering exceeded our expectations!",
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop'
-    },
-    {
-      name: 'Meera & Vikram Joshi',
-      event: 'Engagement Ceremony',
-      location: 'Ahmedabad',
-      text: 'From the beautiful décor to the delicious food, everything was top-notch. The team was professional and accommodating throughout.',
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=100&h=100&fit=crop'
-    },
-    {
-      name: 'Arun Patel',
-      event: 'Retirement Party',
-      location: 'Surat',
-      text: "Organized my father's retirement party with such grace. The traditional touches combined with modern elegance made it special.",
-      rating: 5,
-      image: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&h=100&fit=crop'
+  const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    // Check if redirected with feedback param
+    const feedbackParam = searchParams.get('feedback');
+    if (feedbackParam === 'true') {
+      setShowForm(true);
     }
-  ];
+
+    // Fetch testimonials from API
+    const fetchTestimonials = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5001'}/testimonials`);
+        const data = await response.json();
+        
+        if (data.success) {
+          setTestimonials(data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching testimonials:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTestimonials();
+  }, [searchParams]);
 
   const videoTestimonials = [
     { name: 'The Sharma Wedding', thumbnail: 'https://images.unsplash.com/photo-1519741497674-611481863552?w=400&h=300&fit=crop' },
@@ -84,6 +80,13 @@ const Testimonials = () => {
             <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto">
               Hear from families and businesses who trusted us with their special moments
             </p>
+            <Button
+              onClick={() => setShowForm(true)}
+              className="mt-6 bg-accent text-accent-foreground hover:bg-gold-light"
+              size="lg"
+            >
+              Share Your Experience
+            </Button>
           </motion.div>
         </div>
       </section>
@@ -93,10 +96,10 @@ const Testimonials = () => {
         <div className="container-custom">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center text-accent-foreground">
             {[
-              { value: '4.9/5', label: 'Average Rating' },
+              { value: testimonials.length > 0 ? (testimonials.reduce((acc, t) => acc + t.rating, 0) / testimonials.length).toFixed(1) + '/5' : '4.9/5', label: 'Average Rating' },
               { value: '500+', label: 'Happy Events' },
               { value: '98%', label: 'Would Recommend' },
-              { value: '50+', label: 'Google Reviews' },
+              { value: `${testimonials.length}+`, label: 'Google Reviews' },
             ].map((stat) => (
               <div key={stat.label}>
                 <p className="font-serif text-3xl font-bold">{stat.value}</p>
@@ -125,41 +128,79 @@ const Testimonials = () => {
             </h2>
           </motion.div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {testimonials.map((testimonial, index) => (
-              <motion.div
-                key={testimonial.name}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                className="card-premium p-6 hover-lift"
-              >
-                <Quote className="w-10 h-10 text-accent/30 mb-4" />
-                <div className="flex gap-1 mb-4">
-                  {[...Array(testimonial.rating)].map((_, i) => (
-                    <Star key={i} className="w-4 h-4 fill-accent text-accent" />
-                  ))}
-                </div>
-                <p className="text-muted-foreground mb-6 italic leading-relaxed">
-                  "{testimonial.text}"
-                </p>
-                <div className="flex items-center gap-4">
-                  <img 
-                    src={testimonial.image} 
-                    alt={testimonial.name}
-                    className="w-12 h-12 rounded-full object-cover"
-                  />
-                  <div>
-                    <p className="font-semibold text-foreground">{testimonial.name}</p>
-                    <p className="text-sm text-muted-foreground">
-                      {testimonial.event} • {testimonial.location}
-                    </p>
+          {loading ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <div key={i} className="card-premium p-6 animate-pulse">
+                  <div className="h-10 w-10 bg-muted rounded-lg mb-4" />
+                  <div className="flex gap-1 mb-4">
+                    {[1, 2, 3, 4, 5].map((j) => (
+                      <div key={j} className="w-4 h-4 bg-muted rounded" />
+                    ))}
+                  </div>
+                  <div className="h-20 bg-muted rounded mb-4" />
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 bg-muted rounded-full" />
+                    <div>
+                      <div className="h-4 w-24 bg-muted rounded mb-2" />
+                      <div className="h-3 w-32 bg-muted rounded" />
+                    </div>
                   </div>
                 </div>
-              </motion.div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : testimonials.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={testimonial._id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.5, delay: index * 0.1 }}
+                  className="card-premium p-6 hover-lift"
+                >
+                  <Quote className="w-10 h-10 text-accent/30 mb-4" />
+                  <div className="flex gap-1 mb-4">
+                    {[...Array(testimonial.rating)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-accent text-accent" />
+                    ))}
+                  </div>
+                  <p className="text-muted-foreground mb-6 italic leading-relaxed">
+                    "{testimonial.feedback}"
+                  </p>
+                  <div className="flex items-center gap-4">
+                    {testimonial.profilePic ? (
+                      <img 
+                        src={testimonial.profilePic} 
+                        alt={testimonial.name}
+                        className="w-12 h-12 rounded-full object-cover"
+                      />
+                    ) : (
+                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <span className="text-primary font-semibold">
+                          {testimonial.name.charAt(0)}
+                        </span>
+                      </div>
+                    )}
+                    <div>
+                      <p className="font-semibold text-foreground">{testimonial.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {testimonial.eventType || testimonial.designation} • {testimonial.location}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground mb-4">No testimonials yet. Be the first to share your experience!</p>
+              <Button onClick={() => setShowForm(true)} className="bg-primary hover:bg-primary/90">
+                Share Your Experience
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -277,6 +318,9 @@ const Testimonials = () => {
           ✦✦✦✦✦ &nbsp;§&nbsp; ✦✦✦✦✦
         </span>
       </div>
+
+      {/* Testimonial Form Modal */}
+      <TestimonialForm open={showForm} onClose={() => setShowForm(false)} />
     </>
   );
 };
