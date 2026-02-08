@@ -1,42 +1,85 @@
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import SEO from '@/components/SEO';
 import GalleryGrid from '@/components/gallery/GalleryGrid';
 import { GalleryItem } from '@/components/gallery/GalleryLightbox';
-import heroWedding from '@/assets/hero-wedding.jpg';
-import heroCatering from '@/assets/hero-catering.jpg';
-import eventDecoration from '@/assets/event-decoration.jpg';
-import corporateEvent from '@/assets/corporate-event.jpg';
-import buffetSetup from '@/assets/buffet-setup.jpg';
-import religiousEvent from '@/assets/religious-event.jpg';
+
+interface GalleryItemData {
+  _id: string;
+  title: string;
+  description?: string;
+  category: string;
+  customCategory?: string;
+  type: 'image' | 'video';
+  src: string;
+  thumbnail?: string;
+  order: number;
+  isActive: boolean;
+}
+
+const CATEGORIES = [
+  { value: 'all', label: 'All' },
+  { value: 'wedding', label: 'Weddings' },
+  { value: 'catering', label: 'Catering' },
+  { value: 'decoration', label: 'Decoration' },
+  { value: 'corporate', label: 'Corporate' },
+  { value: 'religious', label: 'Religious' },
+  { value: 'other', label: 'Other' },
+];
 
 const Gallery = () => {
-  const galleryItems: GalleryItem[] = [
-    { id: 'g1', src: heroWedding, category: 'wedding', title: 'Grand Wedding Setup', type: 'image' },
-    { id: 'g2', src: heroCatering, category: 'catering', title: 'Traditional Feast', type: 'image' },
-    { id: 'g3', src: eventDecoration, category: 'decoration', title: 'Floral Arrangements', type: 'image' },
-    { id: 'g4', src: corporateEvent, category: 'corporate', title: 'Corporate Conference', type: 'image' },
-    { id: 'g5', src: buffetSetup, category: 'catering', title: 'Royal Buffet', type: 'image' },
-    { id: 'g6', src: religiousEvent, category: 'religious', title: 'Sacred Ceremony', type: 'image' },
-    { id: 'g7', src: heroWedding, category: 'wedding', title: 'Wedding Reception', type: 'image' },
-    { id: 'g8', src: eventDecoration, category: 'decoration', title: 'Mandap Design', type: 'image' },
-    { id: 'g9', src: heroCatering, category: 'catering', title: 'Live Counters', type: 'image' },
-    { id: 'g10', src: corporateEvent, category: 'corporate', title: 'Awards Night', type: 'image' },
-    { id: 'g11', src: buffetSetup, category: 'catering', title: 'Dessert Station', type: 'image' },
-    { id: 'g12', src: religiousEvent, category: 'religious', title: 'Pooja Setup', type: 'image' },
-    // Video items - using placeholder thumbnails
-    { id: 'v1', src: 'https://www.w3schools.com/html/mov_bbb.mp4', category: 'wedding', title: 'Wedding Highlights', type: 'video', thumbnail: heroWedding },
-    { id: 'v2', src: 'https://www.w3schools.com/html/mov_bbb.mp4', category: 'catering', title: 'Catering Showcase', type: 'video', thumbnail: buffetSetup },
-    { id: 'v3', src: 'https://www.w3schools.com/html/mov_bbb.mp4', category: 'corporate', title: 'Corporate Event Reel', type: 'video', thumbnail: corporateEvent },
-  ];
+  const [galleryItems, setGalleryItems] = useState<GalleryItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const categories = [
-    { value: 'all', label: 'All' },
-    { value: 'wedding', label: 'Weddings' },
-    { value: 'catering', label: 'Catering' },
-    { value: 'decoration', label: 'Decoration' },
-    { value: 'corporate', label: 'Corporate' },
-    { value: 'religious', label: 'Religious' },
-  ];
+  useEffect(() => {
+    fetchGalleryItems();
+  }, []);
+
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
+  const fetchGalleryItems = async () => {
+    try {
+      const response = await fetch(`${API_URL}/gallery?isActive=true`);
+      const data = await response.json();
+      
+      // Transform data to match GalleryItem interface and prepend API_URL for file URLs
+      const transformedItems: GalleryItem[] = data.map((item: GalleryItemData) => {
+        // Extract base URL from API_URL (remove /api suffix if present)
+        const baseUrl = API_URL.replace(/\/api\/?$/, '');
+        
+        // Handle both old (/uploads) and new (/api/uploads) URL formats
+        const src = item.src.startsWith('/api/uploads') 
+          ? `${baseUrl}${item.src}`
+          : item.src.startsWith('/uploads') 
+            ? `${API_URL}${item.src}`
+            : item.src;
+        const thumbnail = item.thumbnail 
+          ? (item.thumbnail.startsWith('/api/uploads') 
+              ? `${baseUrl}${item.thumbnail}`
+              : item.thumbnail.startsWith('/uploads') 
+                ? `${API_URL}${item.thumbnail}`
+                : item.thumbnail)
+          : undefined;
+        
+        return {
+          id: item._id,
+          src,
+          category: item.category,
+          title: item.title,
+          type: item.type,
+          thumbnail,
+        };
+      });
+      
+      setGalleryItems(transformedItems);
+    } catch (error) {
+      console.error('Error fetching gallery items:', error);
+      // Fallback to empty array if API fails
+      setGalleryItems([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -70,7 +113,19 @@ const Gallery = () => {
       {/* Gallery Grid */}
       <section id="main-content" className="section-padding">
         <div className="container-custom">
-          <GalleryGrid items={galleryItems} categories={categories} />
+          {loading ? (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {Array.from({ length: 12 }).map((_, index) => (
+                <div key={index} className="aspect-square bg-muted rounded-lg animate-pulse" />
+              ))}
+            </div>
+          ) : galleryItems.length === 0 ? (
+            <div className="text-center py-12">
+              <p className="text-muted-foreground">No gallery items found. Check back soon!</p>
+            </div>
+          ) : (
+            <GalleryGrid items={galleryItems} categories={CATEGORIES} />
+          )}
         </div>
       </section>
 
@@ -94,9 +149,9 @@ const Gallery = () => {
 
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             {[
-              { number: '500+', label: 'Events Captured' },
-              { number: '1000+', label: 'Photos Delivered' },
-              { number: '50+', label: 'Video Highlights' },
+              { number: `${galleryItems.length}+`, label: 'Events Captured' },
+              { number: `${galleryItems.filter(i => i.type === 'image').length * 50}+`, label: 'Photos Delivered' },
+              { number: `${galleryItems.filter(i => i.type === 'video').length * 10}+`, label: 'Video Highlights' },
               { number: '100%', label: 'Client Satisfaction' },
             ].map((stat, index) => (
               <motion.div
