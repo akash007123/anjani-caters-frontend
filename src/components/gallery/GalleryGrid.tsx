@@ -73,10 +73,10 @@ const GalleryGrid = ({ items, categories }: GalleryGridProps) => {
               className={`relative group cursor-pointer overflow-hidden rounded-xl ${
                 index === 0 || index === 5 ? 'md:col-span-2 md:row-span-2' : ''
               }`}
-              onClick={() => setSelectedIndex(items.indexOf(item))}
+              onClick={() => setSelectedIndex(filteredItems.indexOf(item))}
               role="button"
               tabIndex={0}
-              onKeyDown={(e) => e.key === 'Enter' && setSelectedIndex(items.indexOf(item))}
+              onKeyDown={(e) => e.key === 'Enter' && setSelectedIndex(filteredItems.indexOf(item))}
               aria-label={`View ${item.title}`}
             >
               {/* Loading skeleton */}
@@ -117,7 +117,7 @@ const GalleryGrid = ({ items, categories }: GalleryGridProps) => {
 
       {/* Lightbox */}
       <GalleryLightbox
-        items={items}
+        items={filteredItems}
         selectedIndex={selectedIndex}
         onClose={() => setSelectedIndex(null)}
         onNavigate={setSelectedIndex}

@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronLeft, ChevronRight, Play, Pause } from 'lucide-react';
+import { X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface GalleryItem {
@@ -20,7 +20,6 @@ interface GalleryLightboxProps {
 }
 
 const GalleryLightbox = ({ items, selectedIndex, onClose, onNavigate }: GalleryLightboxProps) => {
-  const [isPlaying, setIsPlaying] = useState(false);
 
   const handleKeyDown = useCallback((e: KeyboardEvent) => {
     if (selectedIndex === null) return;
@@ -120,10 +119,8 @@ const GalleryLightbox = ({ items, selectedIndex, onClose, onNavigate }: GalleryL
                 src={currentItem.src}
                 poster={currentItem.thumbnail}
                 controls
-                autoPlay={isPlaying}
+                autoPlay
                 className="max-w-full max-h-[85vh] rounded-xl shadow-elevated"
-                onPlay={() => setIsPlaying(true)}
-                onPause={() => setIsPlaying(false)}
               >
                 Your browser does not support the video tag.
               </video>
