@@ -111,10 +111,10 @@ const Menu = () => {
             <p className="text-lg text-primary-foreground/80 max-w-2xl mx-auto mb-8">
               Explore our extensive menu featuring authentic Indian delicacies
             </p>
-            <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+            {/* <Button variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
               <Download className="mr-2 w-4 h-4" />
               Download PDF Menu
-            </Button>
+            </Button> */}
           </motion.div>
         </div>
       </section>

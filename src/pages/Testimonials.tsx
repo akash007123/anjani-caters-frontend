@@ -248,29 +248,35 @@ const Testimonials = () => {
       </section>
 
       {/* CTA */}
-      <section className="section-padding bg-primary text-primary-foreground">
-        <div className="container-custom text-center">
+      <section className="section-padding bg-primary text-primary-foreground ">
+        <div className="container-custom text-center shadow-xl border-gray-100 border-2 rounded-xl bg-[#a02c49]">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="heading-section mb-4">Ready to Create Your Story?</h2>
+            <h2 className="heading-section mb-4 mt-5">Ready to Create Your Story?</h2>
             <p className="text-primary-foreground/80 max-w-xl mx-auto mb-8">
               Join our family of happy clients and let us make your event unforgettable.
             </p>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-4 mb-5">
               <Button asChild size="lg" className="bg-accent text-accent-foreground hover:bg-gold-light">
                 <Link to="/booking">Book Now</Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-primary-foreground text-primary-foreground hover:bg-primary-foreground hover:text-primary">
+              <Button asChild size="lg" variant="outline" className="border-primary-foreground text-gold hover:bg-primary-foreground hover:text-primary">
                 <Link to="/contact">Contact Us</Link>
               </Button>
             </div>
           </motion.div>
         </div>
       </section>
+      <div className="relative">
+        <hr className="border-t-4 border-double border-primary" />
+        <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-background px-3 text-primary text-xl rounded-xl">
+          ✦✦✦✦✦ &nbsp;§&nbsp; ✦✦✦✦✦
+        </span>
+      </div>
     </>
   );
 };
