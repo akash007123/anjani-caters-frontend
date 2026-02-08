@@ -14,10 +14,21 @@ import {
   Calendar,
   Briefcase,
   Cross,
-  Mail
+  Mail,
+  Salad,
+  Images,
+  Rss,
+  MessageCircleHeart,
+  ChevronDown,
+  ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { useAuth } from "../../contexts/AuthContext";
 import { toast } from "sonner";
 
@@ -28,20 +39,71 @@ interface NavItem {
   roles?: string[];
 }
 
-const navigation: NavItem[] = [
-  { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
-  { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
-  { name: "Bookings", href: "/admin/bookings", icon: Calendar },
-  { name: "Custom Bookings", href: "/admin/custom-booking", icon: Cross },
-  { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
-  { name: "Users", href: "/admin/users", icon: Users, roles: ["admin", "sub-admin"] },
-  { name: "Employees", href: "/admin/employees", icon: Briefcase, roles: ["admin", "sub-admin"] },
-  { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
-  { name: "Settings", href: "/admin/settings", icon: Settings },
+interface NavSection {
+  title: string;
+  items: NavItem[];
+}
+
+const navigationSections: NavSection[] = [
+  {
+    title: "Overview",
+    items: [{ name: "Dashboard", href: "/admin", icon: LayoutDashboard }],
+  },
+  {
+    title: "Operations",
+    items: [
+      { name: "Contacts", href: "/admin/contacts", icon: MessageSquare },
+      { name: "Bookings", href: "/admin/bookings", icon: Calendar },
+      { name: "Custom Bookings", href: "/admin/custom-booking", icon: Cross },
+      { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },
+    ],
+  },
+  {
+    title: "Management",
+    items: [
+      {
+        name: "Users",
+        href: "/admin/users",
+        icon: Users,
+        roles: ["admin", "sub-admin"],
+      },
+      {
+        name: "Employees",
+        href: "/admin/employees",
+        icon: Briefcase,
+        roles: ["admin", "sub-admin"],
+      },
+    ],
+  },
+  {
+    title: "Content",
+    items: [
+      { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
+      { name: "Menu", href: "/admin/menu", icon: Salad },
+      { name: "Gallery", href: "/admin/gallery", icon: Images },
+      { name: "Blog", href: "/admin/blog", icon: Rss },
+      {
+        name: "Testimonials",
+        href: "/admin/testimonial",
+        icon: MessageCircleHeart,
+      },
+    ],
+  },
+  {
+    title: "System",
+    items: [{ name: "Settings", href: "/admin/settings", icon: Settings }],
+  },
 ];
 
 const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [openSections, setOpenSections] = useState<string[]>([
+    "Overview",
+    "Operations",
+    "Management",
+    "Content",
+    "System",
+  ]);
   const location = useLocation();
   const navigate = useNavigate();
   const { user, logout } = useAuth();
@@ -57,9 +119,26 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
   };
 
   // Filter navigation based on user role
-  const filteredNavigation = navigation.filter(
-    (item) => !item.roles || (user && item.roles.includes(user.role))
-  );
+  const getFilteredItems = (items: NavItem[]) =>
+    items.filter(
+      (item) => !item.roles || (user && item.roles.includes(user.role)),
+    );
+
+  // Check if any item in section is active
+  const isSectionActive = (items: NavItem[]) =>
+    items.some(
+      (item) =>
+        location.pathname === item.href ||
+        (item.href !== "/admin" && location.pathname.startsWith(item.href)),
+    );
+
+  const toggleSection = (title: string) => {
+    setOpenSections((prev) =>
+      prev.includes(title)
+        ? prev.filter((s) => s !== title)
+        : [...prev, title],
+    );
+  };
 
   // Get user initials for avatar
   const getInitials = (name: string) => {
@@ -105,7 +184,10 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b">
             <Link to="/admin" className="flex items-center gap-2">
-              <img src="../icon.png" alt="logo" className="w-10" /><span className="text-xl font-bold text-primary">Admin Panel</span>
+              <img src="../icon.png" alt="logo" className="w-10" />
+              <span className="text-xl font-bold text-primary">
+                Admin Panel
+              </span>
             </Link>
             <Button
               variant="ghost"
@@ -118,22 +200,51 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
           </div>
 
           {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-2 overflow-y-auto">
-            {filteredNavigation.map((item) => {
-              const isActive = location.pathname === item.href;
+          <nav className="flex-1 px-3 py-4 overflow-y-auto">
+            {navigationSections.map((section) => {
+              const filteredItems = getFilteredItems(section.items);
+              if (filteredItems.length === 0) return null;
+
+              const isOpen = openSections.includes(section.title);
+              const active = isSectionActive(filteredItems);
+
               return (
-                <Link
-                  key={item.name}
-                  to={item.href}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${
-                    isActive
-                      ? "bg-primary text-white"
-                      : "text-gray-600 hover:bg-gray-100"
-                  }`}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span className="font-medium">{item.name}</span>
-                </Link>
+                <Collapsible key={section.title} open={isOpen}>
+                  <CollapsibleTrigger
+                    onClick={() => toggleSection(section.title)}
+                    className={`flex items-center justify-between w-full px-4 py-2 text-sm font-semibold rounded-lg transition-colors ${
+                      active
+                        ? "bg-primary/10 text-primary"
+                        : "text-gray-600 hover:bg-gray-100"
+                    }`}
+                  >
+                    <span>{section.title}</span>
+                    {isOpen ? (
+                      <ChevronDown className="w-4 h-4" />
+                    ) : (
+                      <ChevronRight className="w-4 h-4" />
+                    )}
+                  </CollapsibleTrigger>
+                  <CollapsibleContent className="mt-1 space-y-1">
+                    {filteredItems.map((item) => {
+                      const isActive = location.pathname === item.href;
+                      return (
+                        <Link
+                          key={item.name}
+                          to={item.href}
+                          className={`flex items-center gap-3 px-4 py-2 ml-4 text-sm rounded-lg transition-colors ${
+                            isActive
+                              ? "bg-primary text-white"
+                              : "text-gray-600 hover:bg-gray-100"
+                          }`}
+                        >
+                          <item.icon className="w-4 h-4" />
+                          <span>{item.name}</span>
+                        </Link>
+                      );
+                    })}
+                  </CollapsibleContent>
+                </Collapsible>
               );
             })}
           </nav>
@@ -148,11 +259,18 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
                 </AvatarFallback>
               </Avatar>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium truncate">{user?.name || "Admin User"}</p>
-                <p className="text-xs text-gray-500 truncate">{user?.email || "admin@anjani.com"}</p>
+                <p className="text-sm font-medium truncate">
+                  {user?.name || "Admin User"}
+                </p>
+                <p className="text-xs text-gray-500 truncate">
+                  {user?.email || "admin@anjani.com"}
+                </p>
                 {user?.role && (
-                  <span className={`inline-block px-2 py-0.5 text-xs rounded-full mt-1 ${getRoleBadgeColor(user.role)}`}>
-                    {user.role.charAt(0).toUpperCase() + user.role.slice(1).replace("-", " ")}
+                  <span
+                    className={`inline-block px-2 py-0.5 text-xs rounded-full mt-1 ${getRoleBadgeColor(user.role)}`}
+                  >
+                    {user.role.charAt(0).toUpperCase() +
+                      user.role.slice(1).replace("-", " ")}
                   </span>
                 )}
               </div>
@@ -162,7 +280,7 @@ const AdminLayout = ({ children }: { children?: React.ReactNode }) => {
                 variant="outline"
                 className="flex-1"
                 size="sm"
-                onClick={() => window.location.href = "/"}
+                onClick={() => (window.location.href = "/")}
               >
                 <Home className="w-4 h-4 mr-1" />
                 Website

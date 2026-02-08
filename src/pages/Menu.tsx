@@ -15,65 +15,65 @@ const Menu = () => {
     {
       name: 'Starters',
       items: [
-        { name: 'Paneer Tikka', price: 280, type: 'veg', popular: true, description: 'Marinated cottage cheese grilled to perfection' },
-        { name: 'Hara Bhara Kebab', price: 220, type: 'veg', description: 'Spinach and peas patties with aromatic spices' },
-        { name: 'Chicken Seekh Kebab', price: 320, type: 'nonveg', popular: true, description: 'Minced chicken skewers from the tandoor' },
-        { name: 'Fish Amritsari', price: 350, type: 'nonveg', description: 'Crispy fried fish with traditional spices' },
-        { name: 'Dahi Kebab', price: 240, type: 'veg', jain: true, description: 'Creamy hung curd kebabs' },
-        { name: 'Mutton Galouti', price: 380, type: 'nonveg', popular: true, description: 'Melt-in-mouth Lucknowi kebabs' },
+        { name: 'Paneer Tikka', type: 'veg', popular: true, description: 'Marinated cottage cheese grilled to perfection' },
+        { name: 'Hara Bhara Kebab', type: 'veg', description: 'Spinach and peas patties with aromatic spices' },
+        { name: 'Chicken Seekh Kebab', type: 'nonveg', popular: true, description: 'Minced chicken skewers from the tandoor' },
+        { name: 'Fish Amritsari', type: 'nonveg', description: 'Crispy fried fish with traditional spices' },
+        { name: 'Dahi Kebab', type: 'veg', jain: true, description: 'Creamy hung curd kebabs' },
+        { name: 'Mutton Galouti', type: 'nonveg', popular: true, description: 'Melt-in-mouth Lucknowi kebabs' },
       ]
     },
     {
       name: 'Main Course',
       items: [
-        { name: 'Dal Makhani', price: 260, type: 'veg', popular: true, description: 'Creamy black lentils slow-cooked overnight' },
-        { name: 'Paneer Butter Masala', price: 280, type: 'veg', description: 'Cottage cheese in rich tomato gravy' },
-        { name: 'Butter Chicken', price: 340, type: 'nonveg', popular: true, description: 'Tender chicken in creamy tomato curry' },
-        { name: 'Mutton Rogan Josh', price: 420, type: 'nonveg', description: 'Kashmiri style aromatic mutton curry' },
-        { name: 'Malai Kofta', price: 290, type: 'veg', description: 'Fried paneer balls in cashew gravy' },
-        { name: 'Fish Curry', price: 360, type: 'nonveg', description: 'Coastal style fish in coconut curry' },
-        { name: 'Veg Kolhapuri', price: 250, type: 'veg', jain: true, description: 'Spicy mixed vegetables' },
-        { name: 'Chicken Biryani', price: 320, type: 'nonveg', popular: true, description: 'Aromatic rice with spiced chicken' },
+        { name: 'Dal Makhani', type: 'veg', popular: true, description: 'Creamy black lentils slow-cooked overnight' },
+        { name: 'Paneer Butter Masala', type: 'veg', description: 'Cottage cheese in rich tomato gravy' },
+        { name: 'Butter Chicken', type: 'nonveg', popular: true, description: 'Tender chicken in creamy tomato curry' },
+        { name: 'Mutton Rogan Josh', type: 'nonveg', description: 'Kashmiri style aromatic mutton curry' },
+        { name: 'Malai Kofta', type: 'veg', description: 'Fried paneer balls in cashew gravy' },
+        { name: 'Fish Curry', type: 'nonveg', description: 'Coastal style fish in coconut curry' },
+        { name: 'Veg Kolhapuri', type: 'veg', jain: true, description: 'Spicy mixed vegetables' },
+        { name: 'Chicken Biryani', type: 'nonveg', popular: true, description: 'Aromatic rice with spiced chicken' },
       ]
     },
     {
       name: 'Breads',
       items: [
-        { name: 'Butter Naan', price: 50, type: 'veg', description: 'Soft leavened bread from tandoor' },
-        { name: 'Garlic Naan', price: 60, type: 'veg', popular: true, description: 'Naan topped with garlic butter' },
-        { name: 'Laccha Paratha', price: 55, type: 'veg', description: 'Layered whole wheat bread' },
-        { name: 'Missi Roti', price: 45, type: 'veg', jain: true, description: 'Spiced gram flour bread' },
-        { name: 'Tandoori Roti', price: 35, type: 'veg', description: 'Simple tandoor-baked bread' },
+        { name: 'Butter Naan', type: 'veg', description: 'Soft leavened bread from tandoor' },
+        { name: 'Garlic Naan', type: 'veg', popular: true, description: 'Naan topped with garlic butter' },
+        { name: 'Laccha Paratha', type: 'veg', description: 'Layered whole wheat bread' },
+        { name: 'Missi Roti', type: 'veg', jain: true, description: 'Spiced gram flour bread' },
+        { name: 'Tandoori Roti', type: 'veg', description: 'Simple tandoor-baked bread' },
       ]
     },
     {
       name: 'Rice',
       items: [
-        { name: 'Veg Biryani', price: 220, type: 'veg', popular: true, description: 'Aromatic rice with mixed vegetables' },
-        { name: 'Jeera Rice', price: 150, type: 'veg', jain: true, description: 'Cumin tempered basmati rice' },
-        { name: 'Mutton Biryani', price: 380, type: 'nonveg', popular: true, description: 'Layered rice with tender mutton' },
-        { name: 'Pulao', price: 180, type: 'veg', description: 'Lightly spiced rice with vegetables' },
+        { name: 'Veg Biryani', type: 'veg', popular: true, description: 'Aromatic rice with mixed vegetables' },
+        { name: 'Jeera Rice', type: 'veg', jain: true, description: 'Cumin tempered basmati rice' },
+        { name: 'Mutton Biryani', type: 'nonveg', popular: true, description: 'Layered rice with tender mutton' },
+        { name: 'Pulao', type: 'veg', description: 'Lightly spiced rice with vegetables' },
       ]
     },
     {
       name: 'Desserts',
       items: [
-        { name: 'Gulab Jamun', price: 80, type: 'veg', popular: true, description: 'Deep-fried milk dumplings in sugar syrup' },
-        { name: 'Rasmalai', price: 100, type: 'veg', description: 'Soft cheese patties in saffron milk' },
-        { name: 'Kheer', price: 90, type: 'veg', jain: true, description: 'Creamy rice pudding' },
-        { name: 'Gajar Halwa', price: 110, type: 'veg', popular: true, description: 'Warm carrot pudding with nuts' },
-        { name: 'Jalebi', price: 70, type: 'veg', description: 'Crispy sweet spirals' },
-        { name: 'Kulfi', price: 85, type: 'veg', description: 'Traditional Indian ice cream' },
+        { name: 'Gulab Jamun', type: 'veg', popular: true, description: 'Deep-fried milk dumplings in sugar syrup' },
+        { name: 'Rasmalai', type: 'veg', description: 'Soft cheese patties in saffron milk' },
+        { name: 'Kheer', type: 'veg', jain: true, description: 'Creamy rice pudding' },
+        { name: 'Gajar Halwa', type: 'veg', popular: true, description: 'Warm carrot pudding with nuts' },
+        { name: 'Jalebi', type: 'veg', description: 'Crispy sweet spirals' },
+        { name: 'Kulfi', type: 'veg', description: 'Traditional Indian ice cream' },
       ]
     },
     {
       name: 'Beverages',
       items: [
-        { name: 'Masala Chai', price: 40, type: 'veg', description: 'Spiced Indian tea' },
-        { name: 'Lassi', price: 70, type: 'veg', popular: true, description: 'Sweet or salted yogurt drink' },
-        { name: 'Mango Lassi', price: 90, type: 'veg', description: 'Mango flavored yogurt smoothie' },
-        { name: 'Jaljeera', price: 50, type: 'veg', jain: true, description: 'Cumin based refreshing drink' },
-        { name: 'Thandai', price: 100, type: 'veg', description: 'Festive spiced milk drink' },
+        { name: 'Masala Chai', type: 'veg', description: 'Spiced Indian tea' },
+        { name: 'Lassi', type: 'veg', popular: true, description: 'Sweet or salted yogurt drink' },
+        { name: 'Mango Lassi', type: 'veg', description: 'Mango flavored yogurt smoothie' },
+        { name: 'Jaljeera', type: 'veg', jain: true, description: 'Cumin based refreshing drink' },
+        { name: 'Thandai', type: 'veg', description: 'Festive spiced milk drink' },
       ]
     }
   ];
@@ -197,9 +197,6 @@ const Menu = () => {
                         </div>
                         <p className="text-sm text-muted-foreground">{item.description}</p>
                       </div>
-                      <span className="font-serif text-lg font-semibold text-primary whitespace-nowrap">
-                        ₹{item.price}
-                      </span>
                     </motion.div>
                   ))}
                 </div>
