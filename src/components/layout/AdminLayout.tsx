@@ -81,7 +81,7 @@ const navigationSections: NavSection[] = [
       { name: "Subscribers", href: "/admin/subscribers", icon: Mail },
       { name: "Menu", href: "/admin/menu", icon: Salad },
       { name: "Gallery", href: "/admin/gallery", icon: Images },
-      { name: "Blog", href: "/admin/blog", icon: Rss },
+      { name: "Blog", href: "/admin/blogs", icon: Rss },
       {
         name: "Testimonials",
         href: "/admin/testimonial",
