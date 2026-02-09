@@ -150,27 +150,36 @@ const AdminBlogs = () => {
   };
 
   // Helper to get full URL for file paths
-  const getFullUrl = (path: string) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-    
-    // Remove /api prefix if present
-    let cleanPath = path.startsWith('/api/') ? path.replace('/api', '') : path;
-    
-    // Remove protocol and host if present (e.g., "http://localhost:5000/uploads/...")
-    const urlMatch = cleanPath.match(/^https?:\/\/[^/]+(.*)$/);
-    if (urlMatch) {
-      cleanPath = urlMatch[1];
-    }
-    
-    // Ensure path starts with /
-    if (!cleanPath.startsWith('/')) {
-      cleanPath = '/' + cleanPath;
-    }
-    
-    const baseUrl = API_URL.replace(/\/api\/?$/, '');
-    return `${baseUrl}${cleanPath}`;
-  };
+  const getFullUrl = (path?: string) => {
+  if (!path) return '';
+
+  if (path.startsWith('blob:') || path.startsWith('data:')) {
+    return path;
+  }
+
+  const baseUrl = API_URL.replace(/\/api\/?$/, '');
+
+  // Handle already-broken values safely
+  if (path.includes('/api/http')) {
+    path = path.replace(/^.*http/, 'http');
+  }
+
+  if (path.startsWith('http')) {
+    const url = new URL(path);
+    path = url.pathname;
+  }
+
+  if (!path.startsWith('/')) {
+    path = '/' + path;
+  }
+
+  if (!path.startsWith('/api/')) {
+    path = '/api' + path;
+  }
+
+  return `${baseUrl}${path}`;
+};
+
 
   useEffect(() => {
     fetchBlogs();

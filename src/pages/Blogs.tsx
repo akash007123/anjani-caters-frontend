@@ -30,14 +30,41 @@ const Blogs = () => {
   const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
   // Helper to get full URL for file paths
-  const getFullUrl = (path: string) => {
-    if (!path) return '';
-    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) return path;
-    const baseUrl = API_URL.replace(/\/api\/?$/, '');
-    if (path.startsWith('/api/uploads')) return `${baseUrl}${path}`;
-    if (path.startsWith('/uploads')) return `${API_URL}${path}`;
+  const getFullUrl = (path?: string) => {
+  if (!path) return '';
+
+  // Allow previews / base64
+  if (path.startsWith('blob:') || path.startsWith('data:')) {
     return path;
-  };
+  }
+
+  const baseUrl = API_URL.replace(/\/api\/?$/, '');
+
+  // Fix already-broken values like /api/http://...
+  if (path.includes('/api/http')) {
+    path = path.replace(/^.*http/, 'http');
+  }
+
+  // If full URL → extract pathname only
+  if (path.startsWith('http://') || path.startsWith('https://')) {
+    try {
+      path = new URL(path).pathname; // "/uploads/blogs/xxx.jpg"
+    } catch {
+      return '';
+    }
+  }
+
+  if (!path.startsWith('/')) {
+    path = '/' + path;
+  }
+
+  if (!path.startsWith('/api/')) {
+    path = '/api' + path;
+  }
+
+  return `${baseUrl}${path}`;
+};
+
 
   useEffect(() => {
     fetchBlogs();
